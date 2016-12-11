@@ -28,7 +28,7 @@ lfltWhich <- function(d){
 
 
 #' @export
-vizList <- function(){
+lfltvizList <- function(){
   db <- Rd_db("lfltmagic")
   meta <- unname(map_chr(db, tools:::.Rd_get_name))
   keep(meta, ~ grepl("^lflt_*$",.))

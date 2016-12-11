@@ -5,7 +5,8 @@
 \title{lflt_bubbles_GeNuNu
 Multilines}
 \usage{
-lflt_bubbles_GeNuNu(data, geoinfoPath = NULL, geoCodeVar = NULL)
+lflt_bubbles_GeNuNu(data, geoinfoPath = NULL, geoCodeVar = NULL,
+  geoNameVar = NULL, bounds = NULL)
 }
 \arguments{
 \item{x}{A data.frame}

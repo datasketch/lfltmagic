@@ -11,12 +11,30 @@ library(lfltmagic)
 data <- read_csv("inst/aux/world-geo.csv")
 data$country <- data$code3
 data$value <- runif(6)
-data <- data[c("country","value")]
+data <- data[c("code","value")]
+lflt_bubbles_GeNu(data,
+                  geoinfoPath = "inst/aux/world-geo.csv",
+                  geoCodeVar = "code",
+                  geoNameVar = "name" )
 
-lflt_bubbles_GeNu(data)
 
 data$val2 <- runif(6)
-lflt_bubbles_GeNuNu(data)
+lflt_bubbles_GeNuNu(data,
+                    geoinfoPath = "inst/aux/world-geo.csv",
+                    geoCodeVar = "code",
+                    geoNameVar = "name" )
+
+
+data <- read_csv("inst/data/col-cities-GeNu.csv")
+bounds <- c(-76,0,-71,10)
+lflt_bubbles_GeNu(data,
+                  geoinfoPath = "inst/aux/col-cities-geo.csv",
+                  geoCodeVar = "municipio",
+                  bounds = bounds)
+
+
+
+
 
 # Segments
 

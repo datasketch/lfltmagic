@@ -1,4 +1,4 @@
-code3,name,phone_code,code,Lat,Lon
+code,name,phone_code,isocode2,lat,lon
 ARG,Argentina,54,AR,-34.603333,-58.381667
 DEU,Germany,49,DE,51,9
 ISR,Israel,972,IL,31,35
