@@ -24,7 +24,7 @@ lflt_bubbles_GeNu <- function(data,
     geoNameVar <- geoCodeVar
   geo$name <- geo[[geoNameVar]]
   varLabel <- nms[2]
-  dgeo <- f$d %>% na.omit() %>% group_by(a) %>% summarise(b = mean(b))
+  dgeo <- f$d %>% na.omit() %>% group_by(a) %>% dplyr::summarise(b = mean(b))
   d <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   d$info <- pystr_format("<strong>{name}</strong><br>{selectedVarName}: {b}",d) %>% pystr_format(list(selectedVarName = varLabel))
   dd <- d %>% filter(!is.na(b))
@@ -69,7 +69,7 @@ lflt_bubbles_GeNuNu <- function(data,
   varLabel <- nms[2:3]
 
   dgeo <- f$d %>% na.omit() %>% group_by(a) %>%
-    summarise(b = mean(b), c = mean(c))
+    dplyr::summarise(b = mean(b), c = mean(c))
   d <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   d$info <- pystr_format(
     "<strong>{name}</strong><br>{selectedVarName1}: {b}<br>{selectedVarName2}: {c}",d) %>%

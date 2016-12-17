@@ -33,9 +33,6 @@ lflt_bubbles_GeNu(data,
                   bounds = bounds)
 
 
-
-
-
 # Segments
 
 #' @export
