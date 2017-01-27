@@ -53,7 +53,8 @@ lflt_bubbles_GeNuNu <- function(data,
                                 geoinfoPath = NULL,
                                 geoCodeVar = NULL,
                                 geoNameVar = NULL,
-                                bounds =  NULL){
+                                bounds =  NULL,
+                                pos_leg = 'bottomright'){
 
   f <- fringe(data)
   nms <- getClabels(f)
@@ -75,6 +76,16 @@ lflt_bubbles_GeNuNu <- function(data,
     "<strong>{name}</strong><br>{selectedVarName1}: {b}<br>{selectedVarName2}: {c}",d) %>%
     pystr_format(list(selectedVarName1 = varLabel[1],selectedVarName2 = varLabel[2]))
   dd <- d %>% filter(!is.na(b))
+
+  addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.5){
+
+    #coloradd <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px")
+    coloradd <- paste0(colors,"; border-radius: 50%","; width:", sizes, "px; height:", sizes, "px", ";margin-top: 6px")
+    labeladd <- paste0("<div style='display: inline-block;height: ", sizes, "px;margin-right: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
+
+    return(addLegend(map, colors = coloradd, labels = labeladd, opacity = opacity, position = pos_leg))
+  }
+
   l <- leaflet(dd) %>%
     #addTiles() %>%
     addProviderTiles("CartoDB.Positron")
@@ -89,7 +100,9 @@ lflt_bubbles_GeNuNu <- function(data,
                      radius = ~scales::rescale(sqrt(c), to = c(3,20)),
                      popup = ~info,
                      color = "red",
-                     stroke = FALSE)
+                     stroke = FALSE) %>%
+    addLegendCustom(colors = c("navy", "red"), labels = nms[-1],
+                    sizes = rep(10, length(nms) -1))
 }
 
 

@@ -6,7 +6,7 @@
 Multilines}
 \usage{
 lflt_bubbles_GeNuNu(data, geoinfoPath = NULL, geoCodeVar = NULL,
-  geoNameVar = NULL, bounds = NULL)
+  geoNameVar = NULL, bounds = NULL, pos_leg = "bottomright")
 }
 \arguments{
 \item{x}{A data.frame}

@@ -22,7 +22,7 @@ data$val2 <- runif(6)
 lflt_bubbles_GeNuNu(data,
                     geoinfoPath = "inst/aux/world-geo.csv",
                     geoCodeVar = "code",
-                    geoNameVar = "name" )
+                    geoNameVar = "name", pos_leg = "topleft" )
 
 
 data <- read_csv("inst/data/col-cities-GeNu.csv")
