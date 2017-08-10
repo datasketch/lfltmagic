@@ -21,7 +21,7 @@ Multilines
 \section{ftypes}{
  Ye-Nu*
 }
+
 \examples{
 lflt_bubbles_GeNu(sampleData("Ge-Nu",nrow = 10))
 }
-
