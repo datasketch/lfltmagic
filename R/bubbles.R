@@ -1,24 +1,6 @@
-lftLabels <- function()
-
-#' Ordered horizontal bar
+#' Leaflet bubbles size by geographical code
 #'
-#' Ordered horizontal bar
-#'
-#'
-#' @param x A data.frame
-#' @return highcharts viz
-#' @section ctypes:
-#' Cat
-#' @examples
-#' hgch_bar_hor_top_Cat(sampleData("Cat", nrow = 10))
-#' @export hgch_bar_hor_top_Cat
-
-
-
-
-#' Leaflet bubbles size by geocode
-#'
-#' Leaflet bubbles size by geocode
+#' Leaflet bubbles size by geographical code
 #'
 #' @name lflt_bubbles_size_Gcd
 #' @param x A data.frame
@@ -26,52 +8,60 @@ lftLabels <- function()
 #' @section ctypes: Gcd
 #' @export
 #' @examples
-#' lflt_bubbles_Gcd(sampleData("Gcd", nrow = 10))
-lflt_bubbles_Gcd <- function(data,
-                             color = "navy",
-                             #infoVar = NULL,
-                             label = NULL,
-                             popup = "",
-                             minSize = 3,
-                             maxSize = 20,
-                             tiles = "CartoDB.Positron") {
+#' lflt_bubbles_size_Gcd(sampleData("Gcd", nrow = 10))
+lflt_bubbles_size_Gcd <- function(data,
+                                  color = "navy",
+                                  #infoVar = NULL,
+                                  scope = "world_countries",
+                                  label = NULL,
+                                  fillOpacity = 0.5,
+                                  popup = "",
+                                  minSize = 3,
+                                  maxSize = 20,
+                                  tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
 
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
-  gsin <- geodata::geodataCsv("")
-  gofi <- geodata::geodataCsv("TODO")
-
-
-  #geo <- geodataCsv(scope) %>% rename(a = id)
-  dgeo <- f$d %>%
+  dd <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a) %>%
     dplyr::summarise(b = n())
 
-  dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
+  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
+  if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+    cent <- geodata::geodataMeta(scope)$codes
+    dgeo <- dd %>%
+      left_join(cent, by = c(a = "id"))
+  } else {
+    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
+  }
+
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
-  dd$info <- str_tpl_format(tpl,dd)
+  dgeo$info <- str_tpl_format(tpl, dgeo)
+
   # los labels y popups
   if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dgeo[r, ], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- label
   }
 
-  l <- leaflet(dd) %>%
+  l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     #popup = lab,
                      label = lab,
+                     fillOpacity = fillOpacity,
                      color = color,
                      stroke = FALSE)
+  l
 }
 
+# FALTA PENSAR COMO
 
 #' Leaflet bubbles grouped by categorical variable
 #'
@@ -99,11 +89,9 @@ lflt_bubbles_grouped_GcdCat <- function(data,
   gofi <- geodata::geodataCsv("TODO")
   #geo <- geodataCsv(scope) %>% rename(a = id)
   dgeo <- f$d %>%
-    na.omit() %>%
-    dplyr::group_by(b)
+    na.omit()
 
-  col <- colorRampPalette(palette)
-
+  col <- colorFactor(palette = palette, domain = NULL)
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
@@ -118,17 +106,18 @@ lflt_bubbles_grouped_GcdCat <- function(data,
     lab <- label
   }
 
-
   l <- leaflet(dd) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = size,
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = ~col("columna categórica"),
                      stroke = FALSE)
 }
 
+
+# FALTA PENSAR COMO
 #' Leaflet bubbles size by categorical variable
 #'
 #' Leaflet bubbles size by categorical variable
@@ -141,7 +130,7 @@ lflt_bubbles_grouped_GcdCat <- function(data,
 #' @examples
 #' lflt_bubbles_size_GcdCat(sampleData("Gcd-Cat", nrow = 10))
 lflt_bubbles_size_GcdCat <- function(data,
-                                     palette = c("#009EE3", "#9B71AF"),
+                                     color = "navy",
                                      #infoVar = NULL,
                                      label = NULL,
                                      popup = "",
@@ -160,8 +149,6 @@ lflt_bubbles_size_GcdCat <- function(data,
     dplyr::group_by(a, b) %>%
     dplyr::summarise(c = n())
 
-  col <- colorRampPalette(palette)
-
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
@@ -175,14 +162,13 @@ lflt_bubbles_size_GcdCat <- function(data,
     lab <- label
   }
 
-
   l <- leaflet(dd) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = color,
                      stroke = FALSE)
 }
 
@@ -216,10 +202,11 @@ lflt_bubbles_size_GcdNum <- function(data,
   gofi <- geodata::geodataCsv("TODO")
   #geo <- geodataCsv(scope) %>% rename(a = id)
   dgeo <- f$d %>%
-    dplyr::na.omit() %>%
+    na.omit() %>%
     dplyr::group_by(a) %>%
-    dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE))) %>%
-    dplyr::filter(b >= 0)
+    dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE)))
+    # depende de lo que se decida con las advertencias
+    #dplyr::filter(b >= 0)
 
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
@@ -276,10 +263,11 @@ lflt_bubbles_GcdCatNum <- function(data,
   dgeo <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE))) %>%
-    dplyr::filter(c >= 0)
+    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE)))
+    # falta decidir con las advertencias
+    # dplyr::filter(c >= 0)
 
-  col <- colorRampPalette(palette)
+  col <- colorFactor(palette = palette, domain = NULL)
 
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
@@ -302,7 +290,7 @@ lflt_bubbles_GcdCatNum <- function(data,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = ~col("columna categórica"),
                      stroke = FALSE)
 }
 
@@ -390,11 +378,9 @@ lflt_bubbles_grouped_GnmCat <- function(data,
   gofi <- geodata::geodataCsv("TODO")
   #geo <- geodataCsv(scope) %>% rename(a = id)
   dgeo <- f$d %>%
-    na.omit() %>%
-    dplyr::group_by(b)
+    na.omit()
 
-  col <- colorRampPalette(palette)
-
+  col <- colorFactor(palette = palette, domain = NULL)
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
@@ -416,7 +402,7 @@ lflt_bubbles_grouped_GnmCat <- function(data,
                      radius = size,
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = ~col("columna categórica"),
                      stroke = FALSE)
 }
 
@@ -432,7 +418,7 @@ lflt_bubbles_grouped_GnmCat <- function(data,
 #' @examples
 #' lflt_bubbles_size_GnmCat(sampleData("Gnm-Cat", nrow = 10))
 lflt_bubbles_size_GnmCat <- function(data,
-                                     palette = c("#009EE3", "#9B71AF"),
+                                     color = "navy",
                                      #infoVar = NULL,
                                      label = NULL,
                                      popup = "",
@@ -451,8 +437,6 @@ lflt_bubbles_size_GnmCat <- function(data,
     dplyr::group_by(a, b) %>%
     dplyr::summarise(c = n())
 
-  col <- colorRampPalette(palette)
-
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
@@ -470,10 +454,10 @@ lflt_bubbles_size_GnmCat <- function(data,
   l <- leaflet(dd) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
-                     radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
+                     radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = color,
                      stroke = FALSE)
 }
 
@@ -509,8 +493,9 @@ lflt_bubbles_size_GnmNum <- function(data,
   dgeo <- f$d %>%
     dplyr::na.omit() %>%
     dplyr::group_by(a) %>%
-    dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE))) %>%
-    dplyr::filter(b >= 0)
+    dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE)))
+    # falta decidir las advertencias
+    #dplyr::filter(b >= 0)
 
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
@@ -567,11 +552,11 @@ lflt_bubbles_GnmCatNum <- function(data,
   dgeo <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE))) %>%
-    dplyr::filter(c >= 0)
+    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE)))
+    # falta decidir las advertencias
+    #dplyr::filter(c >= 0)
 
-  col <- colorRampPalette(palette)
-
+  col <- colorFactor(palette = palette, domain = NULL)
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
@@ -593,7 +578,7 @@ lflt_bubbles_GnmCatNum <- function(data,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = ~col("columna categórica"),
                      stroke = FALSE)
 }
 
@@ -618,13 +603,16 @@ lflt_bubbles_GlnGlt <- function(data,
                                 #infoVar = NULL,
                                 label = NULL,
                                 popup = "",
-                                size = 5,
+                                minSize = 3,
+                                maxSize = 20,
                                 tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
 
   dgeo <- f$d %>%
-    na.omit()
+    na.omit() %>%
+    dplyr::group_by(a, b) %>%
+    dplyr::summarise(c = n())
 
   # los labels y popups
   if (is.null(label)) {
@@ -638,7 +626,7 @@ lflt_bubbles_GlnGlt <- function(data,
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
-                     radius = size,
+                     radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
                      color = color,
@@ -646,9 +634,9 @@ lflt_bubbles_GlnGlt <- function(data,
 }
 
 
-#' Leaflet bubbles grouped by categorical variable
+#' Leaflet bubbles colored by categorical variable
 #'
-#' Leaflet bubbles grouped by categorical variable
+#' Leaflet bubbles colored by categorical variable
 #'
 #' @name lflt_bubbles_grouped_GlnGltCat
 #' @param x A data.frame
@@ -670,7 +658,7 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
   dgeo <- f$d %>%
     na.omit()
 
-  col <- colorRampPalette(palette)
+  col <- colorFactor(palette = palette, domain = NULL)
 
   # los labels y popups
   if (is.null(label)) {
@@ -680,13 +668,14 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
   } else {
     lab <- label
   }
+
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
                      radius = size,
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = ~col(c),
                      stroke = FALSE)
 }
 
@@ -694,21 +683,78 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
 #'
 #' Leaflet bubbles size by categorical variable
 #'
-#' @name lflt_bubbles_size_GcdCat
+#' @name lflt_bubbles_size_GlnGltCat
 #' @param x A data.frame
 #' @return leaflet viz
-#' @section ctypes: Gcd-Cat
+#' @section ctypes: Gln-Glt-Cat
 #' @export
 #' @examples
-#' lflt_bubbles_size_GcdCat(sampleData("Gcd-Cat", nrow = 10))
-lflt_bubbles_size_GcdCat <- function(data,
-                                     palette = c("#009EE3", "#9B71AF"),
-                                     #infoVar = NULL,
-                                     label = NULL,
-                                     popup = "",
-                                     minSize = 3,
-                                     maxSize = 20,
-                                     tiles = "CartoDB.Positron") {
+#' lflt_bubbles_size_GlnGltCat(sampleData("Gln-Glt-Cat", nrow = 10))
+lflt_bubbles_size_GlnGltCat <- function(data,
+                                        color = "navy",
+                                        #infoVar = NULL,
+                                        label = NULL,
+                                        popup = "",
+                                        minSize = 3,
+                                        maxSize = 20,
+                                        tiles = "CartoDB.Positron") {
+  f <- fringe(data)
+  nms <- getClabels(f)
+
+  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
+  gsin <- geodata::geodataCsv("")
+  gofi <- geodata::geodataCsv("TODO")
+  #geo <- geodataCsv(scope) %>% rename(a = id)
+  dgeo <- f$d %>%
+    na.omit() %>%
+    dplyr::group_by(a, b, c) %>%
+    dplyr::summarise(d = n())
+
+  dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
+  tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
+                        list(GcdName = nms[1], NumName = nms[2]))
+  dd$info <- str_tpl_format(tpl,dd)
+  # los labels y popups
+  if (is.null(label)) {
+    lab <- map(as.list(1:nrow(dgeo)), function(r) {
+      shiny::HTML(paste0("<b>", names(dgeo), ": </b>", dgeo[r, ], "<br/>", collapse = ""))
+    })
+  } else {
+    lab <- label
+  }
+
+  l <- leaflet(dd) %>%
+    addProviderTiles("CartoDB.Positron") %>%
+    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+                     radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
+                     #popup = ~info,
+                     label = lab,
+                     color = color,
+                     stroke = FALSE)
+}
+
+
+#' Leaflet bubbles size by numeric variable
+#'
+#' Leaflet bubbles size by numeric variable
+#'
+#' @name lflt_bubbles_size_GlnGltNum
+#' @param x A data.frame
+#' @return leaflet viz
+#' @section ctypes: Gln-Glt-Num
+#' @export
+#' @examples
+#' lflt_bubbles_size_GlnGltNum(sampleData("Gln-Glt-Num", nrow = 10))
+lflt_bubbles_size_GlnGltNum <- function(data,
+                                        color = "navy",
+                                        #infoVar = NULL,
+                                        label = NULL,
+                                        popup = "",
+                                        minSize = 3,
+                                        maxSize = 20,
+                                        scope = "world",
+                                        agg = "sum",
+                                        tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
 
@@ -719,68 +765,9 @@ lflt_bubbles_size_GcdCat <- function(data,
   dgeo <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = n())
-
-  col <- colorRampPalette(palette)
-
-  dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
-  tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
-                        list(GcdName = nms[1], NumName = nms[2]))
-  dd$info <- str_tpl_format(tpl,dd)
-  # los labels y popups
-  if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", names(dgeo), ": </b>", dgeo[r, ], "<br/>", collapse = ""))
-    })
-  } else {
-    lab <- label
-  }
-
-
-  l <- leaflet(dd) %>%
-    addProviderTiles("CartoDB.Positron") %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
-                     radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
-                     label = lab,
-                     color = col(nrow(dd)),
-                     stroke = FALSE)
-}
-
-
-#' Leaflet bubbles size by numeric variable
-#'
-#' Leaflet bubbles size by numeric variable
-#'
-#' @name lflt_bubbles_size_GcdNum
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gcd-Num
-#' @export
-#' @examples
-#' lflt_bubbles_size_GcdNum(sampleData("Gcd-Num", nrow = 10))
-lflt_bubbles_size_GcdNum <- function(data,
-                                     color = "navy",
-                                     #infoVar = NULL,
-                                     label = NULL,
-                                     popup = "",
-                                     minSize = 3,
-                                     maxSize = 20,
-                                     scope = "world",
-                                     agg = "sum",
-                                     tiles = "CartoDB.Positron") {
-  f <- fringe(data)
-  nms <- getClabels(f)
-
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
-  gsin <- geodata::geodataCsv("")
-  gofi <- geodata::geodataCsv("TODO")
-  #geo <- geodataCsv(scope) %>% rename(a = id)
-  dgeo <- f$d %>%
-    dplyr::na.omit() %>%
-    dplyr::group_by(a) %>%
-    dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE))) %>%
-    dplyr::filter(b >= 0)
+    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE)))
+    # decidir advertencias
+    #dplyr::filter(b >= 0)
 
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
@@ -799,7 +786,7 @@ lflt_bubbles_size_GcdNum <- function(data,
   l <- leaflet(dd) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
-                     radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
+                     radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
                      color = color,
@@ -811,22 +798,22 @@ lflt_bubbles_size_GcdNum <- function(data,
 #'
 #' Leaflet bubbles grouped by categorical variable size by numerical
 #'
-#' @name lflt_bubbles_GcdCatNum
+#' @name lflt_bubbles_GlnGltCatNum
 #' @param x A data.frame
 #' @return leaflet viz
-#' @section ctypes: Gcd-Cat-Num
+#' @section ctypes: Gln-Glt-Cat-Num
 #' @export
 #' @examples
-#' lflt_bubbles_GcdCatNum(sampleData("Gcd-Cat-Num", nrow = 10))
-lflt_bubbles_GcdCatNum <- function(data,
-                                   palette = c("#009EE3", "#9B71AF"),
-                                   #infoVar = NULL,
-                                   label = NULL,
-                                   popup = "",
-                                   minSize = 3,
-                                   maxSize = 20,
-                                   agg = "sum",
-                                   tiles = "CartoDB.Positron") {
+#' lflt_bubbles_GlnGltCatNum(sampleData("Gln-Glt-Cat-Num", nrow = 10))
+lflt_bubbles_GlnGltCatNum <- function(data,
+                                      palette = c("#009EE3", "#9B71AF"),
+                                      #infoVar = NULL,
+                                      label = NULL,
+                                      popup = "",
+                                      minSize = 3,
+                                      maxSize = 20,
+                                      agg = "sum",
+                                      tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
 
@@ -836,11 +823,12 @@ lflt_bubbles_GcdCatNum <- function(data,
   #geo <- geodataCsv(scope) %>% rename(a = id)
   dgeo <- f$d %>%
     na.omit() %>%
-    dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE))) %>%
-    dplyr::filter(c >= 0)
+    dplyr::group_by(a, b, c) %>%
+    dplyr::summarise(d = do.call(agg, list(d, na.rm = TRUE)))
+    # decidir advertencias
+    #dplyr::filter(d >= 0)
 
-  col <- colorRampPalette(palette)
+  col <- colorFactor(palette = palette, domain = NULL)
 
 
   dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
@@ -856,14 +844,13 @@ lflt_bubbles_GcdCatNum <- function(data,
     lab <- label
   }
 
-
   l <- leaflet(dd) %>%
     addProviderTiles("CartoDB.Positron") %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
-                     color = col(nrow(dd)),
+                     color = ~col("columna categórica"),
                      stroke = FALSE)
 }
 
@@ -906,4 +893,18 @@ lflt_bubbles_size_GltLn <- function(data,
 }
 
 
+
+
+############################
+
+
+if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+  if ("altnames" %in% names(geodata::geodataMeta(scope))) {
+    alt <- geodata::geodataMeta(scope)$altnames
+    cent <- geodata::geodataMeta(scope)$codes
+    gu
+  }
+} else {
+  stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
+}
 
