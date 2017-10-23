@@ -151,29 +151,34 @@ lflt_bubbles_size_GcdCat <- function(data,
   f <- fringe(data)
   nms <- getClabels(f)
 
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
-  gsin <- geodata::geodataCsv("")
-  gofi <- geodata::geodataCsv("TODO")
-  #geo <- geodataCsv(scope) %>% rename(a = id)
-  dgeo <- f$d %>%
+  dd <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a, b) %>%
     dplyr::summarise(c = n())
 
-  dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
+  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
+  if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+    cent <- geodata::geodataMeta(scope)$codes
+    dgeo <- dd %>%
+      left_join(cent, by = c(a = "id"))
+  } else {
+    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
+  }
+
+  #dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
-  dd$info <- str_tpl_format(tpl,dd)
+  #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
   if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", names(dgeo), ": </b>", dgeo[r, ], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- label
   }
 
-  l <- leaflet(dd) %>%
+  l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
@@ -210,38 +215,44 @@ lflt_bubbles_size_GcdNum <- function(data,
   f <- fringe(data)
   nms <- getClabels(f)
 
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
-  gsin <- geodata::geodataCsv("")
-  gofi <- geodata::geodataCsv("TODO")
-  #geo <- geodataCsv(scope) %>% rename(a = id)
-  dgeo <- f$d %>%
+  dd <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a) %>%
     dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE)))
     # depende de lo que se decida con las advertencias
     #dplyr::filter(b >= 0)
 
+  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
+  if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+    cent <- geodata::geodataMeta(scope)$codes
+    dgeo <- dd %>%
+      left_join(cent, by = c(a = "id"))
+  } else {
+    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
+  }
 
-  dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
+
+  #dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
-  dd$info <- str_tpl_format(tpl,dd)
+  #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
   if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", names(dgeo), ": </b>", dgeo[r, ], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- label
   }
 
-  l <- leaflet(dd) %>%
+  l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
                      color = color,
+                     fillOpacity = fillOpacity,
                      stroke = FALSE)
 }
 
@@ -271,41 +282,46 @@ lflt_bubbles_GcdCatNum <- function(data,
   f <- fringe(data)
   nms <- getClabels(f)
 
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
-  gsin <- geodata::geodataCsv("")
-  gofi <- geodata::geodataCsv("TODO")
-  #geo <- geodataCsv(scope) %>% rename(a = id)
-  dgeo <- f$d %>%
+  dD <- f$d %>%
     na.omit() %>%
     dplyr::group_by(a, b) %>%
     dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE)))
     # falta decidir con las advertencias
     # dplyr::filter(c >= 0)
 
+  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
+  if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+    cent <- geodata::geodataMeta(scope)$codes
+    dgeo <- dd %>%
+      left_join(cent, by = c(a = "id"))
+  } else {
+    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
+  }
+
   col <- colorFactor(palette = palette, domain = NULL)
 
-
-  dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
+  #dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
-  dd$info <- str_tpl_format(tpl,dd)
+  #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
   if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", names(dgeo), ": </b>", dgeo[r, ], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:lenght(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- label
   }
 
 
-  l <- leaflet(dd) %>%
+  l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      #popup = ~info,
                      label = lab,
-                     color = ~col("columna categórica"),
+                     color = ~col(b),
+                     fillOpacity = fillOpacity,
                      stroke = FALSE)
 }
 
