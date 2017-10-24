@@ -14,7 +14,7 @@ lflt_bubbles_size_Gcd <- function(data,
                                   fillOpacity = 0.5,
                                   #infoVar = NULL,
                                   label = NULL,
-                                  popup = "",
+                                  popup = NULL,
                                   minSize = 3,
                                   maxSize = 20,
                                   scope = "world_countries",
@@ -27,7 +27,6 @@ lflt_bubbles_size_Gcd <- function(data,
     dplyr::group_by(a) %>%
     dplyr::summarise(b = n())
 
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
   if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
     cent <- geodata::geodataMeta(scope)$codes
     dgeo <- dd %>%
@@ -38,30 +37,31 @@ lflt_bubbles_size_Gcd <- function(data,
 
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
-  dgeo$info <- str_tpl_format(tpl, dgeo)
+  #dgeo$info <- str_tpl_format(tpl, dgeo)
 
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
-                     #popup = lab,
+                     popup = popup,
                      label = lab,
                      fillOpacity = fillOpacity,
                      color = color,
                      stroke = FALSE)
   l
 }
-
-# FALTA PENSAR COMO
 
 #' Leaflet bubbles grouped by categorical variable
 #'
@@ -79,7 +79,7 @@ lflt_bubbles_grouped_GcdCat <- function(data,
                                         fillOpacity = 0.5,
                                         #infoVar = NULL,
                                         label = NULL,
-                                        popup = "",
+                                        popup = NULL,
                                         size = 5,
                                         scope = "world_countries",
                                         tiles = "CartoDB.Positron") {
@@ -89,7 +89,6 @@ lflt_bubbles_grouped_GcdCat <- function(data,
   dd <- f$d %>%
     na.omit()
 
-  # primero que se carguen la tabla de sinónimos y de las equivalencias oficiales
   if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
     cent <- geodata::geodataMeta(scope)$codes
     dgeo <- dd %>%
@@ -104,20 +103,24 @@ lflt_bubbles_grouped_GcdCat <- function(data,
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
   # dd$info <- str_tpl_format(tpl,dd)
+
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = size,
-                     #popup = ~info,
+                     popup = popup,
                      label = lab,
                      fillOpacity = fillOpacity,
                      color = ~col(b),
@@ -126,7 +129,6 @@ lflt_bubbles_grouped_GcdCat <- function(data,
 }
 
 
-# FALTA PENSAR COMO
 #' Leaflet bubbles size by categorical variable
 #'
 #' Leaflet bubbles size by categorical variable
@@ -143,7 +145,7 @@ lflt_bubbles_size_GcdCat <- function(data,
                                      fillOpacity = 0.5,
                                      #infoVar = NULL,
                                      label = NULL,
-                                     popup = "",
+                                     popup = NULL,
                                      minSize = 3,
                                      maxSize = 20,
                                      scope = "world_countries",
@@ -170,20 +172,23 @@ lflt_bubbles_size_GcdCat <- function(data,
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
                      label = lab,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      color = color,
                      stroke = FALSE)
@@ -207,7 +212,7 @@ lflt_bubbles_size_GcdNum <- function(data,
                                      #infoVar = NULL,
                                      fillOpacity = 0.5,
                                      label = NULL,
-                                     popup = "",
+                                     popup = NULL,
                                      minSize = 3,
                                      maxSize = 20,
                                      agg = "sum",
@@ -232,25 +237,27 @@ lflt_bubbles_size_GcdNum <- function(data,
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
   }
 
-
   #dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      label = lab,
                      color = color,
                      fillOpacity = fillOpacity,
@@ -276,7 +283,7 @@ lflt_bubbles_GcdCatNum <- function(data,
                                    fillOpacity = 0.5,
                                    #infoVar = NULL,
                                    label = NULL,
-                                   popup = "",
+                                   popup = NULL,
                                    minSize = 3,
                                    maxSize = 20,
                                    agg = "sum",
@@ -308,20 +315,22 @@ lflt_bubbles_GcdCatNum <- function(data,
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
   }
-
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
+  }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      label = lab,
                      color = ~col(b),
                      fillOpacity = fillOpacity,
@@ -346,7 +355,7 @@ lflt_bubbles_size_Gnm <- function(data,
                                   fillOpacity = 0.5,
                                   #infoVar = NULL,
                                   label = NULL,
-                                  popup = "",
+                                  popup = NULL,
                                   minSize = 3,
                                   maxSize = 20,
                                   scope = "world_countries",
@@ -387,19 +396,22 @@ lflt_bubbles_size_Gnm <- function(data,
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = color,
@@ -424,7 +436,7 @@ lflt_bubbles_grouped_GnmCat <- function(data,
                                         fillOpacity = 0.5,
                                         #infoVar = NULL,
                                         label = NULL,
-                                        popup = "",
+                                        popup = NULL,
                                         size = 5,
                                         scope = "world_countries",
                                         tiles = "CartoDB.Positron") {
@@ -458,27 +470,27 @@ lflt_bubbles_grouped_GnmCat <- function(data,
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
   }
-
-
   #dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
   }
-
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
+  }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = size,
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = ~col(b),
@@ -502,7 +514,7 @@ lflt_bubbles_size_GnmCat <- function(data,
                                      fillOpacity = 0.5,
                                      #infoVar = NULL,
                                      label = NULL,
-                                     popup = "",
+                                     popup = NULL,
                                      minSize = 3,
                                      maxSize = 20,
                                      scope = "world_countries",
@@ -543,19 +555,23 @@ lflt_bubbles_size_GnmCat <- function(data,
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  # los labels y popups
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = color,
@@ -580,7 +596,7 @@ lflt_bubbles_size_GnmNum <- function(data,
                                      fillOpacity = 0.5,
                                      #infoVar = NULL,
                                      label = NULL,
-                                     popup = "",
+                                     popup = NULL,
                                      minSize = 3,
                                      maxSize = 20,
                                      agg = "sum",
@@ -624,19 +640,22 @@ lflt_bubbles_size_GnmNum <- function(data,
                         list(GcdName = nms[1], NumName = nms[2]))
   #dd$info <- str_tpl_format(tpl,dd)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = color,
@@ -661,7 +680,7 @@ lflt_bubbles_GnmCatNum <- function(data,
                                    fillOpacity = 0.5,
                                    #infoVar = NULL,
                                    label = NULL,
-                                   popup = "",
+                                   popup = NULL,
                                    minSize = 3,
                                    maxSize = 20,
                                    agg = "sum",
@@ -705,22 +724,24 @@ lflt_bubbles_GnmCatNum <- function(data,
   #dd <- dgeo %>% left_join(geo[c("a","name","lat","lon")],"a")
   tpl <- str_tpl_format("<strong>{GcdName}: {a}</strong><br>{NumName}: {b}",
                         list(GcdName = nms[1], NumName = nms[2]))
-  #dd$info <- str_tpl_format(tpl,dd)
+  #dgeo$info <- str_tpl_format(tpl,dgeo)
   # los labels y popups
-  if (is.null(label)) {
+  if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
       shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
   }
-
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
+  }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = ~col(b),
@@ -745,7 +766,7 @@ lflt_bubbles_GlnGlt <- function(data,
                                 fillOpacity = 0.5,
                                 #infoVar = NULL,
                                 label = NULL,
-                                popup = "",
+                                popup = NULL,
                                 minSize = 3,
                                 maxSize = 20,
                                 tiles = "CartoDB.Positron") {
@@ -758,19 +779,22 @@ lflt_bubbles_GlnGlt <- function(data,
     dplyr::summarise(c = n())
 
   # los labels y popups
-  if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
+  if (is.null(label) || !label %in% nms) {
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = color,
@@ -795,7 +819,7 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
                                            fillOpacity = 0.5,
                                            #infoVar = NULL,
                                            label = NULL,
-                                           popup = "",
+                                           popup = NULL,
                                            size = 5,
                                            tiles = "CartoDB.Positron") {
   f <- fringe(data)
@@ -807,19 +831,22 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
   col <- colorFactor(palette = palette, domain = NULL)
 
   # los labels y popups
-  if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
+  if (is.null(label) || !label %in% nms) {
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
                      radius = size,
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = ~col(c),
@@ -843,7 +870,7 @@ lflt_bubbles_size_GlnGltCat <- function(data,
                                         fillOpacity = 0.5,
                                         #infoVar = NULL,
                                         label = NULL,
-                                        popup = "",
+                                        popup = NULL,
                                         minSize = 3,
                                         maxSize = 20,
                                         tiles = "CartoDB.Positron") {
@@ -856,19 +883,22 @@ lflt_bubbles_size_GlnGltCat <- function(data,
     dplyr::summarise(d = n())
 
   # los labels y popups
-  if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
+  if (is.null(label) || !label %in% nms) {
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
-    addProviderTiles("CartoDB.Positron") %>%
+    addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
                      radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = color,
@@ -893,7 +923,7 @@ lflt_bubbles_size_GlnGltNum <- function(data,
                                         fillOpacity = 0.5,
                                         #infoVar = NULL,
                                         label = NULL,
-                                        popup = "",
+                                        popup = NULL,
                                         minSize = 3,
                                         maxSize = 20,
                                         agg = "sum",
@@ -909,19 +939,22 @@ lflt_bubbles_size_GlnGltNum <- function(data,
     #dplyr::filter(b >= 0)
 
   # los labels y popups
-  if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
+  if (is.null(label) || !label %in% nms) {
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = color,
@@ -946,7 +979,7 @@ lflt_bubbles_GlnGltCatNum <- function(data,
                                       fillOpacity = 0.5,
                                       #infoVar = NULL,
                                       label = NULL,
-                                      popup = "",
+                                      popup = NULL,
                                       minSize = 3,
                                       maxSize = 20,
                                       agg = "sum",
@@ -964,19 +997,22 @@ lflt_bubbles_GlnGltCatNum <- function(data,
   col <- colorFactor(palette = palette, domain = NULL)
 
   # los labels y popups
-  if (is.null(label)) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
+  if (is.null(label) || !label %in% nms) {
+    lab <- map(as.list(1:nrow(dd)), function(r) {
+      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- label
+    lab <- dd[[label]]
+  }
+  if (popup %in% nms) {
+    popup <- dd[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
                      radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
-                     #popup = ~info,
+                     popup = popup,
                      fillOpacity = fillOpacity,
                      label = lab,
                      color = ~col(c),
