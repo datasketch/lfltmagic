@@ -21,6 +21,7 @@ lflt_bubbles_size_Gcd <- function(data,
                                   tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -42,7 +43,7 @@ lflt_bubbles_size_Gcd <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -85,6 +86,7 @@ lflt_bubbles_grouped_GcdCat <- function(data,
                                         tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit()
@@ -107,7 +109,7 @@ lflt_bubbles_grouped_GcdCat <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -152,6 +154,7 @@ lflt_bubbles_size_GcdCat <- function(data,
                                      tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -174,7 +177,7 @@ lflt_bubbles_size_GcdCat <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -220,6 +223,7 @@ lflt_bubbles_size_GcdNum <- function(data,
                                      tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -244,7 +248,7 @@ lflt_bubbles_size_GcdNum <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -291,6 +295,7 @@ lflt_bubbles_GcdCatNum <- function(data,
                                    tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -317,7 +322,7 @@ lflt_bubbles_GcdCatNum <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -362,6 +367,7 @@ lflt_bubbles_size_Gnm <- function(data,
                                   tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -398,7 +404,7 @@ lflt_bubbles_size_Gnm <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -442,6 +448,7 @@ lflt_bubbles_grouped_GnmCat <- function(data,
                                         tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit()
@@ -477,7 +484,7 @@ lflt_bubbles_grouped_GnmCat <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -521,6 +528,7 @@ lflt_bubbles_size_GnmCat <- function(data,
                                      tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -558,7 +566,7 @@ lflt_bubbles_size_GnmCat <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -604,6 +612,7 @@ lflt_bubbles_size_GnmNum <- function(data,
                                      tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -642,7 +651,7 @@ lflt_bubbles_size_GnmNum <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -688,6 +697,7 @@ lflt_bubbles_GnmCatNum <- function(data,
                                    tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dd <- f$d %>%
     na.omit() %>%
@@ -728,7 +738,7 @@ lflt_bubbles_GnmCatNum <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -772,6 +782,7 @@ lflt_bubbles_GlnGlt <- function(data,
                                 tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dgeo <- f$d %>%
     na.omit() %>%
@@ -781,7 +792,7 @@ lflt_bubbles_GlnGlt <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -824,6 +835,7 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
                                            tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dgeo <- f$d %>%
     na.omit()
@@ -833,7 +845,7 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -876,6 +888,7 @@ lflt_bubbles_size_GlnGltCat <- function(data,
                                         tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dgeo <- f$d %>%
     na.omit() %>%
@@ -885,7 +898,7 @@ lflt_bubbles_size_GlnGltCat <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -930,6 +943,7 @@ lflt_bubbles_size_GlnGltNum <- function(data,
                                         tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dgeo <- f$d %>%
     na.omit() %>%
@@ -941,7 +955,7 @@ lflt_bubbles_size_GlnGltNum <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
@@ -986,6 +1000,7 @@ lflt_bubbles_GlnGltCatNum <- function(data,
                                       tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
+  popup <- popup %||% ""
 
   dgeo <- f$d %>%
     na.omit() %>%
@@ -999,7 +1014,7 @@ lflt_bubbles_GlnGltCatNum <- function(data,
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dd)), function(r) {
-      shiny::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
     lab <- dd[[label]]
