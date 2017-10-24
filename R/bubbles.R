@@ -748,7 +748,6 @@ lflt_bubbles_GlnGlt <- function(data,
                                 popup = "",
                                 minSize = 3,
                                 maxSize = 20,
-                                scope = "world_countries",
                                 tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
@@ -798,7 +797,6 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
                                            label = NULL,
                                            popup = "",
                                            size = 5,
-                                           scope = "world_countries",
                                            tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
@@ -848,7 +846,6 @@ lflt_bubbles_size_GlnGltCat <- function(data,
                                         popup = "",
                                         minSize = 3,
                                         maxSize = 20,
-                                        scope = "world_countries",
                                         tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
@@ -900,7 +897,6 @@ lflt_bubbles_size_GlnGltNum <- function(data,
                                         minSize = 3,
                                         maxSize = 20,
                                         agg = "sum",
-                                        scope = "world_countries",
                                         tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)
@@ -954,7 +950,6 @@ lflt_bubbles_GlnGltCatNum <- function(data,
                                       minSize = 3,
                                       maxSize = 20,
                                       agg = "sum",
-                                      scope = "world_countries",
                                       tiles = "CartoDB.Positron") {
   f <- fringe(data)
   nms <- getClabels(f)

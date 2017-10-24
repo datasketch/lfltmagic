@@ -11,26 +11,36 @@
 #' lflt_heatmap_Gcd(sampleData("Gcd", nrow = 10))
 lflt_heatmap_Gcd <- function(data,
                              radius = NULL,
+                             blur = NULL,
                              gradient = NULL,
-                             tiles = "CartoDB.Positron") {
-
+                             tiles = "CartoDB.Positron",
+                             scope = "world_countries") {
   f <- fringe(data)
   nms <- getClabels(f)
 
   radius <- radius %||% 10
+  blur <- blur %||% 10
   gradient <- gradient %||% c("#009EE3", "#9B71AF", "#F72872", "#48239D")
 
-  d <- f$d %>%
+  dd <- f$d %>%
     na.omit()
 
-  leaflet(d) %>%
+  if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+    cent <- geodata::geodataMeta(scope)$codes
+    dgeo <- dd %>%
+      dplyr::left_join(cent, by = c(a = "id"))
+  } else {
+    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
+  }
+
+  l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addHeatmap(lat = ~a, lng = ~b,
-               radius = radius,
-               gradient = gradient)
-
+    leaflet.extras::addHeatmap(lat = ~lat, lng = ~lon,
+                               radius = radius,
+                               blur = blur,
+                               gradient = gradient)
+  l
 }
-
 
 
 #' Leaflet heatmap by geographical name
@@ -45,30 +55,56 @@ lflt_heatmap_Gcd <- function(data,
 #' @section ctypes: Gnm
 #' @export
 #' @examples
-#' lflt_heatmap_size_Gnm(sampleData("Gnm",nrow = 10))
+#' lflt_heatmap_Gnm(sampleData("Gnm", nrow = 10))
 lflt_heatmap_Gnm <- function(data,
                              radius = NULL,
+                             blur = NULL,
                              gradient = NULL,
-                             tiles = "CartoDB.Positron") {
+                             tiles = "CartoDB.Positron",
+                             scope = "world_countries") {
 
   f <- fringe(data)
   nms <- getClabels(f)
 
   radius <- radius %||% 10
+  blur <- blur%||% 10
   gradient <- gradient %||% c("#009EE3", "#9B71AF", "#F72872", "#48239D")
 
-  d <- f$d %>%
+  dd <- f$d %>%
     na.omit()
 
-  leaflet(d) %>%
-    addProviderTiles(tiles) %>%
-    addHeatmap(lat = ~a, lng = ~b,
-               radius = radius,
-               gradient = gradient)
+  if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
+    cent <- geodata::geodataMeta(scope)$codes
+    if ("altnames" %in% names(geodata::geodataMeta(scope))) {
+      alt <- geodata::geodataMeta(scope)$altnames %>%
+        na.omit()
+      dgeo <- dd %>%
+        fuzzyjoin::stringdist_left_join(alt,
+                                        by = c(a = "altname"),
+                                        ignore_case = TRUE,
+                                        method = "jw",
+                                        max_dist = 4,
+                                        distance_col = "dist") %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(dist == min(dist)) %>%
+        dplyr::left_join(cent, by = "id")
+    } else {
+      dgeo <- dd %>%
+        dplyr::left_join(cent, by = c(a = "id"))
+    }
+  } else {
+    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
+  }
 
+  l <- leaflet(dgeo) %>%
+    addProviderTiles(tiles) %>%
+    leaflet.extras::addHeatmap(lat = ~lat, lng = ~lon,
+                               radius = radius,
+                               blur = blur,
+                               gradient = gradient)
+  l
 }
 
-####
 
 #' Leaflet heatmap by longitud and latitud
 #'
@@ -82,9 +118,10 @@ lflt_heatmap_Gnm <- function(data,
 #' @section ctypes: Gln-Glt
 #' @export
 #' @examples
-#' lflt_heatmap_size_GlnGlt(sampleData("Gln-Glt",nrow = 10))
-lflt_heatmap_GltGln <- function(data,
+#' lflt_heatmap_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+lflt_heatmap_GlnGlt <- function(data,
                                 radius = NULL,
+                                blur = NULL,
                                 gradient = NULL,
                                 tiles = "CartoDB.Positron") {
 
@@ -92,17 +129,19 @@ lflt_heatmap_GltGln <- function(data,
   nms <- getClabels(f)
 
   radius <- radius %||% 10
+  blur <- blur %||% 10
   gradient <- gradient %||% c("#009EE3", "#9B71AF", "#F72872", "#48239D")
 
-  d <- f$d %>%
+  dgeo <- f$d %>%
     na.omit()
 
-  leaflet(d) %>%
+  l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addHeatmap(lat = ~a, lng = ~b,
                radius = radius,
+               blur = blur,
                gradient = gradient)
-
+  l
 }
 
 
