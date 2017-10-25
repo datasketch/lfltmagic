@@ -802,7 +802,7 @@ lflt_bubbles_GnmCatNum <- function(data,
 #' @name lflt_bubbles_size_GlnGlt
 #' @param x A data.frame
 #' @return leaflet viz
-#' @section ctypes: GlnGlt
+#' @section ctypes: Gln-Glt
 #' @export
 #' @examples
 #' lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
