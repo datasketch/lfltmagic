@@ -384,14 +384,21 @@ lflt_bubbles_size_Gnm <- function(data,
                                         by = c(a = "altname"),
                                         ignore_case = TRUE,
                                         method = "jw",
-                                        max_dist = 4,
+                                        max_dist = 0.5,
                                         distance_col = "dist") %>%
         dplyr::group_by(a) %>%
         dplyr::filter(dist == min(dist)) %>%
         dplyr::left_join(cent, by = "id")
     } else {
       dgeo <- dd %>%
-        dplyr::left_join(cent, by = c(a = "id"))
+        fuzzyjoin::stringdist_left_join(cent,
+                                        by = c(a = "name"),
+                                        ignore_case = TRUE,
+                                        method = "jw",
+                                        max_dist = 0.5,
+                                        distance_col = "dist") %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(dist == min(dist))
     }
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
@@ -465,14 +472,21 @@ lflt_bubbles_grouped_GnmCat <- function(data,
                                         by = c(a = "altname"),
                                         ignore_case = TRUE,
                                         method = "jw",
-                                        max_dist = 4,
+                                        max_dist = 0.5,
                                         distance_col = "dist") %>%
         dplyr::group_by(a) %>%
         dplyr::filter(dist == min(dist)) %>%
         dplyr::left_join(cent, by = "id")
     } else {
       dgeo <- dd %>%
-        dplyr::left_join(cent, by = c(a = "id"))
+        fuzzyjoin::stringdist_left_join(cent,
+                                        by = c(a = "name"),
+                                        ignore_case = TRUE,
+                                        method = "jw",
+                                        max_dist = 0.5,
+                                        distance_col = "dist") %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(dist == min(dist))
     }
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
@@ -545,14 +559,21 @@ lflt_bubbles_size_GnmCat <- function(data,
                                         by = c(a = "altname"),
                                         ignore_case = TRUE,
                                         method = "jw",
-                                        max_dist = 4,
+                                        max_dist = 0.5,
                                         distance_col = "dist") %>%
         dplyr::group_by(a) %>%
         dplyr::filter(dist == min(dist)) %>%
         dplyr::left_join(cent, by = "id")
     } else {
       dgeo <- dd %>%
-        dplyr::left_join(cent, by = c(a = "id"))
+        fuzzyjoin::stringdist_left_join(cent,
+                                        by = c(a = "name"),
+                                        ignore_case = TRUE,
+                                        method = "jw",
+                                        max_dist = 0.5,
+                                        distance_col = "dist") %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(dist == min(dist))
     }
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
@@ -631,14 +652,21 @@ lflt_bubbles_size_GnmNum <- function(data,
                                         by = c(a = "altname"),
                                         ignore_case = TRUE,
                                         method = "jw",
-                                        max_dist = 4,
+                                        max_dist = 0.5,
                                         distance_col = "dist") %>%
         dplyr::group_by(a) %>%
         dplyr::filter(dist == min(dist)) %>%
         dplyr::left_join(cent, by = "id")
     } else {
       dgeo <- dd %>%
-        dplyr::left_join(cent, by = c(a = "id"))
+        fuzzyjoin::stringdist_left_join(cent,
+                                        by = c(a = "name"),
+                                        ignore_case = TRUE,
+                                        method = "jw",
+                                        max_dist = 0.5,
+                                        distance_col = "dist") %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(dist == min(dist))
     }
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
@@ -718,14 +746,21 @@ lflt_bubbles_GnmCatNum <- function(data,
                                         by = c(a = "altname"),
                                         ignore_case = TRUE,
                                         method = "jw",
-                                        max_dist = 4,
+                                        max_dist = 0.5,
                                         distance_col = "dist") %>%
         dplyr::group_by(a) %>%
         dplyr::filter(dist == min(dist)) %>%
         dplyr::left_join(cent, by = "id")
     } else {
       dgeo <- dd %>%
-        dplyr::left_join(cent, by = c(a = "id"))
+        fuzzyjoin::stringdist_left_join(cent,
+                                        by = c(a = "name"),
+                                        ignore_case = TRUE,
+                                        method = "jw",
+                                        max_dist = 0.5,
+                                        distance_col = "dist") %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(dist == min(dist))
     }
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
