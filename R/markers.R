@@ -122,11 +122,13 @@ lflt_markers_GlnGltCat <- function(data,
     na.omit()
   if (!is.null(icon)) {
     n0 <- unique(dgeo$c)
-    n1 <- data.frame("c" = n0, "d" = c(icon, rep("", length(n0) - length(icon))))
+    n1 <- icon[1:length(n0)]
+    n1[is.na(n1)] <- ""
+    n1 <- data.frame("c" = n0, "d" = n1)
     dgeo <- dgeo %>%
       dplyr::left_join(n1, by = "c")
   } else {
-    dgeo$d <- NA
+    dgeo$d <- ""
   }
   names(dgeo)[4] <- "d"
 
