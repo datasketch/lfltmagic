@@ -131,8 +131,6 @@ lflt_markers_GlnGltCat <- function(data,
     dgeo$d <- ""
   }
   names(dgeo)[4] <- "d"
-
-##### FALTA HACER LSO DE LAS IMÁGENES POR CATEGORIA
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
     lab <- map(as.list(1:nrow(dgeo)), function(r) {
