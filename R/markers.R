@@ -108,9 +108,6 @@ lflt_markers_GlnGltImg <- function(data,
 #' @examples
 #' lflt_markers_GlnGltCat(sampleData("Gln-Glt-Cat", nrow = 10))
 lflt_markers_GlnGltCat <- function(data,
-                                   #color = "navy",
-                                   #fillOpacity = 0.5,
-                                   #infoVar = NULL,
                                    label = NULL,
                                    popup = NULL,
                                    icon = NULL,
@@ -123,6 +120,16 @@ lflt_markers_GlnGltCat <- function(data,
 
   dgeo <- f$d %>%
     na.omit()
+  if (!is.null(icon)) {
+    n0 <- unique(dgeo$c)
+    n1 <- data.frame("c" = n0, "d" = c(icon, rep("", length(n0) - length(icon))))
+    dgeo <- dgeo %>%
+      dplyr::left_join(n1, by = "c")
+  } else {
+    dgeo$d <- NA
+  }
+  names(dgeo)[4] <- "d"
+
 ##### FALTA HACER LSO DE LAS IMÁGENES POR CATEGORIA
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
@@ -136,10 +143,11 @@ lflt_markers_GlnGltCat <- function(data,
     popup <- dgeo[[popup]]
   }
 
+  View(dgeo)
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
     addMarkers(lat = ~b, lng = ~a,
-               icon =  icons(iconUrl = ~c, iconWidth = iconWidth, iconHeight = iconHeight),
+               icon =  icons(iconUrl = ~d, iconWidth = iconWidth, iconHeight = iconHeight),
                popup = popup,
                label = lab)
   l
