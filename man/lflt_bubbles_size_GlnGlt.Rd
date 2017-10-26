@@ -18,7 +18,7 @@ leaflet viz
 Leaflet bubbles size by latitud and longitud
 }
 \section{ctypes}{
- GlnGlt
+ Gln-Glt
 }
 
 \examples{
