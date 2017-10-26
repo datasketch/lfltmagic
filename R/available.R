@@ -1,24 +1,4 @@
 
-#' lflt_test_docs
-#' test
-#' @name lflt_test_docs
-#' @export
-#' @return The sum of \code{x} and \code{y}.
-#' @section noftypes: Ca,Ca-Nu
-#' @examples
-#' add(1, 1)
-lflt_test_docs <- NULL
-
-#' lflt_test_docs2
-#' test
-#' @name lflt_test_docs2
-#' @export
-#' @return The sum of \code{x} and \code{y}.
-#' @section ftypes: Ca,Ca-Ca-Ca
-#' @examples
-#' add(1, 1)
-lflt_test_docs2 <- NULL
-
 #' @export
 lfltWhich <- function(d){
   pf <- lfltFtype()

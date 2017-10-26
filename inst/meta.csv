@@ -1,0 +1,82 @@
+name,title,desc,ctypes,ftype,group,status
+lflt_bubbles_GcdCatNum,Leaflet bubbles grouped by categorical variable size by numerical,"
+Leaflet bubbles grouped by categorical variable size by numerical
+", Gcd-Cat-Num,Cat- Gcd-Num,bubbles,OK
+lflt_bubbles_GlnGltCatNum,Leaflet bubbles grouped by categorical variable size by numerical,"
+Leaflet bubbles grouped by categorical variable size by numerical
+", Gln-Glt-Cat-Num,Cat- Gln-Glt-Num,bubbles,OK
+lflt_bubbles_GnmCatNum,Leaflet bubbles grouped by categorical variable size by numerical,"
+Leaflet bubbles grouped by categorical variable size by numerical
+", Gnm-Cat-Num,Cat- Gnm-Num,bubbles,OK
+lflt_bubbles_grouped_GcdCat,Leaflet bubbles grouped by categorical variable,"
+Leaflet bubbles grouped by categorical variable
+", Gcd-Cat,Cat- Gcd,bubbles,OK
+lflt_bubbles_grouped_GlnGltCat,Leaflet bubbles colored by categorical variable,"
+Leaflet bubbles colored by categorical variable
+", Gln-Glt-Cat,Cat- Gln-Glt,bubbles,OK
+lflt_bubbles_grouped_GnmCat,Leaflet bubbles grouped by categorical variable,"
+Leaflet bubbles grouped by categorical variable
+", Gnm-Cat,Cat- Gnm,bubbles,OK
+lflt_bubbles_size_Gcd,Leaflet bubbles size by geographical code,"
+Leaflet bubbles size by geographical code
+", Gcd, Gcd,bubbles,OK
+lflt_bubbles_size_GcdCat,Leaflet bubbles size by categorical variable,"
+Leaflet bubbles size by categorical variable
+", Gcd-Cat,Cat- Gcd,bubbles,OK
+lflt_bubbles_size_GcdNum,Leaflet bubbles size by numeric variable,"
+Leaflet bubbles size by numeric variable
+", Gcd-Num, Gcd-Num,bubbles,OK
+lflt_bubbles_size_GlnGlt,Leaflet bubbles size by latitud and longitud,"
+Leaflet bubbles size by latitud and longitud
+", Gln-Glt, Gln-Glt,bubbles,OK
+lflt_bubbles_size_GlnGltCat,Leaflet bubbles size by categorical variable,"
+Leaflet bubbles size by categorical variable
+", Gln-Glt-Cat,Cat- Gln-Glt,bubbles,OK
+lflt_bubbles_size_GlnGltNum,Leaflet bubbles size by numeric variable,"
+Leaflet bubbles size by numeric variable
+", Gln-Glt-Num, Gln-Glt-Num,bubbles,OK
+lflt_bubbles_size_Gnm,Leaflet bubbles size by geographical name,"
+Leaflet bubbles size by geographical name
+", Gnm, Gnm,bubbles,OK
+lflt_bubbles_size_GnmCat,Leaflet bubbles size by categorical variable,"
+Leaflet bubbles size by categorical variable
+", Gnm-Cat,Cat- Gnm,bubbles,OK
+lflt_bubbles_size_GnmNum,Leaflet bubbles size by numeric variable,"
+Leaflet bubbles size by numeric variable
+", Gnm-Num, Gnm-Num,bubbles,OK
+lflt_choropleth_Gcd,Leaflet choropleths by geographical code,"
+Leaflet choropleths by geographical code
+", Gcd, Gcd,choropleth,OK
+lflt_choropleth_GcdCat,Leaflet choropleths by categorical variable,"
+Leaflet choropleths by categorical variable
+", Gcd-Cat,Cat- Gcd,choropleth,OK
+lflt_choropleth_GcdNum,Leaflet choropleths by numerical variable,"
+Leaflet choropleths by numerical variable
+", Gcd-Num, Gcd-Num,choropleth,OK
+lflt_choropleth_Gnm,Leaflet choropleths by geographical name,"
+Leaflet choropleths by geographical name
+", Gnm, Gnm,choropleth,OK
+lflt_choropleth_GnmCat,Leaflet choropleths by categorical variable,"
+Leaflet choropleths by categorical variable
+", Gnm-Cat,Cat- Gnm,choropleth,OK
+lflt_choropleth_GnmNum,Leaflet choropleths by numerical variable,"
+Leaflet choropleths by numerical variable
+", Gnm-Num, Gnm-Num,choropleth,OK
+lflt_heatmap_Gcd,Leaflet heatmap by geographical code,"
+Leaflet heatmap by geographical code
+", Gcd, Gcd,heatmap,OK
+lflt_heatmap_GlnGlt,Leaflet heatmap by longitud and latitud,"
+Leaflet heatmap by longitud and latitud
+", Gln-Glt, Gln-Glt,heatmap,OK
+lflt_heatmap_Gnm,Leaflet heatmap by geographical name,"
+Leaflet heatmap by geographical name
+", Gnm, Gnm,heatmap,OK
+lflt_markers_GlnGlt,Leaflet markers by latitud and longitud,"
+Leaflet markers by latitud and longitud
+", Gln-Glt, Gln-Glt,markers,OK
+lflt_markers_GlnGltCat,Leaflet markers by latitud and longitud and icons by categorical variable,"
+Leaflet markers by latitud and longitud and icons by categorical variable
+", Gln-Glt-Cat,Cat- Gln-Glt,markers,OK
+lflt_markers_GlnGltImg,Leaflet markers by latitud and longitud and icons,"
+Leaflet markers by latitud and longitud and icons
+", Gln-Glt-Img, Gln-Glt-Img,markers,OK
