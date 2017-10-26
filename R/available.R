@@ -7,7 +7,11 @@ lfltMeta <- function() {
 #' @export
 lfltWhich <- function(d){
   meta <- lfltMeta()
-  guessedctypes <- guessCtypes(d, as_string = TRUE) # TODO possibleFtypes
+  if ("data.frame" %in% class(d)) {
+    guessedctypes <- guessCtypes(d, as_string = TRUE) # TODO possibleFtypes
+  } else {
+    guessedctypes <- paste(d, collapse = "-")
+  }
   meta %>% filter(ctypes == guessedctypes)
 }
 
