@@ -879,14 +879,14 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
 
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dd)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dgeo)), function(r) {
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- dd[[label]]
+    lab <- dgeo[[label]]
   }
   if (popup %in% nms) {
-    popup <- dd[[popup]]
+    popup <- dgeo[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
@@ -932,14 +932,14 @@ lflt_bubbles_size_GlnGltCat <- function(data,
 
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dd)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dgeo)), function(r) {
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- dd[[label]]
+    lab <- dgeo[[label]]
   }
   if (popup %in% nms) {
-    popup <- dd[[popup]]
+    popup <- dgeo[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
@@ -989,14 +989,14 @@ lflt_bubbles_size_GlnGltNum <- function(data,
 
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dd)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dgeo)), function(r) {
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- dd[[label]]
+    lab <- dgeo[[label]]
   }
   if (popup %in% nms) {
-    popup <- dd[[popup]]
+    popup <- dgeo[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
@@ -1048,14 +1048,14 @@ lflt_bubbles_GlnGltCatNum <- function(data,
 
   # los labels y popups
   if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dd)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dd[r, 1:length(nms)], "<br/>", collapse = ""))
+    lab <- map(as.list(1:nrow(dgeo)), function(r) {
+      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
     })
   } else {
-    lab <- dd[[label]]
+    lab <- dgeo[[label]]
   }
   if (popup %in% nms) {
-    popup <- dd[[popup]]
+    popup <- dgeo[[popup]]
   }
 
   l <- leaflet(dgeo) %>%
