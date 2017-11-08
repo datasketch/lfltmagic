@@ -8,7 +8,6 @@ Depends:
     R (>= 3.0.0),
     tools,
     datafringe,
-    tidyverse,
     geodata,
     leaflet,
     leaflet.extras
