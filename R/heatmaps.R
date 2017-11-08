@@ -28,7 +28,8 @@ lflt_heatmap_Gcd <- function(data,
   if (!is.null(scope) && scope %in% geodata::availableGeodata()) {
     cent <- geodata::geodataMeta(scope)$codes
     dgeo <- dd %>%
-      dplyr::left_join(cent, by = c(a = "id"))
+      dplyr::left_join(cent, by = c(a = "id")) %>%
+      na.omit()
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
   }
@@ -87,10 +88,12 @@ lflt_heatmap_Gnm <- function(data,
                                         distance_col = "dist") %>%
         dplyr::group_by(a) %>%
         dplyr::filter(dist == min(dist)) %>%
-        dplyr::left_join(cent, by = "id")
+        dplyr::left_join(cent, by = "id") %>%
+        na.omit()
     } else {
       dgeo <- dd %>%
-        dplyr::left_join(cent, by = c(a = "id"))
+        dplyr::left_join(cent, by = c(a = "id")) %>%
+        na.omit()
     }
   } else {
     stop("Pick an available map for the 'scope' argument (geodata::availableGeodata)")
