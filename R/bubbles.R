@@ -805,8 +805,8 @@ lflt_bubbles_GnmCatNum <- function(data,
 #' @section ctypes: Gln-Glt
 #' @export
 #' @examples
-#' lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
-lflt_bubbles_GlnGlt <- function(data,
+#' lflt_bubbles_size_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+lflt_bubbles_size_GlnGlt <- function(data,
                                 color = "navy",
                                 fillOpacity = 0.5,
                                 #infoVar = NULL,

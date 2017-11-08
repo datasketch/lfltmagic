@@ -2,11 +2,11 @@
 % Please edit documentation in R/bubbles.R
 \name{lflt_bubbles_size_GlnGlt}
 \alias{lflt_bubbles_size_GlnGlt}
-\alias{lflt_bubbles_GlnGlt}
 \title{Leaflet bubbles size by latitud and longitud}
 \usage{
-lflt_bubbles_GlnGlt(data, color = "navy", fillOpacity = 0.5, label = NULL,
-  popup = NULL, minSize = 3, maxSize = 20, tiles = "CartoDB.Positron")
+lflt_bubbles_size_GlnGlt(data, color = "navy", fillOpacity = 0.5,
+  label = NULL, popup = NULL, minSize = 3, maxSize = 20,
+  tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}
@@ -22,5 +22,5 @@ Leaflet bubbles size by latitud and longitud
 }
 
 \examples{
-lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+lflt_bubbles_size_GlnGlt(sampleData("Gln-Glt", nrow = 10))
 }
