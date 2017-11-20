@@ -54,7 +54,7 @@ lflt_bubbles_size_Gcd <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
                      popup = popup,
                      label = lab,
@@ -120,7 +120,7 @@ lflt_bubbles_grouped_GcdCat <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = size,
                      popup = popup,
                      label = lab,
@@ -188,7 +188,7 @@ lflt_bubbles_size_GcdCat <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      label = lab,
                      popup = popup,
@@ -259,7 +259,7 @@ lflt_bubbles_size_GcdNum <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
                      popup = popup,
                      label = lab,
@@ -333,7 +333,7 @@ lflt_bubbles_GcdCatNum <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      popup = popup,
                      label = lab,
@@ -422,7 +422,7 @@ lflt_bubbles_size_Gnm <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -509,7 +509,7 @@ lflt_bubbles_grouped_GnmCat <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = size,
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -598,7 +598,7 @@ lflt_bubbles_size_GnmCat <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -690,7 +690,7 @@ lflt_bubbles_size_GnmNum <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(b), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -784,7 +784,7 @@ lflt_bubbles_GnmCatNum <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~lat, lng = ~lon, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(lat), lng = ~as.numeric(lon), weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -838,7 +838,7 @@ lflt_bubbles_size_GlnGlt <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -891,7 +891,7 @@ lflt_bubbles_grouped_GlnGltCat <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
                      radius = size,
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -944,7 +944,7 @@ lflt_bubbles_size_GlnGltCat <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
                      radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -1001,7 +1001,7 @@ lflt_bubbles_size_GlnGltNum <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
                      radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,
@@ -1060,7 +1060,7 @@ lflt_bubbles_GlnGltCatNum <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~b, lng = ~a, weight = 3,
+    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
                      radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
                      popup = popup,
                      fillOpacity = fillOpacity,

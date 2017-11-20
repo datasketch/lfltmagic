@@ -36,7 +36,7 @@ lflt_heatmap_Gcd <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    leaflet.extras::addHeatmap(lat = ~lat, lng = ~lon,
+    leaflet.extras::addHeatmap(lat = ~as.numeric(lat), lng = ~as.numeric(lon),
                                radius = radius,
                                blur = blur,
                                gradient = gradient)
@@ -101,7 +101,7 @@ lflt_heatmap_Gnm <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    leaflet.extras::addHeatmap(lat = ~lat, lng = ~lon,
+    leaflet.extras::addHeatmap(lat = ~as.numeric(lat), lng = ~as.numeric(lon),
                                radius = radius,
                                blur = blur,
                                gradient = gradient)
@@ -140,7 +140,7 @@ lflt_heatmap_GlnGlt <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addHeatmap(lat = ~a, lng = ~b,
+    addHeatmap(lat = ~as.numeric(a), lng = ~as.numeric(b),
                radius = radius,
                blur = blur,
                gradient = gradient)

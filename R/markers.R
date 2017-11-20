@@ -40,7 +40,7 @@ lflt_markers_GlnGlt <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addMarkers(lat = ~b, lng = ~a,
+    addMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a),
                icon =  icons(iconUrl = icon, iconWidth = iconWidth, iconHeight = iconHeight),
                popup = popup,
                label = lab)
@@ -88,7 +88,7 @@ lflt_markers_GlnGltImg <- function(data,
 
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addMarkers(lat = ~b, lng = ~a,
+    addMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a),
                icon =  icons(iconUrl = ~c, iconWidth = iconWidth, iconHeight = iconHeight),
                popup = popup,
                label = lab)
@@ -146,7 +146,7 @@ lflt_markers_GlnGltCat <- function(data,
   View(dgeo)
   l <- leaflet(dgeo) %>%
     addProviderTiles(tiles) %>%
-    addMarkers(lat = ~b, lng = ~a,
+    addMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a),
                icon =  icons(iconUrl = ~d, iconWidth = iconWidth, iconHeight = iconHeight),
                popup = popup,
                label = lab)
