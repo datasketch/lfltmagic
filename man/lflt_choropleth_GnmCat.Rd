@@ -4,8 +4,8 @@
 \alias{lflt_choropleth_GnmCat}
 \title{Leaflet choropleths by categorical variable}
 \usage{
-lflt_choropleth_GnmCat(data, palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-  fillOpacity = 0.5, label = NULL, popup = NULL,
+lflt_choropleth_GnmCat(data, palette = c("#009EE3", "#9B71AF",
+  "#FFFF99"), fillOpacity = 0.5, label = NULL, popup = NULL,
   scope = "world_countries", tiles = "CartoDB.Positron")
 }
 \arguments{

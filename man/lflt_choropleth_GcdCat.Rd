@@ -4,9 +4,12 @@
 \alias{lflt_choropleth_GcdCat}
 \title{Leaflet choropleths by categorical variable}
 \usage{
-lflt_choropleth_GcdCat(data, palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-  fillOpacity = 0.5, label = NULL, popup = NULL,
-  scope = "world_countries", tiles = "CartoDB.Positron")
+lflt_choropleth_GcdCat(data, dropNa = FALSE, fillOpacity = 0.5,
+  format = c("", ""), legendColor = "discrete",
+  legendPosition = "bottomleft", legendTitle = NULL, label = NULL,
+  marks = c(",", "."), nDigits = 2, palette = c("#009EE3", "#9B71AF",
+  "#FFFF99"), percentage = FALSE, scope = "world_countries",
+  tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}

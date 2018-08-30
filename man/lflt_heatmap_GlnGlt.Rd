@@ -4,8 +4,8 @@
 \alias{lflt_heatmap_GlnGlt}
 \title{Leaflet heatmap by longitud and latitud}
 \usage{
-lflt_heatmap_GlnGlt(data, radius = NULL, blur = NULL, gradient = NULL,
-  tiles = "CartoDB.Positron")
+lflt_heatmap_GlnGlt(data, radius = NULL, blur = NULL,
+  gradient = NULL, tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}

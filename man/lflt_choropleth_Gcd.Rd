@@ -4,8 +4,11 @@
 \alias{lflt_choropleth_Gcd}
 \title{Leaflet choropleths by geographical code}
 \usage{
-lflt_choropleth_Gcd(data, palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-  fillOpacity = 0.5, label = NULL, popup = NULL,
+lflt_choropleth_Gcd(data, dropNa = FALSE, fillOpacity = 0.5,
+  format = c("", ""), legendColor = "discrete",
+  legendPosition = "bottomleft", legendTitle = NULL, label = NULL,
+  marks = c(",", "."), nBins = 8, nDigits = 2,
+  palette = c("#009EE3", "#E5007D", "#95C11E"), percentage = FALSE,
   scope = "world_countries", tiles = "CartoDB.Positron")
 }
 \arguments{

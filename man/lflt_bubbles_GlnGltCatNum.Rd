@@ -4,9 +4,10 @@
 \alias{lflt_bubbles_GlnGltCatNum}
 \title{Leaflet bubbles grouped by categorical variable size by numerical}
 \usage{
-lflt_bubbles_GlnGltCatNum(data, palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-  fillOpacity = 0.5, label = NULL, popup = NULL, minSize = 3,
-  maxSize = 20, agg = "sum", tiles = "CartoDB.Positron")
+lflt_bubbles_GlnGltCatNum(data, palette = c("#009EE3", "#9B71AF",
+  "#FFFF99"), fillOpacity = 0.5, label = NULL, popup = NULL,
+  minSize = 3, maxSize = 20, agg = "sum",
+  tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}

@@ -5,8 +5,8 @@
 \title{Leaflet bubbles colored by categorical variable}
 \usage{
 lflt_bubbles_grouped_GlnGltCat(data, palette = c("#009EE3", "#9B71AF",
-  "#FFFF99"), fillOpacity = 0.5, label = NULL, popup = NULL, size = 5,
-  tiles = "CartoDB.Positron")
+  "#FFFF99"), fillOpacity = 0.5, label = NULL, popup = NULL,
+  size = 5, tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}

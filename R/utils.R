@@ -59,3 +59,64 @@ file_path_sans_ext <- function (x)
 {
   sub("([^.]+)\\.[[:alnum:]]+$", "\\1", x)
 }
+
+# percent column
+#' @export
+percentColumn <- function (data, col, percentage = TRUE, nDigits = 2) {
+  if (percentage) {
+    data[[col]] <- round((data[[col]] * 100)/sum(data[[col]],
+                                                 na.rm = TRUE), digits = nDigits)
+  }
+  else {
+    data[[col]] <- round(data[[col]], digits = nDigits)
+  }
+  data
+}
+
+
+# leaflet labelFormat with decimal.mark
+#' @export
+labFor <- function (prefix = "",
+                    suffix = "",
+                    between = " &ndash; ",
+                    digits = 3,
+                    big.mark = ",",
+                    decimal.mark = ".",
+                    transform = identity) {
+  formatNum <- function(x) {
+    format(round(transform(x), digits), trim = TRUE, scientific = FALSE,
+           big.mark = big.mark, decimal.mark = decimal.mark)
+  }
+  function(type, ...) {
+    switch(type, numeric = (function(cuts) {
+      paste0(prefix, formatNum(cuts), suffix)
+    })(...), bin = (function(cuts) {
+      n <- length(cuts)
+      paste0(prefix, formatNum(cuts[-n]), between, formatNum(cuts[-1]),
+             suffix)
+    })(...), quantile = (function(cuts, p) {
+      n <- length(cuts)
+      p <- paste0(round(p * 100), "%")
+      cuts <- paste0(formatNum(cuts[-n]), between, formatNum(cuts[-1]))
+      paste0("<span title=\"", cuts, "\">", prefix, p[-n],
+             between, p[-1], suffix, "</span>")
+    })(...), factor = (function(cuts) {
+      paste0(prefix, as.character(transform(cuts)), suffix)
+    })(...))
+  }
+}
+
+# aggregation
+#'@export
+agg <- function(aggregation,...){
+  f <- NULL
+  if(aggregation == "sum")
+    f <- sum(..., na.rm = TRUE)
+  if(aggregation == "mean")
+    f <- mean(..., na.rm = TRUE)
+  if(aggregation == "median")
+    f <- median(...,na.rm = TRUE)
+  f
+}
+
+

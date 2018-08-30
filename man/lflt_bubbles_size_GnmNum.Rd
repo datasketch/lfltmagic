@@ -5,8 +5,8 @@
 \title{Leaflet bubbles size by numeric variable}
 \usage{
 lflt_bubbles_size_GnmNum(data, color = "navy", fillOpacity = 0.5,
-  label = NULL, popup = NULL, minSize = 3, maxSize = 20, agg = "sum",
-  scope = "world_countries", tiles = "CartoDB.Positron")
+  label = NULL, popup = NULL, minSize = 3, maxSize = 20,
+  agg = "sum", scope = "world_countries", tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}

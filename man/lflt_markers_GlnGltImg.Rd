@@ -4,8 +4,8 @@
 \alias{lflt_markers_GlnGltImg}
 \title{Leaflet markers by latitud and longitud and icons}
 \usage{
-lflt_markers_GlnGltImg(data, label = NULL, popup = NULL, iconWidth = 36,
-  iconHeight = 24, tiles = "CartoDB.Positron")
+lflt_markers_GlnGltImg(data, label = NULL, popup = NULL,
+  iconWidth = 36, iconHeight = 24, tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}
