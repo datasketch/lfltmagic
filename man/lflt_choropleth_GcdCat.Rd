@@ -5,11 +5,9 @@
 \title{Leaflet choropleths by categorical variable}
 \usage{
 lflt_choropleth_GcdCat(data, dropNa = FALSE, fillOpacity = 0.5,
-  format = c("", ""), legendColor = "discrete",
-  legendPosition = "bottomleft", legendTitle = NULL, label = NULL,
-  marks = c(",", "."), nDigits = 2, palette = c("#009EE3", "#9B71AF",
-  "#FFFF99"), percentage = FALSE, scope = "world_countries",
-  tiles = "CartoDB.Positron")
+  legendColor = "discrete", legendPosition = "bottomleft",
+  legendTitle = NULL, label = NULL, palette = c("#009EE3", "#9B71AF",
+  "#FFFF99"), scope = "world_countries", tiles = "CartoDB.Positron")
 }
 \arguments{
 \item{x}{A data.frame}

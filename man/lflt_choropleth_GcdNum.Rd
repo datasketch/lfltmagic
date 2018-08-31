@@ -7,7 +7,7 @@
 lflt_choropleth_GcdNum(data, agg = "sum", dropNa = FALSE,
   fillOpacity = 0.5, format = c("", ""), legendColor = "discrete",
   legendPosition = "bottomleft", legendTitle = NULL, label = NULL,
-  marks = c(",", "."), nBins = 8, nDigits = 2,
+  marks = c(",", "."), nBins = 4, nDigits = 2,
   palette = c("#009EE3", "#E5007D", "#95C11E"), percentage = FALSE,
   scope = "world_countries", tiles = "CartoDB.Positron")
 }

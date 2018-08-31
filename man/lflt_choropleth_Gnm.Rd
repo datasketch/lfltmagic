@@ -4,8 +4,11 @@
 \alias{lflt_choropleth_Gnm}
 \title{Leaflet choropleths by geographical name}
 \usage{
-lflt_choropleth_Gnm(data, palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-  fillOpacity = 0.5, label = NULL, popup = NULL,
+lflt_choropleth_Gnm(data, fillOpacity = 0.5, format = c("", ""),
+  legendColor = "discrete", legendPosition = "bottomleft",
+  legendTitle = NULL, label = NULL, marks = c(",", "."),
+  matchMethod = "lv", maxDist = 2, nBins = 4, nDigits = 2,
+  palette = c("#009EE3", "#E5007D", "#95C11E"), percentage = FALSE,
   scope = "world_countries", tiles = "CartoDB.Positron")
 }
 \arguments{
