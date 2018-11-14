@@ -60,18 +60,7 @@ file_path_sans_ext <- function (x)
   sub("([^.]+)\\.[[:alnum:]]+$", "\\1", x)
 }
 
-# percent column
-#' @export
-percentColumn <- function (data, col, percentage = TRUE, nDigits = 2) {
-  if (percentage) {
-    data[[col]] <- round((data[[col]] * 100)/sum(data[[col]],
-                                                 na.rm = TRUE), digits = nDigits)
-  }
-  else {
-    data[[col]] <- round(data[[col]], digits = nDigits)
-  }
-  data
-}
+
 
 
 # leaflet labelFormat with decimal.mark
@@ -117,6 +106,95 @@ agg <- function(aggregation,...){
   if(aggregation == "median")
     f <- median(...,na.rm = TRUE)
   f
+}
+
+
+# colores
+#' @export
+fillColors <- function (data, col, colors, colorScale, highlightValue, highlightValueColor,
+                        labelWrap, bins = NULL, numeric = TRUE) {
+  cat <- unique(data[[col]])
+  highlightValue <- stringr::str_wrap(highlightValue, labelWrap)
+  ds <- dsColorsHex(TRUE)
+  if (!is.null(colors)) {
+    cl <- col2rgb(colors)
+    colors <- map_chr(1:ncol(cl), function(s) {
+      rgb(cl[1, s], cl[2, s], cl[3, s], maxColorValue = 255)
+    })
+  }
+  if (colorScale == "no") {
+    if (is.null(colors)) {
+      colors <- dsColorsHex()[2]
+    }
+    fillCol <- data.frame(a = cat,
+                          color = rep(colors, length(cat))[1:length(cat)])
+    names(fillCol)[1] <- col
+    # fillCol <- rep(colors, length(cat))[1:length(cat)]
+    # names(fillCol) <- cat
+  }
+  if (colorScale == "discrete") {
+    if (is.null(colors)) {
+      colors <- dsColorsHex()
+    }
+    ad <- unlist(map(colors, function(y) {
+      l0 <- ds[((grep(substr(y, 2, 2), ignore.case = TRUE, ds) + 6) %% 16) + 1]
+      l1 <- paste0(substr(y, 1, 1), l0, substr(y, 3, 7))
+      p0 <- ds[((grep(substr(l1, 4, 4), ignore.case = TRUE, ds) + 6) %% 16) + 1]
+      p1 <- paste0(substr(l1, 1, 3), p0, substr(l1, 5, 7))
+      # p0 <- ds[((grep(substr(ifelse(length(colors) > 1, y, l1), 4, 4), ignore.case = TRUE, ds) + 6) %% 16) + 1]
+      # p1 <- paste0(substr(ifelse(length(colors) > 1, y,  l1), 1, 3),
+      #              p0,
+      #              substr(ifelse(length(colors) > 1, y, l1), 5, 7))
+      c(l1, p1)
+    }))
+  }
+  if (colorScale == "continuous") {
+    if (is.null(colors)) {
+      colors <- dsColorsHex()[c(1, 7, 3, 4)]
+    }
+    if (length(colors) == 1) {
+      l0 <- ds[((grep(substr(colors, 2, 2), ignore.case = TRUE, ds) + 7) %% 16) + 1]
+      colors <- c(colors, paste0(substr(colors, 1, 1), l0, substr(colors, 3, 7)))
+    }
+  }
+  if (numeric) {
+    # fillCol <- data.frame(a = cat,
+    #                       color = c(colors, colorNumeric(ad, cat)(cat))[sample(1:length(cat))])
+    fillCol <- data.frame(a = cat,
+                          color = c(colors, colorBin(c(colors, ad), cat, bins = bins)(cat))[sample(1:length(cat))])
+    names(fillCol)[1] <- col
+  } else {
+    # fillCol <- data.frame(a = cat,
+    #                       color = c(colors, colorFactor(ad, cat)(cat))[sample(1:length(cat))])
+    fillCol <- data.frame(a = cat,
+                          color = c(colors, colorFactor(c(colors, ad), cat)(cat))[sample(1:length(cat))])
+    names(fillCol)[1] <- col
+  }
+  if (!is.null(highlightValue) & sum(highlightValue %in% data[[1]]) > 0) {
+    wh <- which(data[[1]] %in% highlightValue)
+    if (is.null(highlightValueColor)) {
+      l0 <- ds[((grep(substr(colors[1], 2, 2), ignore.case = TRUE, ds) + 13) %% 16) + 1]
+      highlightValueColor <- paste0(substr(colors[1], 1, 1), l0, substr(colors[1], 3, 7))
+    }
+    print(wh)
+    fillCol[[2]][wh] <- highlightValueColor
+  }
+  fillCol <- data %>%
+    dplyr::left_join(fillCol)
+  fillCol
+}
+
+# ds palette
+#' @export
+dsColorsHex <- function(hex = FALSE) {
+  if (hex) {
+    c <- c(0:9, "A", "B", "C", "D", "E", "F")
+
+  } else {
+    c <- c("#2E0F35", "#74D1F7", "#B70F7F", "#C2C4C4", "#8097A4",  "#A6CEDE", "#801549",
+           "#FECA84", "#ACD9C2", "#EEF1F2")
+  }
+  c
 }
 
 

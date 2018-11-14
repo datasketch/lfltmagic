@@ -13,6 +13,9 @@ lflt_choropleth_Gcd <- function(data,
                                 # dropNa = FALSE, ¿NO HACE FALTA? ¿SIEMPRE SE QUITAN??
                                 fillOpacity = 0.5,
                                 format = c("", ""),
+                                # legend = list(color = "discrete",
+                                #               position = "bottomleft",
+                                #               title = NULL),
                                 legendColor = "discrete",
                                 legendPosition = "bottomleft",
                                 legendTitle = NULL,
@@ -55,8 +58,10 @@ lflt_choropleth_Gcd <- function(data,
   if (is.null(label)) {
     #lab <- paste0(dgeo@data$id, ": ", dgeo@data$b)
     lab <- map(1:nrow(dgeo@data), function(r) {
-      htmltools::HTML(paste0(dgeo@data$id[r],
-                             ": <b>",
+      htmltools::HTML(paste0(dgeo@data$name[r],
+                             " (",
+                             dgeo@data$id[r],
+                             "): <b>",
                              format[1],
                              format(dgeo@data$b[r], big.mark = marks[1], decimal.mark = marks[2]),
                              ifelse(is.na(dgeo@data$b[r]), "", format[2]),
@@ -75,7 +80,7 @@ lflt_choropleth_Gcd <- function(data,
   # reverse = TRUE)
 
   col <- colorNumeric(palette = palette,
-                      domain = dgeo@data$b)
+                      domain = dgeo@data$b, na.color = "transparent")
   if (legendColor == "discrete") {
   col <- colorBin(palette = palette,
                   domain = dgeo@data$b,
@@ -106,6 +111,9 @@ lflt_choropleth_Gcd <- function(data,
   }
   l
 }
+
+
+
 
 #' Leaflet choropleths by categorical variable
 #'
@@ -173,8 +181,10 @@ lflt_choropleth_GcdCat <- function(data,
     #lab <- paste0(dgeo@data$id, ": ", dgeo@data$b)
     lab <- map(1:nrow(dgeo@data), function(r) {
       htmltools::HTML(paste0("<b>",
+                             dgeo@data$name[r],
+                             " (",
                              dgeo@data$id[r],
-                             "</b><br/>",
+                             ")</b><br/>",
                              nms[2],
                              ": <b>",
                              dgeo@data$b[r],
@@ -274,8 +284,10 @@ lflt_choropleth_GcdNum <- function(data,
   if (is.null(label)) {
     #lab <- paste0(dgeo@data$id, ": ", dgeo@data$b)
     lab <- map(1:nrow(dgeo@data), function(r) {
-      htmltools::HTML(paste0(dgeo@data$id[r],
-                             ": <b>",
+      htmltools::HTML(paste0(dgeo@data$name[r],
+                             " (",
+                             dgeo@data$id[r],
+                             "): <b>",
                              format[1],
                              format(dgeo@data$b[r], big.mark = marks[1], decimal.mark = marks[2]),
                              ifelse(is.na(dgeo@data$b[r]), "", format[2]),
@@ -377,7 +389,7 @@ lflt_choropleth_Gnm <- function(data,
     if ("altnames" %in% names(geodata::geodataMeta(scope))) {
       alt <- geodata::geodataMeta(scope)$altnames %>%
         na.omit()
-      a0 <- adist(d$a, alt$altname)
+      a0 <- adist(d$a, alt$altname, ignore.case = TRUE)
       p0 <- map_df(1:nrow(a0), function(u) {
         f0 <- which(a0[u, ] == min(a0[u, ], na.rm = TRUE))[1]
         f1 <- unique(alt$id[f0])[1]
@@ -396,7 +408,7 @@ lflt_choropleth_Gnm <- function(data,
       dgeo@data <- left_join(dgeo@data, p1, by = "id")
       names(dgeo@data) <- c("id", "name", "name_i", "altname", "a", "b", "dist")
     } else {
-      a0 <- adist(d$a, dgeo@data$name)
+      a0 <- adist(d$a, dgeo@data$name, ignore.case = TRUE)
       p0 <- map_df(1:nrow(a0), function(u) {
         f0 <- which(a0[u, ] == min(a0[u, ], na.rm = TRUE))[1]
         bind_cols(dgeo@data[f0, ], d[u, ], data.frame("dist" = a0[u, f0]))
@@ -511,7 +523,7 @@ lflt_choropleth_GnmCat <- function(data,
     if ("altnames" %in% names(geodata::geodataMeta(scope))) {
       alt <- geodata::geodataMeta(scope)$altnames %>%
         na.omit()
-      a0 <- adist(d$a, alt$altname)
+      a0 <- adist(d$a, alt$altname, ignore.case = TRUE)
       p0 <- map_df(1:nrow(a0), function(u) {
         f0 <- which(a0[u, ] == min(a0[u, ], na.rm = TRUE))[1]
         f1 <- unique(alt$id[f0])[1]
@@ -530,7 +542,7 @@ lflt_choropleth_GnmCat <- function(data,
       dgeo@data <- left_join(dgeo@data, p1, by = "id")
       names(dgeo@data) <- c("id", "name", "name_i", "altname", "a", "b", "c", "dist")
     } else {
-      a0 <- adist(d$a, dgeo@data$name)
+      a0 <- adist(d$a, dgeo@data$name, ignore.case = TRUE)
       p0 <- map_df(1:nrow(a0), function(u) {
         f0 <- which(a0[u, ] == min(a0[u, ], na.rm = TRUE))[1]
         bind_cols(dgeo@data[f0, ], d[u, ], data.frame("dist" = a0[u, f0]))
@@ -639,7 +651,7 @@ lflt_choropleth_GnmNum <- function(data,
     if ("altnames" %in% names(geodata::geodataMeta(scope))) {
       alt <- geodata::geodataMeta(scope)$altnames %>%
         na.omit()
-      a0 <- adist(d$a, alt$altname)
+      a0 <- adist(d$a, alt$altname, ignore.case = TRUE)
       p0 <- map_df(1:nrow(a0), function(u) {
         f0 <- which(a0[u, ] == min(a0[u, ], na.rm = TRUE))[1]
         f1 <- unique(alt$id[f0])[1]
@@ -658,7 +670,7 @@ lflt_choropleth_GnmNum <- function(data,
       dgeo@data <- left_join(dgeo@data, p1, by = "id")
       names(dgeo@data) <- c("id", "name", "name_i", "altname", "a", "b", "dist")
     } else {
-      a0 <- adist(d$a, dgeo@data$name)
+      a0 <- adist(d$a, dgeo@data$name, ignore.case = TRUE)
       p0 <- map_df(1:nrow(a0), function(u) {
         f0 <- which(a0[u, ] == min(a0[u, ], na.rm = TRUE))[1]
         bind_cols(dgeo@data[f0, ], d[u, ], data.frame("dist" = a0[u, f0]))
