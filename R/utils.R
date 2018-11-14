@@ -129,8 +129,6 @@ fillColors <- function (data, col, colors, colorScale, highlightValue, highlight
     fillCol <- data.frame(a = cat,
                           color = rep(colors, length(cat))[1:length(cat)])
     names(fillCol)[1] <- col
-    # fillCol <- rep(colors, length(cat))[1:length(cat)]
-    # names(fillCol) <- cat
   }
   if (colorScale == "discrete") {
     if (is.null(colors)) {
@@ -158,29 +156,27 @@ fillColors <- function (data, col, colors, colorScale, highlightValue, highlight
     }
   }
   if (numeric) {
-    # fillCol <- data.frame(a = cat,
-    #                       color = c(colors, colorNumeric(ad, cat)(cat))[sample(1:length(cat))])
     fillCol <- data.frame(a = cat,
-                          color = c(colors, colorBin(c(colors, ad), cat, bins = bins)(cat))[sample(1:length(cat))])
+                          color = c(colors, colorNumeric(c(colors, ad), cat)(cat))[sample(1:length(cat))])
     names(fillCol)[1] <- col
   } else {
-    # fillCol <- data.frame(a = cat,
-    #                       color = c(colors, colorFactor(ad, cat)(cat))[sample(1:length(cat))])
     fillCol <- data.frame(a = cat,
                           color = c(colors, colorFactor(c(colors, ad), cat)(cat))[sample(1:length(cat))])
     names(fillCol)[1] <- col
   }
-  if (!is.null(highlightValue) & sum(highlightValue %in% data[[1]]) > 0) {
-    wh <- which(data[[1]] %in% highlightValue)
+
+  fillCol <- data %>%
+    dplyr::left_join(fillCol)
+
+  if (!is.null(highlightValue) & sum(highlightValue %in% fillCol[[1]]) > 0) {
+    wh <- which(fillCol[[1]] %in% highlightValue)
     if (is.null(highlightValueColor)) {
       l0 <- ds[((grep(substr(colors[1], 2, 2), ignore.case = TRUE, ds) + 13) %% 16) + 1]
       highlightValueColor <- paste0(substr(colors[1], 1, 1), l0, substr(colors[1], 3, 7))
     }
-    print(wh)
-    fillCol[[2]][wh] <- highlightValueColor
+    fillCol$color <- as.character(fillCol$color)
+    fillCol$color[wh] <- highlightValueColor
   }
-  fillCol <- data %>%
-    dplyr::left_join(fillCol)
   fillCol
 }
 
@@ -197,4 +193,19 @@ dsColorsHex <- function(hex = FALSE) {
   c
 }
 
+# label popups
+#' @export
+labelsPopups <- function(data, lp) {
+  m0 <- regmatches(lp, gregexpr("\\{.[^\\{]+}", lp))[[1]]
+  m1 <- gsub("\\{", "\\\\{", gsub("\\.", "\\\\.", m0))
+  n0 <- gsub("\\.", "", unlist(regmatches(m0, gregexpr("\\.[^}]+", m0))))
+  cl <- rep(lp, nrow(data))
+  map(1:length(n0), function(p) {
+    st0 <- strsplit(cl, m1[p])
+    cl <<- paste0(map(st0, ~`[`(.x, 1)),
+                  data[[n0[p]]],
+                  map(st0, ~`[`(.x, 2)))
+  })
+  cl
+}
 
