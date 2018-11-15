@@ -116,6 +116,7 @@ fillColors <- function (data, col, colors, colorScale, highlightValue, highlight
   cat <- unique(data[[col]])
   highlightValue <- stringr::str_wrap(highlightValue, labelWrap)
   ds <- dsColorsHex(TRUE)
+  ad <- c()
   if (!is.null(colors)) {
     cl <- col2rgb(colors)
     colors <- map_chr(1:ncol(cl), function(s) {
@@ -195,16 +196,20 @@ dsColorsHex <- function(hex = FALSE) {
 
 # label popups
 #' @export
-labelsPopups <- function(data, lp) {
+labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 12) {
   m0 <- regmatches(lp, gregexpr("\\{.[^\\{]+}", lp))[[1]]
   m1 <- gsub("\\{", "\\\\{", gsub("\\.", "\\\\.", m0))
   n0 <- gsub("\\.", "", unlist(regmatches(m0, gregexpr("\\.[^}]+", m0))))
   cl <- rep(lp, nrow(data))
   map(1:length(n0), function(p) {
     st0 <- strsplit(cl, m1[p])
-    cl <<- paste0(map(st0, ~`[`(.x, 1)),
-                  data[[n0[p]]],
-                  map(st0, ~`[`(.x, 2)))
+    cl <<- paste0(ifelse(all(is.na(map(st0, ~`[`(.x, 1)))), "", map(st0, ~`[`(.x, 1))),
+                  stringr::str_wrap(format(data[[n0[p]]],
+                                           big.mark = marks[1],
+                                           decimal.mark = marks[2],
+                                           nsmall = nDigits),
+                                    labelWrap),
+                  ifelse(all(is.na(map(st0, ~`[`(.x, 2)))), "", map(st0, ~`[`(.x, 2))))
   })
   cl
 }

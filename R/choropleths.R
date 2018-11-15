@@ -85,8 +85,8 @@ lflt_choropleth_Gcd <- function(data = NULL,
   if (is.null(popup)) {
     popup <- "{point.id}: <b> {point.b} </b>"
   }
-  dt@data$label <- labelsPopups(dt@data, label)
-  dt@data$popup <- labelsPopups(dt@data, popup)
+  dt@data$label <- labelPopup(dt@data, label, marks, nDigits, labelWrap)
+  dt@data$popup <- labelPopup(dt@data, popup, marks, nDigits, labelWrap)
 
   lf <- leaflet(dt)
   if (!is.null(tiles)) {
@@ -101,20 +101,20 @@ lflt_choropleth_Gcd <- function(data = NULL,
                 fillOpacity = fill$opacity,
                 opacity = border$opacity,
                 weight = border$weight)
-
-  # if (legendColor %in% c("discrete", "continuous")) {
-  #   l <- l %>%
-  #     addLegend(pal = col,
-  #               title = legendTitle,
-  #               values = dgeo@data$b,
-  #               labFormat = labFor(prefix = format[1],
-  #                                  suffix = format[2],
-  #                                  big.mark = marks[1],
-  #                                  decimal.mark = marks[2],
-  #                                  digits = nDigits),
-  #               opacity = 2,
-  #               position = legendPosition)
-  # }
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(ifelse(count, b, id)),
+                # labFormat = labFor(prefix = format[1],
+                #                    suffix = format[2],
+                #                    big.mark = marks[1],
+                #                    decimal.mark = marks[2],
+                #                    digits = nDigits),
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
+  }
   lf
 }
 
