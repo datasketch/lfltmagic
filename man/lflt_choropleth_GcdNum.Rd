@@ -4,12 +4,14 @@
 \alias{lflt_choropleth_GcdNum}
 \title{Leaflet choropleths by numerical variable}
 \usage{
-lflt_choropleth_GcdNum(data, agg = "sum", dropNa = FALSE,
-  fillOpacity = 0.5, format = c("", ""), legendColor = "discrete",
-  legendPosition = "bottomleft", legendTitle = NULL, label = NULL,
-  marks = c(",", "."), nBins = 4, nDigits = 2,
-  palette = c("#009EE3", "#E5007D", "#95C11E"), percentage = FALSE,
-  scope = "world_countries", tiles = "CartoDB.Positron")
+lflt_choropleth_GcdNum(data = NULL, caption = NULL, agg = "sum",
+  border = list(weight = 1, color = "black", opacity = 1),
+  fill = list(color = NULL, opacity = 0.5, scale = "no", nullColor =
+  "#cccccc"), format = c("", ""), highlightValue = NULL,
+  highlightValueColor = NULL, labelWrap = 12, legend = list(bins = 6,
+  position = "bottomleft", title = NULL), mapName = "world_countries",
+  marks = c(",", "."), nDigits = 2, label = NULL,
+  percentage = FALSE, popup = NULL, tiles = NULL)
 }
 \arguments{
 \item{x}{A data.frame}

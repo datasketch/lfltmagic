@@ -27,17 +27,12 @@ lflt_choropleth_Gcd <- function(data = NULL,
                                 legend = list(bins = 6,
                                               position = "bottomleft",
                                               title = NULL),
-
                                 mapName = "world_countries",
                                 marks = c(",", "."),
                                 nDigits = 2,
-
                                 label = NULL,
-                                popup = NULL,
-
                                 percentage = FALSE,
-                                # popup = NULL,
-                                # infoVar = NULL,
+                                popup = NULL,
                                 tiles = NULL) {
 
   if (!mapName %in% availableGeodata()) {
@@ -51,6 +46,7 @@ lflt_choropleth_Gcd <- function(data = NULL,
     d <- f$d
     if (count) {
       d <- d  %>%
+        tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA))) %>%
         # tidyr::drop_na() %>%
         dplyr::group_by(a) %>%
         dplyr::summarise(b = n()) %>%
@@ -60,13 +56,13 @@ lflt_choropleth_Gcd <- function(data = NULL,
                       labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
     } else {
       d <- d %>%
+        tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA))) %>%
         dplyr::group_by(a) %>%
         dplyr::slice(1)
 
       d <- fillColors(d, "a", fill$color, fill$scale, highlightValue, highlightValueColor,
                       labelWrap = labelWrap, numeric = FALSE)
     }
-    # legendTitle <- legendTitle %||% ""
     dt@data <- dt@data %>%
       dplyr::select(-color) %>%
       dplyr::left_join(d, by = c(id = "a"))
@@ -120,10 +116,9 @@ lflt_choropleth_Gcd <- function(data = NULL,
 
 
 
-
-#' Leaflet choropleths by categorical variable
+#' Leaflet choropleths by geographical variable
 #'
-#' Leaflet choropleths by categorical variable
+#' Leaflet choropleths by geographical variable
 #'
 #' @name lflt_choropleth_GcdCat
 #' @param x A data.frame
@@ -132,99 +127,118 @@ lflt_choropleth_Gcd <- function(data = NULL,
 #' @export
 #' @examples
 #' lflt_choropleth_GcdCat(sampleData("Gcd-Cat", nrow = 10))
-lflt_choropleth_GcdCat <- function(data,
-                                   dropNa = FALSE,
-                                   fillOpacity = 0.5,
-                                   #format = c("", ""),
-                                   legendColor = "discrete",
-                                   legendPosition = "bottomleft",
-                                   legendTitle = NULL,
+lflt_choropleth_GcdCat <- function(data = NULL,
+                                   caption = NULL,
+                                   count = TRUE,
+                                   border = list(weight = 1,
+                                                 color = "black",
+                                                 opacity = 1),
+                                   fill = list(color = NULL,
+                                               opacity = 0.5,
+                                               scale = "no",
+                                               nullColor = "#cccccc"),
+                                   # dropNa = FALSE, ¿NO HACE FALTA? ¿SIEMPRE SE QUITAN??
+                                   format = c("", ""),
+                                   highlightValue = NULL,
+                                   highlightValueColor = NULL,
+                                   labelWrap = 12,
+                                   legend = list(bins = 6,
+                                                 position = "bottomleft",
+                                                 title = NULL),
+                                   mapName = "world_countries",
+                                   marks = c(",", "."),
+                                   nDigits = 2,
                                    label = NULL,
-                                   #marks = c(",", "."),
-                                   #nDigits = 2,
-                                   palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-                                   #percentage = FALSE,
-                                   #infoVar = NULL,
-                                   # popup = NULL,
-                                   scope = "world_countries",
-                                   tiles = "CartoDB.Positron") {
-  f <- fringe(data)
-  nms <- getClabels(f)
-  d <- f$d
+                                   percentage = FALSE,
+                                   popup = NULL,
+                                   tiles = NULL) {
 
-  legendTitle <- legendTitle %||% ""
+  if (!mapName %in% availableGeodata()) {
+    stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
+  }
+  dt <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
+  dt@data$color <- fill$nullColor
+  if (!is.null(data)) {
+    f <- fringe(data)
+    nms <- getClabels(f)
+    d <- f$d
+    if (count) {
+      d <- d  %>%
+        tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA),
+                               b = ifelse(is.character(d$b), "NA", NA))) %>%
+        # tidyr::drop_na() %>%
+        dplyr::group_by(a, b) %>%
+        dplyr::summarise(c = n()) %>%
+        dplyr::arrange(desc(c)) %>%
+        dplyr::slice(1) %>%
+        dplyr::mutate(percent = c * 100 / sum(c, na.rm = TRUE))
 
+      d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
+                      labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
+    } else {
+      d <- d %>%
+        tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA),
+                               b = ifelse(is.character(d$b), "NA", NA))) %>%
+        dplyr::group_by(a, b) %>%
+        dplyr::summarise(c = n()) %>%
+        dplyr::arrange(desc(c)) %>%
+        dplyr::slice(1) %>%
+        dplyr::selec(a, b)
 
-  if (dropNa)
-    d <- d %>%
-    tidyr::drop_na(2)
-
-  d <- d %>%
-    drop_na(1) %>%
-    tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA),
-                           b = ifelse(is.character(d$b), "NA", NA))) %>%
-    dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = n()) %>%
-    dplyr::arrange(desc(c)) %>%
-    dplyr::slice(1)
-
-  # d <- percentColumn(d, "b", percentage, nDigits)
-  #
-  # if (percentage & nchar(format[2]) == 0) {
-  #   format[2] <- "%"
-  # }
-
-  if (scope %in% geodata::availableGeodata()) {
-    dgeo <- geojsonio::topojson_read(geodata::geodataTopojsonPath(scope))
-    dgeo@data <- dgeo@data %>%
+      d <- fillColors(d, "b", fill$color, fill$scale, highlightValue, highlightValueColor,
+                      labelWrap = labelWrap, numeric = FALSE)
+    }
+    dt@data <- dt@data %>%
+      dplyr::select(-color) %>%
       dplyr::left_join(d, by = c(id = "a"))
-  } else {
-    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
+
+    dt@data$color <- as.character(dt@data$color)
+    dt@data$color[is.na(dt@data$color)] <- fill$nullColor
   }
 
+  if (percentage & nchar(format[2]) == 0) {
+    format[2] <- "%"
+  }
   # los labels y popups
   if (is.null(label)) {
-    #lab <- paste0(dgeo@data$id, ": ", dgeo@data$b)
-    lab <- map(1:nrow(dgeo@data), function(r) {
-      htmltools::HTML(paste0("<b>",
-                             dgeo@data$name[r],
-                             " (",
-                             dgeo@data$id[r],
-                             ")</b><br/>",
-                             nms[2],
-                             ": <b>",
-                             dgeo@data$b[r],
-                             "</b>"))
-    })
+    label <- "{point.id} <br/><b> {point.b}: </b> {point.c}"
   }
+  if (is.null(popup)) {
+    popup <- "{point.id} <br/><b> {point.b}: </b> {point.c}"
+  }
+  dt@data$label <- labelPopup(dt@data, label, marks, nDigits, labelWrap)
+  dt@data$popup <- labelPopup(dt@data, popup, marks, nDigits, labelWrap)
 
-  col <- colorFactor(palette = palette, domain = unique(dgeo@data$b))
-  # col <- colorNumeric(palette = palette, domain = NULL)
-
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addPolygons(fillColor = col(dgeo@data$b),
-                fillOpacity = fillOpacity,
-                color = "black",
-                label = lab,
-                weight = 0.5)
-
-  if (legendColor == "discrete") {
-    l <- l %>%
-      addLegend(pal = col,
-                title = legendTitle,
-                values = dgeo@data$b,
+  lf <- leaflet(dt)
+  if (!is.null(tiles)) {
+    lf <- lf %>%
+      addProviderTiles(tiles)
+  }
+  lf <- lf %>%
+    addPolygons(fillColor = ~color,
+                label = ~map(label, ~shiny::HTML(.x)),
+                popup = ~map(popup, ~shiny::HTML(.x)),
+                color = border$color,
+                fillOpacity = fill$opacity,
+                opacity = border$opacity,
+                weight = border$weight)
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(ifelse(count, b, id)),
                 # labFormat = labFor(prefix = format[1],
                 #                    suffix = format[2],
                 #                    big.mark = marks[1],
                 #                    decimal.mark = marks[2],
                 #                    digits = nDigits),
-                opacity = 2,
-                position = legendPosition)
-
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
   }
-  l
+  lf
 }
+
 
 
 #' Leaflet choropleths by numerical variable
@@ -238,110 +252,105 @@ lflt_choropleth_GcdCat <- function(data,
 #' @export
 #' @examples
 #' lflt_choropleth_GcdNum(sampleData("Gcd-Num", nrow = 10))
-lflt_choropleth_GcdNum <- function(data,
+lflt_choropleth_GcdNum <- function(data = NULL,
+                                   caption = NULL,
                                    agg = "sum",
-                                   dropNa = FALSE,
-                                   fillOpacity = 0.5,
+                                   border = list(weight = 1,
+                                                 color = "black",
+                                                 opacity = 1),
+                                   fill = list(color = NULL,
+                                               opacity = 0.5,
+                                               scale = "no",
+                                               nullColor = "#cccccc"),
+                                   # dropNa = FALSE, ¿NO HACE FALTA? ¿SIEMPRE SE QUITAN??
                                    format = c("", ""),
-                                   legendColor = "discrete",
-                                   legendPosition = "bottomleft",
-                                   legendTitle = NULL,
-                                   label = NULL,
+                                   highlightValue = NULL,
+                                   highlightValueColor = NULL,
+                                   labelWrap = 12,
+                                   legend = list(bins = 6,
+                                                 position = "bottomleft",
+                                                 title = NULL),
+                                   mapName = "world_countries",
                                    marks = c(",", "."),
-                                   nBins = 4,
                                    nDigits = 2,
-                                   palette = c("#009EE3", "#E5007D", "#95C11E"),
+                                   label = NULL,
                                    percentage = FALSE,
-                                   # popup = NULL,
-                                   #infoVar = NULL,,
-                                   scope = "world_countries",
-                                   tiles = "CartoDB.Positron") {
-  f <- fringe(data)
-  nms <- getClabels(f)
-  d <- f$d
+                                   popup = NULL,
+                                   tiles = NULL) {
 
-  legendTitle <- legendTitle %||% ""
+  if (!mapName %in% availableGeodata()) {
+    stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
+  }
+  dt <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
+  dt@data$color <- fill$nullColor
+  if (!is.null(data)) {
+    f <- fringe(data)
+    nms <- getClabels(f)
+    d <- f$d
+    d <- d  %>%
+      tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA),
+                             b =  NA)) %>%
+      # tidyr::drop_na() %>%
+      dplyr::group_by(a) %>%
+      dplyr::summarise(b = agg(agg, b)) %>%
+      dplyr::mutate(percent = b * 100 / sum(b, na.rm = TRUE))
 
-  if (dropNa)
-    d <- d %>%
-    tidyr::drop_na(2)
+    d <- fillColors(d, "b", fill$color, fill$scale, highlightValue, highlightValueColor,
+                    labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
 
-  d <- d  %>%
-    drop_na(1) %>%
-    tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA))) %>%
-    dplyr::group_by(a) %>%
-    dplyr::summarise(b = do.call(agg, list(b, na.rm = TRUE)))
+    dt@data <- dt@data %>%
+      dplyr::select(-color) %>%
+      dplyr::left_join(d, by = c(id = "a"))
 
-  d <- percentColumn(d, "b", percentage, nDigits)
+    dt@data$color <- as.character(dt@data$color)
+    dt@data$color[is.na(dt@data$color)] <- fill$nullColor
+  }
 
   if (percentage & nchar(format[2]) == 0) {
     format[2] <- "%"
   }
-
-  if (scope %in% geodata::availableGeodata()) {
-    dgeo <- geojsonio::topojson_read(geodata::geodataTopojsonPath(scope))
-    dgeo@data <- dgeo@data %>%
-      dplyr::left_join(d, by = c(id = "a"))
-  } else {
-    stop("Pick an available map for the 'scope' argument (geodata::availableGeodata())")
-  }
-
-  # los labels y popups
+# los labels y popups
   if (is.null(label)) {
-    #lab <- paste0(dgeo@data$id, ": ", dgeo@data$b)
-    lab <- map(1:nrow(dgeo@data), function(r) {
-      htmltools::HTML(paste0(dgeo@data$name[r],
-                             " (",
-                             dgeo@data$id[r],
-                             "): <b>",
-                             format[1],
-                             format(dgeo@data$b[r], big.mark = marks[1], decimal.mark = marks[2]),
-                             ifelse(is.na(dgeo@data$b[r]), "", format[2]),
-                             "<br/>"))
-    })
+    label <- "{point.id}: <b> {point.b} </b>"
   }
-
-  # colorBin en vez de colorNumeric
-  # col <- colorQuantile(palette = palette,
-  #                      domain = dgeo@data$b,
-  #                      probs = seq(0, 1, 1/nBins))
-
-  col <- colorNumeric(palette = palette,
-                      domain = dgeo@data$b)
-  if (legendColor == "discrete") {
-    col <- colorBin(palette = palette,
-                    domain = dgeo@data$b,
-                    bins = nBins,
-                    pretty = FALSE)
+  if (is.null(popup)) {
+    popup <- "{point.id}: <b> {point.b} </b>"
   }
+  dt@data$label <- labelPopup(dt@data, label, marks, nDigits, labelWrap)
+  dt@data$popup <- labelPopup(dt@data, popup, marks, nDigits, labelWrap)
 
-  # col <- colorNumeric(palette = palette, domain = NULL)
-
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addPolygons(fillColor = col(dgeo@data$b),
-                # addPolygons(fillColor = col(unique(dgeo@data$b)),
-                fillOpacity = fillOpacity,
-                color = "black",
-                label = lab,
-                weight = 0.5)
-  # stroke = FALSE)
-
-  if (legendColor %in% c("discrete", "continuous")) {
-    l <- l %>%
-      addLegend(pal = col,
-                title = legendTitle,
-                values = dgeo@data$b,
-                labFormat = labFor(prefix = format[1],
-                                   suffix = format[2],
-                                   big.mark = marks[1],
-                                   decimal.mark = marks[2],
-                                   digits = nDigits),
-                opacity = 2,
-                position = legendPosition)
+  lf <- leaflet(dt)
+  if (!is.null(tiles)) {
+    lf <- lf %>%
+      addProviderTiles(tiles)
   }
-  l
+  lf <- lf %>%
+    addPolygons(fillColor = ~color,
+                label = ~map(label, ~shiny::HTML(.x)),
+                popup = ~map(popup, ~shiny::HTML(.x)),
+                color = border$color,
+                fillOpacity = fill$opacity,
+                opacity = border$opacity,
+                weight = border$weight)
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(ifelse(count, b, id)),
+                # labFormat = labFor(prefix = format[1],
+                #                    suffix = format[2],
+                #                    big.mark = marks[1],
+                #                    decimal.mark = marks[2],
+                #                    digits = nDigits),
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
+  }
+  lf
 }
+
+
+
 
 #' Leaflet choropleths by geographical name
 #'

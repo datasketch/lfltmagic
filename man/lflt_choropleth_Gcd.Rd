@@ -10,8 +10,8 @@ lflt_choropleth_Gcd(data = NULL, caption = NULL, count = TRUE,
   "#cccccc"), format = c("", ""), highlightValue = NULL,
   highlightValueColor = NULL, labelWrap = 12, legend = list(bins = 6,
   position = "bottomleft", title = NULL), mapName = "world_countries",
-  marks = c(",", "."), nDigits = 2, label = NULL, popup = NULL,
-  percentage = FALSE, tiles = NULL)
+  marks = c(",", "."), nDigits = 2, label = NULL,
+  percentage = FALSE, popup = NULL, tiles = NULL)
 }
 \arguments{
 \item{x}{A data.frame}

@@ -2,12 +2,16 @@
 % Please edit documentation in R/choropleths.R
 \name{lflt_choropleth_GcdCat}
 \alias{lflt_choropleth_GcdCat}
-\title{Leaflet choropleths by categorical variable}
+\title{Leaflet choropleths by geographical variable}
 \usage{
-lflt_choropleth_GcdCat(data, dropNa = FALSE, fillOpacity = 0.5,
-  legendColor = "discrete", legendPosition = "bottomleft",
-  legendTitle = NULL, label = NULL, palette = c("#009EE3", "#9B71AF",
-  "#FFFF99"), scope = "world_countries", tiles = "CartoDB.Positron")
+lflt_choropleth_GcdCat(data = NULL, caption = NULL, count = TRUE,
+  border = list(weight = 1, color = "black", opacity = 1),
+  fill = list(color = NULL, opacity = 0.5, scale = "no", nullColor =
+  "#cccccc"), format = c("", ""), highlightValue = NULL,
+  highlightValueColor = NULL, labelWrap = 12, legend = list(bins = 6,
+  position = "bottomleft", title = NULL), mapName = "world_countries",
+  marks = c(",", "."), nDigits = 2, label = NULL,
+  percentage = FALSE, popup = NULL, tiles = NULL)
 }
 \arguments{
 \item{x}{A data.frame}
@@ -16,7 +20,7 @@ lflt_choropleth_GcdCat(data, dropNa = FALSE, fillOpacity = 0.5,
 leaflet viz
 }
 \description{
-Leaflet choropleths by categorical variable
+Leaflet choropleths by geographical variable
 }
 \section{ctypes}{
  Gcd-Cat
