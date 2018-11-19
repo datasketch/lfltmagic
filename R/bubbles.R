@@ -795,220 +795,335 @@ lflt_bubbles_GnmCatNum <- function(data,
 }
 
 
-#' Leaflet bubbles size by latitud and longitud
+#' Leaflet bubbles by latitud and longitud
 #'
-#' Leaflet bubbles size by latitud and longitud
+#' Leaflet bubbles by latitud and longitud
 #'
-#' @name lflt_bubbles_size_GlnGlt
+#' @name lflt_bubbles_GlnGlt
 #' @param x A data.frame
 #' @return leaflet viz
 #' @section ctypes: Gln-Glt
 #' @export
 #' @examples
-#' lflt_bubbles_size_GlnGlt(sampleData("Gln-Glt", nrow = 10))
-lflt_bubbles_size_GlnGlt <- function(data,
-                                color = "navy",
-                                fillOpacity = 0.5,
-                                #infoVar = NULL,
+#' lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+lflt_bubbles_GlnGlt <- function(data,
+                                caption = NULL,
+                                count = TRUE,
+                                border = list(weight = 1.3,
+                                              color = "black",
+                                              opacity = 1,
+                                              stroke = TRUE),
+                                fill = list(color = NULL,
+                                            opacity = 0.5,
+                                            scale = "discrete",
+                                            nullColor = "#dddddd"),
+                                format = c("", ""),
+                                highlightValue = NULL,
+                                highlightValueColor = NULL,
+                                labelWrap = 12,
+                                legend = list(bins = 6,
+                                              position = "bottomleft",
+                                              title = NULL),
+                                marks = c(",", "."),
+                                nDigits = 2,
                                 label = NULL,
+                                percentage = FALSE,
                                 popup = NULL,
-                                minSize = 3,
-                                maxSize = 20,
-                                tiles = "CartoDB.Positron") {
+                                size = c(3, 20),
+                                tiles = NULL) {
   f <- fringe(data)
   nms <- getClabels(f)
-  popup <- popup %||% ""
+  d <- f$d
+  if (count) {
+    d <- d  %>%
+      tidyr::replace_na(list(a = NA,
+                             b = NA)) %>%
+      # tidyr::drop_na() %>%
+      dplyr::group_by(a, b) %>%
+      dplyr::summarise(c = n()) %>%
+      dplyr::mutate(percent = c * 100 / sum(c, na.rm = TRUE))
 
-  dgeo <- f$d %>%
-    na.omit() %>%
-    dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = n())
-
-  # los labels y popups
-  if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
-    })
+    d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
+                    labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
   } else {
-    lab <- dgeo[[label]]
-  }
-  if (popup %in% nms) {
-    popup <- dgeo[[popup]]
+    d <- d %>%
+      tidyr::replace_na(list(a = NA,
+                             b = NA)) %>%
+      dplyr::group_by(a, b) %>%
+      dplyr::slice(1) %>%
+      dplyr::mutate(c = 1,
+                    d = 1:length(b))
+
+    d <- fillColors(d, "d", fill$color, fill$scale, highlightValue, highlightValueColor,
+                    labelWrap = labelWrap, numeric = FALSE)
   }
 
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
-                     radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     popup = popup,
-                     fillOpacity = fillOpacity,
-                     label = lab,
-                     color = color,
-                     stroke = FALSE)
-  l
+  if (percentage & nchar(format[2]) == 0) {
+    format[2] <- "%"
+  }
+  # los labels y popups
+  if (is.null(label)) {
+    label <- "{point.a}, {point.b} <br/><b> {point.c} </b>"
+  }
+  if (is.null(popup)) {
+    popup <- "{point.a}, {point.b} <br/><b> {point.c} </b>"
+  }
+  d$label <- labelPopup(d, label, marks, nDigits, labelWrap)
+  d$popup <- labelPopup(d, popup, marks, nDigits, labelWrap)
+
+  lf <- leaflet(d)
+  if (!is.null(tiles)) {
+    lf <- lf %>%
+      addProviderTiles(tiles)
+  }
+  lf <- lf %>%
+    addCircleMarkers(lng = ~as.numeric(a),
+                     lat = ~as.numeric(b),
+                     color = ~color,#ifelse(border$color == "color", color, border$color),
+                     fillColor = ~color,
+                     fillOpacity = fill$opacity,
+                     opacity = border$opacity,
+                     radius = ~scales::rescale(sqrt(c), to = c(size[1], size[2])),
+                     label = ~map(label, ~shiny::HTML(.x)),
+                     popup = ~popup,
+                     stroke = border$stroke,
+                     weight = border$weight)
+
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(c),
+                # labFormat = labFor(prefix = format[1],
+                #                    suffix = format[2],
+                #                    big.mark = marks[1],
+                #                    decimal.mark = marks[2],
+                #                    digits = nDigits),
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
+  }
+  lf
 }
 
 
-#' Leaflet bubbles colored by categorical variable
+#' Leaflet bubbles by latitud and longitud and category
 #'
-#' Leaflet bubbles colored by categorical variable
+#' Leaflet bubbles by latitud and longitud and category
 #'
-#' @name lflt_bubbles_grouped_GlnGltCat
+#' @name lflt_bubbles_GlnGltCat
 #' @param x A data.frame
 #' @return leaflet viz
 #' @section ctypes: Gln-Glt-Cat
 #' @export
 #' @examples
-#' lflt_bubbles_grouped_GlnGltCat(sampleData("Gln-Glt-Cat", nrow = 10))
-lflt_bubbles_grouped_GlnGltCat <- function(data,
-                                           palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-                                           fillOpacity = 0.5,
-                                           #infoVar = NULL,
-                                           label = NULL,
-                                           popup = NULL,
-                                           size = 5,
-                                           tiles = "CartoDB.Positron") {
+#' lflt_bubbles_GlnGltCat(sampleData("Gln-Glt-Cat", nrow = 10))
+lflt_bubbles_GlnGltCat <- function(data,
+                                   caption = NULL,
+                                   count = TRUE,
+                                   border = list(weight = 1.3,
+                                                 color = "black",
+                                                 opacity = 1,
+                                                 stroke = TRUE),
+                                   fill = list(color = NULL,
+                                               opacity = 0.5,
+                                               scale = "discrete",
+                                               nullColor = "#dddddd"),
+                                   format = c("", ""),
+                                   highlightValue = NULL,
+                                   highlightValueColor = NULL,
+                                   labelWrap = 12,
+                                   legend = list(bins = 6,
+                                                 position = "bottomleft",
+                                                 title = NULL),
+                                   marks = c(",", "."),
+                                   nDigits = 2,
+                                   label = NULL,
+                                   percentage = FALSE,
+                                   popup = NULL,
+                                   size = c(3, 20),
+                                   tiles = NULL) {
   f <- fringe(data)
   nms <- getClabels(f)
-  popup <- popup %||% ""
+  d <- f$d
 
-  dgeo <- f$d %>%
-    na.omit()
+  if (count) {
+    d <- d  %>%
+      tidyr::replace_na(list(a = NA,
+                             b = NA,
+                             c = ifelse(is.character(d$c), "NA", NA))) %>%
+      # tidyr::drop_na() %>%
+      dplyr::group_by(a, b, c) %>%
+      dplyr::summarise(d = n()) %>%
+      dplyr::arrange(desc(d)) %>%
+      dplyr::slice(1) %>%
+      dplyr::mutate(percent = d * 100 / sum(d, na.rm = TRUE))
 
-  col <- colorFactor(palette = palette, domain = NULL)
-
-  # los labels y popups
-  if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
-    })
+    d <- fillColors(d, "d", fill$color, fill$scale, highlightValue, highlightValueColor,
+                    labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
   } else {
-    lab <- dgeo[[label]]
+    d <- d %>%
+      tidyr::replace_na(list(a = NA,
+                             b = NA,
+                             c = ifelse(is.character(d$c), "NA", NA))) %>%
+      dplyr::group_by(a, b, c) %>%
+      dplyr::summarise(d = n()) %>%
+      dplyr::arrange(desc(d)) %>%
+      dplyr::slice(1) %>%
+      dplyr::select(a, b, c) %>%
+      dplyr::mutate(d = 1)
+
+    d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
+                    labelWrap = labelWrap, numeric = FALSE)
   }
-  if (popup %in% nms) {
-    popup <- dgeo[[popup]]
+
+  if (percentage & nchar(format[2]) == 0) {
+    format[2] <- "%"
   }
-
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
-                     radius = size,
-                     popup = popup,
-                     fillOpacity = fillOpacity,
-                     label = lab,
-                     color = ~col(c),
-                     stroke = FALSE)
-  l
-}
-
-#' Leaflet bubbles size by categorical variable
-#'
-#' Leaflet bubbles size by categorical variable
-#'
-#' @name lflt_bubbles_size_GlnGltCat
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gln-Glt-Cat
-#' @export
-#' @examples
-#' lflt_bubbles_size_GlnGltCat(sampleData("Gln-Glt-Cat", nrow = 10))
-lflt_bubbles_size_GlnGltCat <- function(data,
-                                        color = "navy",
-                                        fillOpacity = 0.5,
-                                        #infoVar = NULL,
-                                        label = NULL,
-                                        popup = NULL,
-                                        minSize = 3,
-                                        maxSize = 20,
-                                        tiles = "CartoDB.Positron") {
-  f <- fringe(data)
-  nms <- getClabels(f)
-  popup <- popup %||% ""
-
-  dgeo <- f$d %>%
-    na.omit() %>%
-    dplyr::group_by(a, b, c) %>%
-    dplyr::summarise(d = n())
-
   # los labels y popups
-  if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
-    })
-  } else {
-    lab <- dgeo[[label]]
+  if (is.null(label)) {
+    label <- "{point.a}, {point.b} <br/><b> {point.c} </b> <br/> {point.d}"
   }
-  if (popup %in% nms) {
-    popup <- dgeo[[popup]]
+  if (is.null(popup)) {
+    popup <- "{point.a}, {point.b} <br/><b> {point.c} </b> <br/> {point.d}"
   }
+  d$label <- labelPopup(d, label, marks, nDigits, labelWrap)
+  d$popup <- labelPopup(d, popup, marks, nDigits, labelWrap)
 
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
-                     radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
-                     popup = popup,
-                     fillOpacity = fillOpacity,
-                     label = lab,
-                     color = color,
-                     stroke = FALSE)
-  l
+  lf <- leaflet(d)
+  if (!is.null(tiles)) {
+    lf <- lf %>%
+      addProviderTiles(tiles)
+  }
+  lf <- lf %>%
+    addCircleMarkers(lng = ~as.numeric(a),
+                     lat = ~as.numeric(b),
+                     color = ~color,#ifelse(border$color == "color", color, border$color),
+                     fillColor = ~color,
+                     fillOpacity = fill$opacity,
+                     opacity = border$opacity,
+                     radius = ~scales::rescale(sqrt(d), to = c(size[1], size[2])),
+                     label = ~map(label, ~shiny::HTML(.x)),
+                     popup = ~popup,
+                     stroke = border$stroke,
+                     weight = border$weight)
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(c),
+                # labFormat = labFor(prefix = format[1],
+                #                    suffix = format[2],
+                #                    big.mark = marks[1],
+                #                    decimal.mark = marks[2],
+                #                    digits = nDigits),
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
+  }
+  lf
 }
 
 
-#' Leaflet bubbles size by numeric variable
+
+#' Leaflet bubbles by latitud and longitud and numeric variable
 #'
-#' Leaflet bubbles size by numeric variable
+#' Leaflet bubbles by latitud and longitud and numeric variable
 #'
-#' @name lflt_bubbles_size_GlnGltNum
+#' @name lflt_bubbles_GlnGltNum
 #' @param x A data.frame
 #' @return leaflet viz
 #' @section ctypes: Gln-Glt-Num
 #' @export
 #' @examples
-#' lflt_bubbles_size_GlnGltNum(sampleData("Gln-Glt-Num", nrow = 10))
-lflt_bubbles_size_GlnGltNum <- function(data,
-                                        color = "navy",
-                                        fillOpacity = 0.5,
-                                        #infoVar = NULL,
-                                        label = NULL,
-                                        popup = NULL,
-                                        minSize = 3,
-                                        maxSize = 20,
-                                        agg = "sum",
-                                        tiles = "CartoDB.Positron") {
+#' lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num", nrow = 10))
+lflt_bubbles_GlnGltNum <- function(data,
+                                   caption = NULL,
+                                   agg = "sum",
+                                   border = list(weight = 1.3,
+                                                 color = "black",
+                                                 opacity = 1,
+                                                 stroke = TRUE),
+                                   fill = list(color = NULL,
+                                               opacity = 0.5,
+                                               scale = "discrete",
+                                               nullColor = "#dddddd"),
+                                   format = c("", ""),
+                                   highlightValue = NULL,
+                                   highlightValueColor = NULL,
+                                   labelWrap = 12,
+                                   legend = list(bins = 6,
+                                                 position = "bottomleft",
+                                                 title = NULL),
+                                   marks = c(",", "."),
+                                   nDigits = 2,
+                                   label = NULL,
+                                   percentage = FALSE,
+                                   popup = NULL,
+                                   size = c(3, 20),
+                                   tiles = NULL) {
   f <- fringe(data)
   nms <- getClabels(f)
-  popup <- popup %||% ""
+  d <- f$d
 
-  dgeo <- f$d %>%
-    na.omit() %>%
+  d <- d  %>%
+    tidyr::replace_na(list(a = NA,
+                           b = NA,
+                           c = NA)) %>%
+    # tidyr::drop_na() %>%
     dplyr::group_by(a, b) %>%
-    dplyr::summarise(c = do.call(agg, list(c, na.rm = TRUE)))
-    # decidir advertencias
-    #dplyr::filter(b >= 0)
+    dplyr::summarise(c = agg(agg, c)) %>%
+    dplyr::mutate(percent = c * 100 / sum(c, na.rm = TRUE))
 
+  d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
+                  labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
+
+  if (percentage & nchar(format[2]) == 0) {
+    format[2] <- "%"
+  }
   # los labels y popups
-  if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
-    })
-  } else {
-    lab <- dgeo[[label]]
+  if (is.null(label)) {
+    label <- "{point.a}, {point.b} <br/><b> {point.c} </b>"
   }
-  if (popup %in% nms) {
-    popup <- dgeo[[popup]]
+  if (is.null(popup)) {
+    popup <- "{point.a}, {point.b} <br/><b> {point.c} </b>"
   }
+  d$label <- labelPopup(d, label, marks, nDigits, labelWrap)
+  d$popup <- labelPopup(d, popup, marks, nDigits, labelWrap)
 
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
-                     radius = ~scales::rescale(sqrt(c), to = c(minSize, maxSize)),
-                     popup = popup,
-                     fillOpacity = fillOpacity,
-                     label = lab,
-                     color = color,
-                     stroke = FALSE)
-  l
+  lf <- leaflet(d)
+  if (!is.null(tiles)) {
+    lf <- lf %>%
+      addProviderTiles(tiles)
+  }
+  lf <- lf %>%
+    addCircleMarkers(lng = ~as.numeric(a),
+                     lat = ~as.numeric(b),
+                     color = ~color,#ifelse(border$color == "color", color, border$color),
+                     fillColor = ~color,
+                     fillOpacity = fill$opacity,
+                     opacity = border$opacity,
+                     radius = ~scales::rescale(sqrt(c), to = c(size[1], size[2])),
+                     label = ~map(label, ~shiny::HTML(.x)),
+                     popup = ~popup,
+                     stroke = border$stroke,
+                     weight = border$weight)
+
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(c),
+                # labFormat = labFor(prefix = format[1],
+                #                    suffix = format[2],
+                #                    big.mark = marks[1],
+                #                    decimal.mark = marks[2],
+                #                    digits = nDigits),
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
+  }
+  lf
 }
 
 
@@ -1024,50 +1139,93 @@ lflt_bubbles_size_GlnGltNum <- function(data,
 #' @examples
 #' lflt_bubbles_GlnGltCatNum(sampleData("Gln-Glt-Cat-Num", nrow = 10))
 lflt_bubbles_GlnGltCatNum <- function(data,
-                                      palette = c("#009EE3", "#9B71AF", "#FFFF99"),
-                                      fillOpacity = 0.5,
-                                      #infoVar = NULL,
-                                      label = NULL,
-                                      popup = NULL,
-                                      minSize = 3,
-                                      maxSize = 20,
+                                      caption = NULL,
                                       agg = "sum",
-                                      tiles = "CartoDB.Positron") {
+                                      border = list(weight = 1.3,
+                                                    color = "black",
+                                                    opacity = 1,
+                                                    stroke = TRUE),
+                                      fill = list(color = NULL,
+                                                  opacity = 0.5,
+                                                  scale = "discrete",
+                                                  nullColor = "#dddddd"),
+                                      format = c("", ""),
+                                      highlightValue = NULL,
+                                      highlightValueColor = NULL,
+                                      labelWrap = 12,
+                                      legend = list(bins = 6,
+                                                    position = "bottomleft",
+                                                    title = NULL),
+                                      marks = c(",", "."),
+                                      nDigits = 2,
+                                      label = NULL,
+                                      percentage = FALSE,
+                                      popup = NULL,
+                                      size = c(3, 20),
+                                      tiles = NULL) {
   f <- fringe(data)
   nms <- getClabels(f)
-  popup <- popup %||% ""
+  d <- f$d
 
-  dgeo <- f$d %>%
-    na.omit() %>%
+  d <- d  %>%
+    tidyr::replace_na(list(a = NA,
+                           b = NA,
+                           c = ifelse(is.character(d$c), "NA", NA),
+                           d = NA)) %>%
+    # tidyr::drop_na() %>%
     dplyr::group_by(a, b, c) %>%
-    dplyr::summarise(d = do.call(agg, list(d, na.rm = TRUE)))
-    # decidir advertencias
-    #dplyr::filter(d >= 0)
+    dplyr::summarise(d = agg(agg, d)) %>%
+    dplyr::mutate(percent = d * 100 / sum(d, na.rm = TRUE))
 
-  col <- colorFactor(palette = palette, domain = NULL)
+  d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
+                  labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
 
+    if (percentage & nchar(format[2]) == 0) {
+    format[2] <- "%"
+  }
   # los labels y popups
-  if (is.null(label) || !label %in% nms) {
-    lab <- map(as.list(1:nrow(dgeo)), function(r) {
-      htmltools::HTML(paste0("<b>", nms, ": </b>", dgeo[r, 1:length(nms)], "<br/>", collapse = ""))
-    })
-  } else {
-    lab <- dgeo[[label]]
+  if (is.null(label)) {
+    label <- "{point.a}, {point.b} <br/> {point.c}: <b> {point.d} </b>"
   }
-  if (popup %in% nms) {
-    popup <- dgeo[[popup]]
+  if (is.null(popup)) {
+    popup <- "{point.a}, {point.b} <br/> {point.c}: <b> {point.d} </b>"
   }
+  d$label <- labelPopup(d, label, marks, nDigits, labelWrap)
+  d$popup <- labelPopup(d, popup, marks, nDigits, labelWrap)
 
-  l <- leaflet(dgeo) %>%
-    addProviderTiles(tiles) %>%
-    addCircleMarkers(lat = ~as.numeric(b), lng = ~as.numeric(a), weight = 3,
-                     radius = ~scales::rescale(sqrt(d), to = c(minSize, maxSize)),
-                     popup = popup,
-                     fillOpacity = fillOpacity,
-                     label = lab,
-                     color = ~col(c),
-                     stroke = FALSE)
-  l
+  lf <- leaflet(d)
+  if (!is.null(tiles)) {
+    lf <- lf %>%
+      addProviderTiles(tiles)
+  }
+  lf <- lf %>%
+    addCircleMarkers(lng = ~as.numeric(a),
+                     lat = ~as.numeric(b),
+                     color = ~color,#ifelse(border$color == "color", color, border$color),
+                     fillColor = ~color,
+                     fillOpacity = fill$opacity,
+                     opacity = border$opacity,
+                     radius = ~scales::rescale(sqrt(d), to = c(size[1], size[2])),
+                     label = ~map(label, ~shiny::HTML(.x)),
+                     popup = ~popup,
+                     stroke = border$stroke,
+                     weight = border$weight)
+
+  if (!legend$position %in% "no") {
+    lf <- lf %>%
+      addLegend(bins = legend$bins,
+                colors = ~unique(color),
+                labels = ~unique(c),
+                # labFormat = labFor(prefix = format[1],
+                #                    suffix = format[2],
+                #                    big.mark = marks[1],
+                #                    decimal.mark = marks[2],
+                #                    digits = nDigits),
+                opacity = fill$opacity,
+                position = legend$position,
+                title = legend$title)
+  }
+  lf
 }
 
 

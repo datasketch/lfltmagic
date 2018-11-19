@@ -197,13 +197,25 @@ labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 1
   cl <- rep(lp, nrow(data))
   map(1:length(n0), function(p) {
     st0 <- strsplit(cl, m1[p])
-    cl <<- paste0(ifelse(all(is.na(map(st0, ~`[`(.x, 1)))), "", map(st0, ~`[`(.x, 1))),
-                  stringr::str_wrap(format(data[[n0[p]]],
+    st1 <- map(st0, ~`[`(.x, 1))
+    st2 <- map(st0, ~`[`(.x, 2))
+    md <- data[[n0[p]]]
+    if (!nzchar(st1[[1]]) | is.na(st1[[1]])) {
+      st1 <- ""
+    }
+    if (!nzchar(st2[[1]]) | is.na(st2[[1]])) {
+      st2 <- ""
+    }
+    if (is.null(md)) {
+      md <- ""
+    }
+    cl <<- paste0(st1,
+                  stringr::str_wrap(format(md,
                                            big.mark = marks[1],
                                            decimal.mark = marks[2],
                                            nsmall = nDigits),
                                     labelWrap),
-                  ifelse(all(is.na(map(st0, ~`[`(.x, 2)))), "", map(st0, ~`[`(.x, 2))))
+                  st2)
   })
   cl
 }

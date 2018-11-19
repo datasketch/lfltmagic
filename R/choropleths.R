@@ -135,8 +135,8 @@ lflt_choropleth_GcdCat <- function(data = NULL,
                                                  opacity = 1),
                                    fill = list(color = NULL,
                                                opacity = 0.5,
-                                               scale = "no",
-                                               nullColor = "#cccccc"),
+                                               scale = "discrete",
+                                               nullColor = "#dddddd"),
                                    # dropNa = FALSE, ¿NO HACE FALTA? ¿SIEMPRE SE QUITAN??
                                    format = c("", ""),
                                    highlightValue = NULL,
@@ -183,7 +183,7 @@ lflt_choropleth_GcdCat <- function(data = NULL,
         dplyr::summarise(c = n()) %>%
         dplyr::arrange(desc(c)) %>%
         dplyr::slice(1) %>%
-        dplyr::selec(a, b)
+        dplyr::select(a, b)
 
       d <- fillColors(d, "b", fill$color, fill$scale, highlightValue, highlightValueColor,
                       labelWrap = labelWrap, numeric = FALSE)
@@ -195,7 +195,7 @@ lflt_choropleth_GcdCat <- function(data = NULL,
     dt@data$color <- as.character(dt@data$color)
     dt@data$color[is.na(dt@data$color)] <- fill$nullColor
   }
-
+  View(dt@data)
   if (percentage & nchar(format[2]) == 0) {
     format[2] <- "%"
   }
@@ -333,18 +333,18 @@ lflt_choropleth_GcdNum <- function(data = NULL,
                 opacity = border$opacity,
                 weight = border$weight)
   if (!legend$position %in% "no") {
-    lf <- lf %>%
-      addLegend(bins = legend$bins,
-                colors = ~unique(color),
-                labels = ~unique(ifelse(count, b, id)),
-                # labFormat = labFor(prefix = format[1],
-                #                    suffix = format[2],
-                #                    big.mark = marks[1],
-                #                    decimal.mark = marks[2],
-                #                    digits = nDigits),
-                opacity = fill$opacity,
-                position = legend$position,
-                title = legend$title)
+    # lf <- lf %>%
+    #   addLegend(bins = legend$bins,
+    #             colors = ~unique(color),
+    #             labels = ~unique(ifelse(count, b, id)),
+    #             # labFormat = labFor(prefix = format[1],
+    #             #                    suffix = format[2],
+    #             #                    big.mark = marks[1],
+    #             #                    decimal.mark = marks[2],
+    #             #                    digits = nDigits),
+    #             opacity = fill$opacity,
+    #             position = legend$position,
+    #             title = legend$title)
   }
   lf
 }
