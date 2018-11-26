@@ -15,18 +15,13 @@ lflt_choropleth_Gcd <- function(data = NULL,
                                 border = list(weight = 1,
                                               color = "black",
                                               opacity = 1),
-                                fill = list(color = NULL,
-                                            opacity = 0.5,
-                                            scale = "no",
-                                            nullColor = "#cccccc"),
+                                fill = list(),
                                 # dropNa = FALSE, ¿NO HACE FALTA? ¿SIEMPRE SE QUITAN??
                                 format = c("", ""),
                                 highlightValue = NULL,
                                 highlightValueColor = NULL,
                                 labelWrap = 12,
-                                legend = list(bins = 6,
-                                              position = "bottomleft",
-                                              title = NULL),
+                                legend = list(),
                                 mapName = "world_countries",
                                 marks = c(",", "."),
                                 nDigits = 2,
@@ -35,11 +30,23 @@ lflt_choropleth_Gcd <- function(data = NULL,
                                 popup = NULL,
                                 tiles = NULL) {
 
+  fillDefault <- list(color = NULL,
+                      mode = "quantile",
+                      opacity = 0.5,
+                      scale = "discrete",
+                      nullColor = "#dddddd")
+  fill <- modifyList(fillDefault, fill)
+
+  legendDefault <- list(bins = 4,
+                        position = "bottomleft",
+                        title = NULL)
+  legend <- modifyList(legendDefault, legend)
+
   if (!mapName %in% availableGeodata()) {
     stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
   }
   dt <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
-  dt@data$color <- fill$nullColor
+  # dt@data$color <- fill$nullColor
   if (!is.null(data)) {
     f <- fringe(data)
     nms <- getClabels(f)
@@ -51,24 +58,29 @@ lflt_choropleth_Gcd <- function(data = NULL,
         dplyr::group_by(a) %>%
         dplyr::summarise(b = n()) %>%
         dplyr::mutate(percent = b * 100 / sum(b, na.rm = TRUE))
-
-      d <- fillColors(d, "b", fill$color, fill$scale, highlightValue, highlightValueColor,
-                      labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
+### FILL COL = IFELSE(PERCENTAGE; "PERCERNT"; B")
+      # d <- fillColors(d, "b", fill$scale, fill$color, highlightValue, highlightValueColor,
+      #                 labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
+      col <- ifelse(percentage, "percent", "b")
     } else {
       d <- d %>%
         tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA))) %>%
         dplyr::group_by(a) %>%
         dplyr::slice(1)
 
-      d <- fillColors(d, "a", fill$color, fill$scale, highlightValue, highlightValueColor,
-                      labelWrap = labelWrap, numeric = FALSE)
+      # d <- fillColors(d, "a", fill$color, fill$scale, highlightValue, highlightValueColor,
+      #                 labelWrap = labelWrap, numeric = FALSE)
+      # d <- binsLeg(d, "a", fill$scale, fill$mode, legend$bins, fill$color, highlightValue, highlightValueColor)
+      legend$position <- "no"
+      col <- "id"
     }
     dt@data <- dt@data %>%
-      dplyr::select(-color) %>%
+      # dplyr::select(-color) %>%
       dplyr::left_join(d, by = c(id = "a"))
 
-    dt@data$color <- as.character(dt@data$color)
-    dt@data$color[is.na(dt@data$color)] <- fill$nullColor
+    plt <- fillColorsChoropleth(dt@data, col, fill$color, fill$scale, legend$bins, fill$mode, count, fill$nullColor)
+    # dt@data$color <- as.character(dt@data$color)
+    # dt@data$color[is.na(dt@data$color)] <- fill$nullColor
   }
 
   if (percentage & nchar(format[2]) == 0) {
@@ -76,21 +88,20 @@ lflt_choropleth_Gcd <- function(data = NULL,
   }
   # los labels y popups
   if (is.null(label)) {
-    label <- "{point.id}: <b> {point.b} </b>"
+    label <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>") ### OOO PERCENT....
   }
   if (is.null(popup)) {
-    popup <- "{point.id}: <b> {point.b} </b>"
+    popup <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>")
   }
   dt@data$label <- labelPopup(dt@data, label, marks, nDigits, labelWrap)
   dt@data$popup <- labelPopup(dt@data, popup, marks, nDigits, labelWrap)
-
   lf <- leaflet(dt)
   if (!is.null(tiles)) {
     lf <- lf %>%
       addProviderTiles(tiles)
   }
   lf <- lf %>%
-    addPolygons(fillColor = ~color,
+    addPolygons(fillColor = ~plt(dt@data[[col]]),
                 label = ~map(label, ~shiny::HTML(.x)),
                 popup = ~map(popup, ~shiny::HTML(.x)),
                 color = border$color,
@@ -100,13 +111,15 @@ lflt_choropleth_Gcd <- function(data = NULL,
   if (!legend$position %in% "no") {
     lf <- lf %>%
       addLegend(bins = legend$bins,
-                colors = ~unique(color),
-                labels = ~unique(ifelse(count, b, id)),
-                # labFormat = labFor(prefix = format[1],
-                #                    suffix = format[2],
-                #                    big.mark = marks[1],
-                #                    decimal.mark = marks[2],
-                #                    digits = nDigits),
+                pal = plt,
+                values = dt@data[[col]],
+                # colors = ~unique(color),
+                # labels = ~unique(bins),
+                labFormat = labelFormat0(prefix = format[1],
+                                         suffix = format[2],
+                                         big.mark = marks[1],
+                                         decimal.mark = marks[2],
+                                         digits = nDigits),
                 opacity = fill$opacity,
                 position = legend$position,
                 title = legend$title)

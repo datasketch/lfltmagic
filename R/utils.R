@@ -65,7 +65,7 @@ file_path_sans_ext <- function (x)
 
 # leaflet labelFormat with decimal.mark
 #' @export
-labFor <- function (prefix = "",
+labelFormat0 <- function (prefix = "",
                     suffix = "",
                     between = " &ndash; ",
                     digits = 3,
@@ -81,14 +81,14 @@ labFor <- function (prefix = "",
       paste0(prefix, formatNum(cuts), suffix)
     })(...), bin = (function(cuts) {
       n <- length(cuts)
-      paste0(prefix, formatNum(cuts[-n]), between, formatNum(cuts[-1]),
+      paste0(prefix, formatNum(cuts[-n]), suffix, between, prefix, formatNum(cuts[-1]),
              suffix)
     })(...), quantile = (function(cuts, p) {
       n <- length(cuts)
       p <- paste0(round(p * 100), "%")
       cuts <- paste0(formatNum(cuts[-n]), between, formatNum(cuts[-1]))
-      paste0("<span title=\"", cuts, "\">", prefix, p[-n],
-             between, p[-1], suffix, "</span>")
+      paste0("<span title=\"", cuts, "\">", prefix, p[-n], suffix,
+             between, prefix, p[-1], suffix, "</span>")
     })(...), factor = (function(cuts) {
       paste0(prefix, as.character(transform(cuts)), suffix)
     })(...))
@@ -213,10 +213,84 @@ labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 1
                   stringr::str_wrap(format(md,
                                            big.mark = marks[1],
                                            decimal.mark = marks[2],
-                                           nsmall = nDigits),
+                                           nsmall = nDigits,
+                                           digits = nDigits),
                                     labelWrap),
                   st2)
   })
   cl
 }
+
+
+
+
+
+
+
+
+
+
+
+
+################### CHOROPLETH
+fillColorsChoropleth <- function(data, col, color, colorScale, bins, mode, numeric, nullColor) {
+  cat <- unique(data[[col]])
+  ds <- dsColorsHex(TRUE)
+  if (is.null(color)) {
+    color <- dsColorsHex()
+  } else {
+    cl <- col2rgb(color)
+    color <- map_chr(1:ncol(cl), function(s) {
+      rgb(cl[1, s], cl[2, s], cl[3, s], maxColorValue = 255)
+    })
+  }
+  if (colorScale == "discrete") {
+    ad <- unlist(map(color, function(y) {
+      l0 <- ds[((grep(substr(y, 2, 2), ignore.case = TRUE, ds) + 6) %% 16) + 1]
+      l1 <- paste0(substr(y, 1, 1), l0, substr(y, 3, 7))
+      p0 <- ds[((grep(substr(l1, 4, 4), ignore.case = TRUE, ds) + 6) %% 16) + 1]
+      p1 <- paste0(substr(l1, 1, 3), p0, substr(l1, 5, 7))
+      c(l1, p1)
+    }))
+    color <- union(color, ad)
+  }
+  if (colorScale == "continuous") {
+    if (length(color) == 1) {
+      l0 <- ds[((grep(substr(color, 2, 2), ignore.case = TRUE, ds) + 7) %% 16) + 1]
+      color <- c(color, paste0(substr(color, 1, 1), l0, substr(color, 3, 7)))
+    }
+    color <- unique(color)
+  }
+  # YA TENGO DATOS, COLUMNA, COLOR
+  if (numeric) {
+    if (colorScale == "discrete") {
+      if (mode %in% "quantile") {
+        pal <- colorBin(color, cat, quantile(cat, seq(0, 1, 1/bins), na.rm = TRUE), na.color = nullColor)
+      } else {
+        pal <- colorBin(color, cat, bins, na.color = nullColor)
+      }
+    } else {
+      pal <- colorNumeric(color, cat, na.color = nullColor)
+    }
+  } else {
+    pal <- colorFactor(color, cat, na.color = nullColor)
+  }
+  pal
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
