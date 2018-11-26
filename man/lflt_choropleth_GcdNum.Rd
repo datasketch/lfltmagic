@@ -5,11 +5,8 @@
 \title{Leaflet choropleths by numerical variable}
 \usage{
 lflt_choropleth_GcdNum(data = NULL, caption = NULL, agg = "sum",
-  border = list(weight = 1, color = "black", opacity = 1),
-  fill = list(color = NULL, opacity = 0.5, scale = "no", nullColor =
-  "#cccccc"), format = c("", ""), highlightValue = NULL,
-  highlightValueColor = NULL, labelWrap = 12, legend = list(bins = 6,
-  position = "bottomleft", title = NULL), mapName = "world_countries",
+  border = list(), fill = list(), format = c("", ""),
+  labelWrap = 12, legend = list(), mapName = "world_countries",
   marks = c(",", "."), nDigits = 2, label = NULL,
   percentage = FALSE, popup = NULL, tiles = NULL)
 }

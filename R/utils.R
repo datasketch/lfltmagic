@@ -224,15 +224,8 @@ labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 1
 
 
 
-
-
-
-
-
-
-
-
-################### CHOROPLETH
+# fillcolors choropleth returns pal
+#' @export
 fillColorsChoropleth <- function(data, col, color, colorScale, bins, mode, numeric, nullColor) {
   cat <- unique(data[[col]])
   ds <- dsColorsHex(TRUE)
