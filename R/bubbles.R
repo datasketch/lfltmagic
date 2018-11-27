@@ -809,21 +809,11 @@ lflt_bubbles_GnmCatNum <- function(data,
 lflt_bubbles_GlnGlt <- function(data,
                                 caption = NULL,
                                 count = TRUE,
-                                border = list(weight = 1.3,
-                                              color = "black",
-                                              opacity = 1,
-                                              stroke = TRUE),
-                                fill = list(color = NULL,
-                                            opacity = 0.5,
-                                            scale = "discrete",
-                                            nullColor = "#dddddd"),
+                                border = list(),
+                                fill = list(),
                                 format = c("", ""),
-                                highlightValue = NULL,
-                                highlightValueColor = NULL,
                                 labelWrap = 12,
-                                legend = list(bins = 6,
-                                              position = "bottomleft",
-                                              title = NULL),
+                                legend = list(),
                                 marks = c(",", "."),
                                 nDigits = 2,
                                 label = NULL,
@@ -831,6 +821,22 @@ lflt_bubbles_GlnGlt <- function(data,
                                 popup = NULL,
                                 size = c(3, 20),
                                 tiles = NULL) {
+  fillDefault <- list(color = NULL,
+                      opacity = 0.5,
+                      scale = "discrete",
+                      nullColor = "#dddddd")
+  fill <- modifyList(fillDefault, fill)
+
+  legendDefault <- list(position = "bottomleft",
+                        title = NULL)
+  legend <- modifyList(legendDefault, legend)
+
+  borderDefault <- list(weight = 1.3,
+                        color = "black",
+                        opacity = 1,
+                        stroke = TRUE)
+  border <- modifyList(borderDefault, border)
+
   f <- fringe(data)
   nms <- getClabels(f)
   d <- f$d

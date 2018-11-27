@@ -257,10 +257,15 @@ fillColorsChoropleth <- function(data, col, color, colorScale, bins, mode, numer
   # YA TENGO DATOS, COLUMNA, COLOR
   if (numeric) {
     if (colorScale == "discrete") {
+      ca <- unique(cat)
+      ct <- as.numeric(ca[!is.na(ca)])
+      if (length(ct) == 1) {
+        ct <- ct + 1
+      }
       if (mode %in% "quantile") {
-        pal <- colorBin(color, cat, quantile(cat, seq(0, 1, 1/bins), na.rm = TRUE), na.color = nullColor)
+        pal <- colorBin(color, union(ca, ct), quantile(union(ca, ct), seq(0, 1, 1/bins), na.rm = TRUE), na.color = nullColor)
       } else {
-        pal <- colorBin(color, cat, bins, na.color = nullColor)
+        pal <- colorBin(color, union(ca, ct), bins, na.color = nullColor)
       }
     } else {
       pal <- colorNumeric(color, cat, na.color = nullColor)

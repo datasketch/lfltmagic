@@ -63,17 +63,17 @@ lflt_choropleth_Gcd <- function(data = NULL,
       d <- d %>%
         tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA))) %>%
         dplyr::group_by(a) %>%
-        dplyr::slice(1)
+        dplyr::slice(1) %>%
+        dplyr::mutate(c = a)
 
       legend$position <- "no"
-      col <- "id"
+      col <- "c"
     }
     dt@data <- dt@data %>%
       dplyr::left_join(d, by = c(id = "a"))
 
     plt <- fillColorsChoropleth(dt@data, col, fill$color, fill$scale, legend$bins, fill$mode, count, fill$nullColor)
   }
-
   if (percentage & nchar(format[2]) == 0) {
     format[2] <- "%"
   }
