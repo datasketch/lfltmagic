@@ -66,12 +66,12 @@ file_path_sans_ext <- function (x)
 # leaflet labelFormat with decimal.mark
 #' @export
 labelFormat0 <- function (prefix = "",
-                    suffix = "",
-                    between = " &ndash; ",
-                    digits = 3,
-                    big.mark = ",",
-                    decimal.mark = ".",
-                    transform = identity) {
+                          suffix = "",
+                          between = " &ndash; ",
+                          digits = 3,
+                          big.mark = ",",
+                          decimal.mark = ".",
+                          transform = identity) {
   formatNum <- function(x) {
     format(round(transform(x), digits), trim = TRUE, scientific = FALSE,
            big.mark = big.mark, decimal.mark = decimal.mark)
@@ -106,7 +106,7 @@ agg <- function (aggregation, ...) {
 # colores
 #' @export
 fillColors <- function (data, col, colors, colorScale, highlightValue, highlightValueColor,
-                        labelWrap, bins = NULL, numeric = TRUE) {
+                        labelWrap, numeric = TRUE) {
   cat <- unique(data[[col]])
   highlightValue <- stringr::str_wrap(highlightValue, labelWrap)
   ds <- dsColorsHex(TRUE)
@@ -152,11 +152,11 @@ fillColors <- function (data, col, colors, colorScale, highlightValue, highlight
   }
   if (numeric) {
     fillCol <- data.frame(a = cat,
-                          color = c(colors, colorNumeric(c(colors, ad), cat)(cat))[sample(1:length(cat))])
+                          color = union(colors, colorNumeric(c(colors, ad), cat)(cat))[sample(1:length(cat))])
     names(fillCol)[1] <- col
   } else {
     fillCol <- data.frame(a = cat,
-                          color = c(colors, colorFactor(c(colors, ad), cat)(cat))[sample(1:length(cat))])
+                          color = union(colors, colorFactor(c(colors, ad), cat)(cat))[sample(1:length(cat))])
     names(fillCol)[1] <- col
   }
 
@@ -200,6 +200,7 @@ labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 1
     st1 <- map(st0, ~`[`(.x, 1))
     st2 <- map(st0, ~`[`(.x, 2))
     md <- data[[n0[p]]]
+
     if (!nzchar(st1[[1]]) | is.na(st1[[1]])) {
       st1 <- ""
     }
@@ -217,6 +218,7 @@ labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 1
                                            digits = nDigits),
                                     labelWrap),
                   st2)
+
   })
   cl
 }
@@ -256,19 +258,19 @@ fillColorsChoropleth <- function(data, col, color, colorScale, bins, mode, numer
   }
   # YA TENGO DATOS, COLUMNA, COLOR
   if (numeric) {
+    ca <- unique(cat)
+    ct <- as.numeric(ca[!is.na(ca)])
+    if (length(ct) == 1) {
+      ct <- ct + 1
+    }
     if (colorScale == "discrete") {
-      ca <- unique(cat)
-      ct <- as.numeric(ca[!is.na(ca)])
-      if (length(ct) == 1) {
-        ct <- ct + 1
-      }
       if (mode %in% "quantile") {
         pal <- colorBin(color, union(ca, ct), quantile(union(ca, ct), seq(0, 1, 1/bins), na.rm = TRUE), na.color = nullColor)
       } else {
         pal <- colorBin(color, union(ca, ct), bins, na.color = nullColor)
       }
     } else {
-      pal <- colorNumeric(color, cat, na.color = nullColor)
+      pal <- colorNumeric(color, unique(ca, ct), na.color = nullColor)
     }
   } else {
     pal <- colorFactor(color, cat, na.color = nullColor)

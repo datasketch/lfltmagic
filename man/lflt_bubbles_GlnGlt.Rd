@@ -6,9 +6,8 @@
 \usage{
 lflt_bubbles_GlnGlt(data, caption = NULL, count = TRUE,
   border = list(), fill = list(), format = c("", ""),
-  labelWrap = 12, legend = list(), marks = c(",", "."),
-  nDigits = 2, label = NULL, percentage = FALSE, popup = NULL,
-  size = c(3, 20), tiles = NULL)
+  labelWrap = 12, marks = c(",", "."), nDigits = 2, label = NULL,
+  percentage = FALSE, popup = NULL, size = c(3, 20), tiles = NULL)
 }
 \arguments{
 \item{x}{A data.frame}

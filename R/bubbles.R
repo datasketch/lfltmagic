@@ -813,7 +813,6 @@ lflt_bubbles_GlnGlt <- function(data,
                                 fill = list(),
                                 format = c("", ""),
                                 labelWrap = 12,
-                                legend = list(),
                                 marks = c(",", "."),
                                 nDigits = 2,
                                 label = NULL,
@@ -826,10 +825,6 @@ lflt_bubbles_GlnGlt <- function(data,
                       scale = "discrete",
                       nullColor = "#dddddd")
   fill <- modifyList(fillDefault, fill)
-
-  legendDefault <- list(position = "bottomleft",
-                        title = NULL)
-  legend <- modifyList(legendDefault, legend)
 
   borderDefault <- list(weight = 1.3,
                         color = "black",
@@ -847,21 +842,23 @@ lflt_bubbles_GlnGlt <- function(data,
       # tidyr::drop_na() %>%
       dplyr::group_by(a, b) %>%
       dplyr::summarise(c = n()) %>%
-      dplyr::mutate(percent = c * 100 / sum(c, na.rm = TRUE))
+      dplyr::ungroup() %>%
+      dplyr::mutate(d = seq_along(c),
+                    percent = c * 100 / sum(c, na.rm = TRUE))
 
-    d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
-                    labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
+    d <- fillColors(d, "d", fill$color, fill$scale, NULL, NULL,
+                    labelWrap = labelWrap, numeric = TRUE)
   } else {
     d <- d %>%
       tidyr::replace_na(list(a = NA,
                              b = NA)) %>%
       dplyr::group_by(a, b) %>%
       dplyr::slice(1) %>%
+      dplyr::ungroup() %>%
       dplyr::mutate(c = 1,
-                    d = 1:length(b))
-
-    d <- fillColors(d, "d", fill$color, fill$scale, highlightValue, highlightValueColor,
-                    labelWrap = labelWrap, numeric = FALSE)
+                    d = seq_along(c))
+    d <- fillColors(d, "d", fill$color, fill$scale, NULL, NULL,
+                    labelWrap = labelWrap, numeric = TRUE)
   }
 
   if (percentage & nchar(format[2]) == 0) {
@@ -869,10 +866,20 @@ lflt_bubbles_GlnGlt <- function(data,
   }
   # los labels y popups
   if (is.null(label)) {
-    label <- "{point.a}, {point.b} <br/><b> {point.c} </b>"
+    label <- paste0("Lng: <b> {point.a} </b><br/> Lat: <b> {point.b} <br/>",
+                    ifelse(count,
+                           paste0(format[1], "{point.",
+                                  ifelse(percentage, "percent}", "c}"),
+                                  format[2], "<br/>"),
+                           "</b>"))
   }
   if (is.null(popup)) {
-    popup <- "{point.a}, {point.b} <br/><b> {point.c} </b>"
+    popup <- paste0("Lng: <b> {point.a} </b><br/> Lat: <b> {point.b} <br/>",
+                    ifelse(count,
+                           paste0(format[1], "{point.",
+                                  ifelse(percentage, "percent}", "c}"),
+                                  format[2], "<br/>"),
+                           "</b>"))
   }
   d$label <- labelPopup(d, label, marks, nDigits, labelWrap)
   d$popup <- labelPopup(d, popup, marks, nDigits, labelWrap)
@@ -885,7 +892,7 @@ lflt_bubbles_GlnGlt <- function(data,
   lf <- lf %>%
     addCircleMarkers(lng = ~as.numeric(a),
                      lat = ~as.numeric(b),
-                     color = ~color,#ifelse(border$color == "color", color, border$color),
+                     color = ~ifelse(border$color == "color", color, border$color),
                      fillColor = ~color,
                      fillOpacity = fill$opacity,
                      opacity = border$opacity,
@@ -895,20 +902,6 @@ lflt_bubbles_GlnGlt <- function(data,
                      stroke = border$stroke,
                      weight = border$weight)
 
-  if (!legend$position %in% "no") {
-    lf <- lf %>%
-      addLegend(bins = legend$bins,
-                colors = ~unique(color),
-                labels = ~unique(c),
-                # labFormat = labFor(prefix = format[1],
-                #                    suffix = format[2],
-                #                    big.mark = marks[1],
-                #                    decimal.mark = marks[2],
-                #                    digits = nDigits),
-                opacity = fill$opacity,
-                position = legend$position,
-                title = legend$title)
-  }
   lf
 }
 
@@ -927,21 +920,10 @@ lflt_bubbles_GlnGlt <- function(data,
 lflt_bubbles_GlnGltCat <- function(data,
                                    caption = NULL,
                                    count = TRUE,
-                                   border = list(weight = 1.3,
-                                                 color = "black",
-                                                 opacity = 1,
-                                                 stroke = TRUE),
-                                   fill = list(color = NULL,
-                                               opacity = 0.5,
-                                               scale = "discrete",
-                                               nullColor = "#dddddd"),
+                                   border = list(),
+                                   fill = list(),
                                    format = c("", ""),
-                                   highlightValue = NULL,
-                                   highlightValueColor = NULL,
                                    labelWrap = 12,
-                                   legend = list(bins = 6,
-                                                 position = "bottomleft",
-                                                 title = NULL),
                                    marks = c(",", "."),
                                    nDigits = 2,
                                    label = NULL,
@@ -949,6 +931,18 @@ lflt_bubbles_GlnGltCat <- function(data,
                                    popup = NULL,
                                    size = c(3, 20),
                                    tiles = NULL) {
+  fillDefault <- list(color = NULL,
+                      opacity = 0.5,
+                      scale = "discrete",
+                      nullColor = "#dddddd")
+  fill <- modifyList(fillDefault, fill)
+
+  borderDefault <- list(weight = 1.3,
+                        color = "black",
+                        opacity = 1,
+                        stroke = TRUE)
+  border <- modifyList(borderDefault, border)
+
   f <- fringe(data)
   nms <- getClabels(f)
   d <- f$d
@@ -963,10 +957,12 @@ lflt_bubbles_GlnGltCat <- function(data,
       dplyr::summarise(d = n()) %>%
       dplyr::arrange(desc(d)) %>%
       dplyr::slice(1) %>%
-      dplyr::mutate(percent = d * 100 / sum(d, na.rm = TRUE))
+      dplyr::ungroup() %>%
+      dplyr::mutate(e = seq_along(d),
+                    percent = d * 100 / sum(d, na.rm = TRUE))
 
-    d <- fillColors(d, "d", fill$color, fill$scale, highlightValue, highlightValueColor,
-                    labelWrap = labelWrap, bins = legend$bins, numeric = TRUE)
+    d <- fillColors(d, "e", fill$color, fill$scale, NULL, NULL,
+                    labelWrap = labelWrap, numeric = TRUE)
   } else {
     d <- d %>%
       tidyr::replace_na(list(a = NA,
@@ -979,8 +975,9 @@ lflt_bubbles_GlnGltCat <- function(data,
       dplyr::select(a, b, c) %>%
       dplyr::mutate(d = 1)
 
-    d <- fillColors(d, "c", fill$color, fill$scale, highlightValue, highlightValueColor,
+    d <- fillColors(d, "c", fill$color, fill$scale, NULL, NULL,
                     labelWrap = labelWrap, numeric = FALSE)
+    assign("d", d, envir = globalenv())
   }
 
   if (percentage & nchar(format[2]) == 0) {
@@ -988,10 +985,20 @@ lflt_bubbles_GlnGltCat <- function(data,
   }
   # los labels y popups
   if (is.null(label)) {
-    label <- "{point.a}, {point.b} <br/><b> {point.c} </b> <br/> {point.d}"
+    label <- paste0("Lng: <b> {point.a} </b><br/> Lat: <b> {point.b} <br/> {point.c}",
+                    ifelse(count,
+                           paste0(": ", format[1], "{point.",
+                                  ifelse(percentage, "percent}", "d}"),
+                                  format[2], "<br/>"),
+                           "</b>"))
   }
   if (is.null(popup)) {
-    popup <- "{point.a}, {point.b} <br/><b> {point.c} </b> <br/> {point.d}"
+    popup <- paste0("Lng: <b> {point.a} </b><br/> Lat: <b> {point.b} <br/> {point.c}",
+                    ifelse(count,
+                           paste0(": ", format[1], "{point.",
+                                  ifelse(percentage, "percent}", "d}"),
+                                  format[2], "<br/>"),
+                           "</b>"))
   }
   d$label <- labelPopup(d, label, marks, nDigits, labelWrap)
   d$popup <- labelPopup(d, popup, marks, nDigits, labelWrap)
@@ -1004,7 +1011,7 @@ lflt_bubbles_GlnGltCat <- function(data,
   lf <- lf %>%
     addCircleMarkers(lng = ~as.numeric(a),
                      lat = ~as.numeric(b),
-                     color = ~color,#ifelse(border$color == "color", color, border$color),
+                     color = ~ifelse(border$color == "color", color, border$color),
                      fillColor = ~color,
                      fillOpacity = fill$opacity,
                      opacity = border$opacity,
@@ -1013,20 +1020,6 @@ lflt_bubbles_GlnGltCat <- function(data,
                      popup = ~popup,
                      stroke = border$stroke,
                      weight = border$weight)
-  if (!legend$position %in% "no") {
-    lf <- lf %>%
-      addLegend(bins = legend$bins,
-                colors = ~unique(color),
-                labels = ~unique(c),
-                # labFormat = labFor(prefix = format[1],
-                #                    suffix = format[2],
-                #                    big.mark = marks[1],
-                #                    decimal.mark = marks[2],
-                #                    digits = nDigits),
-                opacity = fill$opacity,
-                position = legend$position,
-                title = legend$title)
-  }
   lf
 }
 

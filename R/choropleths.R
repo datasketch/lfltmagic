@@ -32,7 +32,7 @@ lflt_choropleth_Gcd <- function(data = NULL,
                       mode = "quantile",
                       opacity = 0.5,
                       scale = "discrete",
-                      nullColor = "#dddddd")
+                      nullColor = "#eeeeee")
   fill <- modifyList(fillDefault, fill)
 
   legendDefault <- list(bins = 4,
@@ -44,8 +44,9 @@ lflt_choropleth_Gcd <- function(data = NULL,
                         color = "black",
                         opacity = 1)
   border <- modifyList(borderDefault, border)
-
+  plt0 <- fill$nullColor
   dt <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
+
   if (!is.null(data)) {
     f <- fringe(data)
     nms <- getClabels(f)
@@ -53,7 +54,6 @@ lflt_choropleth_Gcd <- function(data = NULL,
     if (count) {
       d <- d  %>%
         tidyr::replace_na(list(a = ifelse(is.character(d$a), "NA", NA))) %>%
-        # tidyr::drop_na() %>%
         dplyr::group_by(a) %>%
         dplyr::summarise(b = n()) %>%
         dplyr::mutate(percent = b * 100 / sum(b, na.rm = TRUE))
@@ -73,33 +73,42 @@ lflt_choropleth_Gcd <- function(data = NULL,
       dplyr::left_join(d, by = c(id = "a"))
 
     plt <- fillColorsChoropleth(dt@data, col, fill$color, fill$scale, legend$bins, fill$mode, count, fill$nullColor)
+    plt0 <- plt(dt@data[[col]])
   }
+
   if (percentage & nchar(format[2]) == 0) {
     format[2] <- "%"
   }
   # los labels y popups
   if (is.null(label)) {
-    label <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>") ### OOO PERCENT....
+    label <- paste0("{point.id}",
+                    ifelse(count & !is.null(data),
+                           paste0(": <b>", format[1], "{point.", ifelse(percentage, "percent", "b"), "}", format[2], "</b>"),
+                           ""))
   }
   if (is.null(popup)) {
-    popup <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>")
+    popup <- paste0("{point.id}",
+                    ifelse(count & !is.null(data),
+                           paste0(": <b>", format[1], "{point.", ifelse(percentage, "percent", "b"), "}", format[2],"</b>"),
+                           ""))
   }
   dt@data$label <- labelPopup(dt@data, label, marks, nDigits, labelWrap)
   dt@data$popup <- labelPopup(dt@data, popup, marks, nDigits, labelWrap)
+
   lf <- leaflet(dt)
   if (!is.null(tiles)) {
     lf <- lf %>%
       addProviderTiles(tiles)
   }
   lf <- lf %>%
-    addPolygons(fillColor = plt(dt@data[[col]]),
+    addPolygons(fillColor = plt0,
                 label = ~map(label, ~shiny::HTML(.x)),
                 popup = ~map(popup, ~shiny::HTML(.x)),
                 color = border$color,
                 fillOpacity = fill$opacity,
                 opacity = border$opacity,
                 weight = border$weight)
-  if (!legend$position %in% "no") {
+  if (!legend$position %in% "no" & !is.null(data)) {
     lf <- lf %>%
       addLegend(bins = legend$bins,
                 pal = plt,
@@ -109,6 +118,7 @@ lflt_choropleth_Gcd <- function(data = NULL,
                                          big.mark = marks[1],
                                          decimal.mark = marks[2],
                                          digits = nDigits),
+                na.label = "NULL",
                 opacity = fill$opacity,
                 position = legend$position,
                 title = legend$title)
@@ -153,7 +163,7 @@ lflt_choropleth_GcdCat <- function(data = NULL,
                       mode = "quantile",
                       opacity = 0.5,
                       scale = "discrete",
-                      nullColor = "#dddddd")
+                      nullColor = "#eeeeee")
   fill <- modifyList(fillDefault, fill)
 
   legendDefault <- list(bins = 4,
@@ -165,7 +175,7 @@ lflt_choropleth_GcdCat <- function(data = NULL,
                         color = "black",
                         opacity = 1)
   border <- modifyList(borderDefault, border)
-
+  plt0 <- fill$nullColor
   dt <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
   if (!is.null(data)) {
     f <- fringe(data)
@@ -180,6 +190,7 @@ lflt_choropleth_GcdCat <- function(data = NULL,
         dplyr::summarise(c = n()) %>%
         dplyr::arrange(desc(c)) %>%
         dplyr::slice(1) %>%
+        dplyr::ungroup() %>%
         dplyr::mutate(percent = c * 100 / sum(c, na.rm = TRUE))
 
       col <- ifelse(percentage, "percent", "c")
@@ -193,13 +204,13 @@ lflt_choropleth_GcdCat <- function(data = NULL,
         dplyr::slice(1) %>%
         dplyr::select(a, b)
 
-      legend$position <- "no"
       col <- "b"
     }
     dt@data <- dt@data %>%
       dplyr::left_join(d, by = c(id = "a"))
 
     plt <- fillColorsChoropleth(dt@data, col, fill$color, fill$scale, legend$bins, fill$mode, count, fill$nullColor)
+    plt0 <- plt(dt@data[[col]])
   }
 
   if (percentage & nchar(format[2]) == 0) {
@@ -207,14 +218,16 @@ lflt_choropleth_GcdCat <- function(data = NULL,
   }
   # los labels y popups
   if (is.null(label)) {
-    label <- paste0("{point.id} <br/><b> {point.b}: </b> {point.",
-                    ifelse(percentage, "percent", "c"),
-                    "}")
+    label <- paste0("{point.id} <br/><b> {point.b}",
+                    ifelse(count & !is.null(data),
+                           paste0(": ", format[1], "{point.", ifelse(percentage, "percent", "c"), "}", format[2], "</b>"),
+                           ""))
   }
   if (is.null(popup)) {
-    popup <- paste0("{point.id} <br/><b> {point.b}: </b> {point.",
-                    ifelse(percentage, "percent", "c"),
-                    "}")
+    popup <- paste0("{point.id} <br/><b> {point.b}",
+                    ifelse(count & !is.null(data),
+                           paste0(": ", format[1], "{point.", ifelse(percentage, "percent", "c"), "}", format[2], "</b>"),
+                           ""))
   }
   dt@data$label <- labelPopup(dt@data, label, marks, nDigits, labelWrap)
   dt@data$popup <- labelPopup(dt@data, popup, marks, nDigits, labelWrap)
@@ -224,23 +237,30 @@ lflt_choropleth_GcdCat <- function(data = NULL,
       addProviderTiles(tiles)
   }
   lf <- lf %>%
-    addPolygons(fillColor = plt(dt@data[[col]]),
+    addPolygons(fillColor = plt0,
                 label = ~map(label, ~shiny::HTML(.x)),
                 popup = ~map(popup, ~shiny::HTML(.x)),
                 color = border$color,
                 fillOpacity = fill$opacity,
                 opacity = border$opacity,
                 weight = border$weight)
-  if (!legend$position %in% "no") {
+  if (!legend$position %in% "no" & !is.null(data)) {
+    # un solo número en la columna numérica
+    ca <- unique(dt@data[[col]])
+    ct <- as.numeric(ca[!is.na(ca)])
+    if (length(ct) == 1) {
+      ct <- ct + 1
+    }
     lf <- lf %>%
       addLegend(bins = legend$bins,
                 pal = plt,
-                values = dt@data[[col]],
+                values = union(ca, ct),
                 labFormat = labelFormat0(prefix = format[1],
                                          suffix = format[2],
                                          big.mark = marks[1],
                                          decimal.mark = marks[2],
                                          digits = nDigits),
+                na.label = "NULL",
                 opacity = fill$opacity,
                 position = legend$position,
                 title = legend$title)
@@ -285,7 +305,7 @@ lflt_choropleth_GcdNum <- function(data = NULL,
                       mode = "quantile",
                       opacity = 0.5,
                       scale = "discrete",
-                      nullColor = "#dddddd")
+                      nullColor = "#eeeeee")
   fill <- modifyList(fillDefault, fill)
 
   legendDefault <- list(bins = 4,
@@ -297,7 +317,7 @@ lflt_choropleth_GcdNum <- function(data = NULL,
                         color = "black",
                         opacity = 1)
   border <- modifyList(borderDefault, border)
-
+  plt0 <- fill$nullColor
   dt <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
   if (!is.null(data)) {
     f <- fringe(data)
@@ -317,7 +337,8 @@ lflt_choropleth_GcdNum <- function(data = NULL,
     dt@data <- dt@data %>%
       dplyr::left_join(d, by = c(id = "a"))
 
-    plt <- fillColorsChoropleth(dt@data, col, fill$color, fill$scale, legend$bins, fill$mode, count, fill$nullColor)
+    plt <- fillColorsChoropleth(dt@data, col, fill$color, fill$scale, legend$bins, fill$mode, TRUE, fill$nullColor)
+    plt0 <- plt(dt@data[[col]])
   }
 
   if (percentage & nchar(format[2]) == 0) {
@@ -325,7 +346,12 @@ lflt_choropleth_GcdNum <- function(data = NULL,
   }
 # los labels y popups
   if (is.null(label)) {
-    label <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>")
+    # label <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>")
+    label <- paste0("{point.id} <br/><b> {point.b}",
+                    ifelse(!is.null(data),
+                           paste0(": ", format[1], "{point.", ifelse(percentage, "percent", "b"), "}", format[2], "</b>"),
+                           ""))
+
   }
   if (is.null(popup)) {
     popup <- label <- paste0("{point.id}: <b> {point.", ifelse(percentage, "percent", "b"), "} </b>")
@@ -339,14 +365,14 @@ lflt_choropleth_GcdNum <- function(data = NULL,
       addProviderTiles(tiles)
   }
   lf <- lf %>%
-    addPolygons(fillColor = plt(dt@data[[col]]),
+    addPolygons(fillColor = plt0,
                 label = ~map(label, ~shiny::HTML(.x)),
                 popup = ~map(popup, ~shiny::HTML(.x)),
                 color = border$color,
                 fillOpacity = fill$opacity,
                 opacity = border$opacity,
                 weight = border$weight)
-  if (!legend$position %in% "no") {
+  if (!legend$position %in% "no" & !is.null(data)) {
     lf <- lf %>%
       addLegend(bins = legend$bins,
                 pal = plt,
