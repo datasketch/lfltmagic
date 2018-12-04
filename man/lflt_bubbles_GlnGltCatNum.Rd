@@ -5,13 +5,9 @@
 \title{Leaflet bubbles grouped by categorical variable size by numerical}
 \usage{
 lflt_bubbles_GlnGltCatNum(data, caption = NULL, agg = "sum",
-  border = list(weight = 1.3, color = "black", opacity = 1, stroke =
-  TRUE), fill = list(color = NULL, opacity = 0.5, scale = "discrete",
-  nullColor = "#dddddd"), format = c("", ""), highlightValue = NULL,
-  highlightValueColor = NULL, labelWrap = 12, legend = list(bins = 6,
-  position = "bottomleft", title = NULL), marks = c(",", "."),
-  nDigits = 2, label = NULL, percentage = FALSE, popup = NULL,
-  size = c(3, 20), tiles = NULL)
+  border = list(), fill = list(), format = c("", ""),
+  labelWrap = 12, marks = c(",", "."), nDigits = 2, label = NULL,
+  percentage = FALSE, popup = NULL, size = c(3, 20), tiles = NULL)
 }
 \arguments{
 \item{x}{A data.frame}

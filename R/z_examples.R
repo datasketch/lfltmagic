@@ -53,20 +53,43 @@ lflt_choropleth_GcdNum(g0[, c(1, 3)], fill = list(mode = "quantile", color = c("
 # Bubbles: Gln-Glt, Gln-Glt-Cat, Gln-Glt-Num, Gln-Glt-Cat-Num
 g1 <- sampleData("Gln-Glt-Cat-Num", 76)
 # Gln-Glt
-lflt_bubbles_GlnGlt(g1)
-lflt_bubbles_GlnGlt(g1, fill = list(color = "green", opacity = 1))
-lflt_bubbles_GlnGlt(g1, fill = list(color = c("green", "yellow"), opacity = 1,
-                                    scale = "continuous"), count = FALSE,
+lflt_bubbles_GlnGlt(g1[, 1:2])
+lflt_bubbles_GlnGlt(g1[, 1:2], fill = list(color = "green", opacity = 1))
+lflt_bubbles_GlnGlt(g1[, 1:2], fill = list(color = c("green", "yellow"), opacity = 1,
+                                           scale = "continuous"), count = FALSE,
                     border = list(stroke = FALSE))
-lflt_bubbles_GlnGlt(g1, fill = list(scale = "continuous"), percentage = TRUE, size = c(20, 21),
-                    format = c("oj ", "po"), border = list(color = "green", weight = 5))
+lflt_bubbles_GlnGlt(g1[, 1:2], fill = list(scale = "continuous"), percentage = TRUE, size = c(20, 21),
+                    format = c("oj ", "po"), border = list(color = "green", weight = 5),
+                    tiles = providers$Thunderforest.Outdoors)
 
 # Gln-Glt-Cat
-lflt_bubbles_GlnGltCat(g1)
-lflt_bubbles_GlnGltCat(g1, fill = list(color = "green", opacity = 1))
-lflt_bubbles_GlnGltCat(g1, fill = list(color = c("green", "yellow", "red"), opacity = 1,
-                                       scale = "continuous"), count = FALSE,
+lflt_bubbles_GlnGltCat(g1[, 1:3])
+lflt_bubbles_GlnGltCat(g1[, 1:3], fill = list(color = "green", opacity = 1))
+lflt_bubbles_GlnGltCat(g1[, 1:3], fill = list(color = c("green", "yellow", "red"), opacity = 1,
+                                              scale = "continuous"), count = FALSE,
                        border = list(stroke = FALSE))
-lflt_bubbles_GlnGltCat(g1, fill = list(scale = "continuous"), percentage = TRUE, size = c(20, 21),
-                       format = c("oj ", "po"), border = list(color = "green", weight = 5))
+lflt_bubbles_GlnGltCat(g1[, 1:3], fill = list(scale = "continuous"), percentage = TRUE, size = c(20, 21),
+                       format = c("oj ", "po"), border = list(color = "green", weight = 5),
+                       tiles = providers$Thunderforest.Outdoors)
+
+
+# Gln-Glt-Num
+lflt_bubbles_GlnGltNum(g1[, c(1, 2, 4)])
+lflt_bubbles_GlnGltNum(g1[, c(1, 2, 4)], fill = list(color = "green", opacity = 1))
+lflt_bubbles_GlnGltNum(g1[, c(1, 2, 4)], fill = list(color = c("green", "yellow", "red"), opacity = 1,
+                                                     scale = "continuous"),
+                       border = list(stroke = FALSE))
+lflt_bubbles_GlnGltNum(g1[, c(1, 2, 4)], fill = list(scale = "continuous"), percentage = TRUE, size = c(20, 21),
+                       format = c("oj ", "po"), border = list(color = "green", weight = 5),
+                       tiles = providers$Thunderforest.Outdoors)
+
+# Gln-Glt-Cat-Num
+lflt_bubbles_GlnGltCatNum(g1)
+lflt_bubbles_GlnGltCatNum(g1, fill = list(color = "green", opacity = 1))
+lflt_bubbles_GlnGltCatNum(g1, fill = list(color = c("green", "yellow", "red"), opacity = 1,
+                                          scale = "continuous"),
+                          border = list(stroke = FALSE))
+lflt_bubbles_GlnGltCatNum(g1, fill = list(scale = "continuous"), percentage = TRUE, size = c(20, 21),
+                          format = c("oj ", "po"), border = list(color = "green", weight = 5),
+                          tiles = providers$Thunderforest.Outdoors)
 
