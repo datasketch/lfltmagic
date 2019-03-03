@@ -10,9 +10,7 @@ discard_all_na_cols <- function (d){
 }
 
 remove_accents <- function(string){
-  accents <- "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝäëïöüÄËÏÖÜâêîôûÂÊÎÔÛñÑç"
-  translation <- "aeiouAEIOUaeiouyAEIOUYaeiouAEIOUaeiouAEIOUnNc"
-  chartr(accents, translation, string)
+  iconv(string, from="UTF-8", to="ASCII//TRANSLIT")
 }
 
 match_replace <- function(v,dic, force = TRUE){
@@ -191,6 +189,7 @@ dsColorsHex <- function(hex = FALSE) {
 # label popups
 #' @export
 labelPopup <- function(data, lp, marks = c(".", "."), nDigits = 2, labelWrap = 12) {
+  if (is.null(lp)) lp <- ""
   m0 <- regmatches(lp, gregexpr("\\{.[^\\{]+}", lp))[[1]]
   m1 <- gsub("\\{", "\\\\{", gsub("\\.", "\\\\.", m0))
   n0 <- gsub("\\.", "", unlist(regmatches(m0, gregexpr("\\.[^}]+", m0))))
@@ -280,7 +279,30 @@ fillColorsChoropleth <- function(data, col, color, colorScale, bins, mode, numer
 
 
 
+# layerMap and dataMap
+#' @export
+layerMap <- function(mapName, borderColor, borderWeigth, fillColor, fillOpacity ) {
+  lfmap <- geodataMeta(mapName)
+  lfmap$path <- file.path("geodata",lfmap$geoname,paste0(lfmap$basename,".topojson"))
+  lfmap$centroides <- file.path("geodata",lfmap$geoname,paste0(lfmap$basename,".csv"))
+  centroides <- read_csv(system.file(lfmap$centroides,package = "geodata"))
 
+  tj <- topojson_read(system.file(lfmap$path, package = "geodata"))
+
+  tj <- readLines(system.file(lfmap$path, package = "geodata")) %>% paste(collapse = "\n")
+
+  mapLf <- leaflet()%>%
+            addTiles() %>%
+             addTopoJSON(tj,
+                         weight = borderWeigth,
+                         color = borderColor,
+                         fillColor = fillColor,
+                         fillOpacity = fillOpacity)
+
+  result <- list(centroides, mapLf)
+  result
+
+}
 
 
 
