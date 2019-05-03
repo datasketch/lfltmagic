@@ -16,18 +16,20 @@ getDefaultOpts <- function(...){
     palette = "viridis",
     customPalette = NA,
     scale = 'continuous',
-    defaultFill = "#DDDDDD",
+    defaultFill = "#bdcad1",
     naColor = "#CCCCCC",
     tiles = NULL,
-    borderColor = "#CCCCCC",
+    border_color = "#2d2d2d",
     borderWidth = 1,
     borderOpacity = 1,
     opacity = 0.7,
     agg = 'sum',
     count = TRUE,
     percentage = FALSE,
+    size = c(3, 20),
     marks = c(".", ","),
-    format = c('', ''),
+    prefix = NULL,
+    suffix = NULL,
     color = NULL,
     nDigits = NULL,
     textMap = list(
@@ -55,6 +57,7 @@ getDefaultOpts <- function(...){
         size = 7
       )
     ),
+    legend_title = NULL,
     legend = list(
       background = 'transparent',
       show = c(TRUE,TRUE),

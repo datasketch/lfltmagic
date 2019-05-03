@@ -8,6 +8,11 @@ library(lfltmagic)
 
 # choropleth
 dta <- sampleData("Gcd")
+
+lflt_bubbles_GcdNum(mapName = "col_departments",
+data = sampleData("Gcd-Num"),
+                    opts = list(borderColor = 'red'))
+
 lflt_choropleth_Gcd(mapName = "col_departments",
                     opts = list(borderColor = 'red'))
 lflt_choropleth_Gcd(data = dta) %>%  setView(0, 0, 3)
