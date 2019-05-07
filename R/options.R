@@ -32,6 +32,7 @@ getDefaultOpts <- function(...){
     suffix = NULL,
     color = NULL,
     nDigits = NULL,
+    zoom = 5,
     textMap = list(
       optText = 'code',
       propText = 'all',

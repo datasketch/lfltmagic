@@ -699,7 +699,7 @@ lflt_choropleth_GnmNum <- function(data = NULL,
 
   if (mapName != "world_countries") {
     lf <- lf %>%
-      setView(lng = mean(centroides$lon, na.rm = T), lat = mean(centroides$lat, na.rm = T), zoom = 5)
+      setView(lng = mean(centroides$lon, na.rm = T), lat = mean(centroides$lat, na.rm = T), zoom = opts$zoom)
   }
 
   if (!is.null(opts$tiles)) {
