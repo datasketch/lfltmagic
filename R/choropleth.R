@@ -602,7 +602,8 @@ lflt_choropleth_GnmNum <- function(data = NULL,
   }
 
   lfmap <- geodataMeta(mapName)
-  topoInfo <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
+  #topoInfo <- geojsonio::topojson_read(geodataTopojsonPath(mapName))
+  topoInfo <- rgdal::readOGR(geodataTopojsonPath(mapName))
 
   centroides <- file.path("geodata",lfmap$geoname,paste0(lfmap$basename,".csv"))
   centroides <- read_csv(system.file(centroides,package = "geodata"))
