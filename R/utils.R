@@ -277,7 +277,20 @@ fillColorsChoropleth <- function(data, col, color, colorScale, bins, mode, numer
   pal
 }
 
-
+# discrete color
+#' @export
+discreteColor <- function (colorDefault, d) {
+  lengData <- length(unique(d$a))
+  lengColor <- length(colorDefault)
+  if (lengData == lengColor) {
+    colorDefault <- colorDefault
+  } else if (lengData > lengColor) {
+    colorDefault <- c(colorDefault, sample(colorDefault, lengData-lengColor))
+  } else {
+    colorDefault <- colorDefault[1:lengData]
+  }
+  colorDefault
+}
 
 # layerMap and dataMap
 #' @export
@@ -307,6 +320,13 @@ layerMap <- function(mapName, borderColor, borderWeigth, fillColor, fillOpacity 
 
 
 
+#legend for categories
+#' export
+addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.8, position ="bottomleft", title = " "){
+  colorAdditions <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px")
+  labelAdditions <- paste0("<div style='display: inline-block;height: ", sizes, "px;margin-top: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
+  return(addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, position = position, title = title))
+}
 
 
 
