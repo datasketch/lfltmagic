@@ -123,4 +123,112 @@ lflt_bubbles_CatGlnGlt <- function(data = NULL,
                className="map-caption")
 }
 
+#' Leaflet bubbles
+#'
+#' Leaflet bubbles
+#'
+#' @name lflt_bubbles_GlnGlt
+#' @param x A data.frame
+#' @return leaflet viz
+#' @section ctypes: Gln-Glt
+#' @export
+#' @examples
+#' lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+lflt_bubbles_GlnGlt <- function(data = NULL,
+                                mapName = "world_countries",
+                                opts = NULL, ...) {
+
+  if (is.null(data) & is.null(mapName)) return("You must call a data or mapName argument")
+
+  opts <- getOpts(opts = opts)
+
+  title <-  opts$title %||% ""
+  subtitle <- opts$subtitle %||% ""
+  caption <- opts$caption %||% ""
+
+
+  if (!is.null(data)) {
+    f <- fringe(data)
+    nms <- getClabels(f)
+    d <- f$d
+    d <- d %>% drop_na()
+
+    if (is.null(opts$nDigits)) opts$nDigits <- 2
+    d$a <- round(d$a, opts$nDigits)
+    d$b <- round(d$b, opts$nDigits)
+
+    if (is.null(opts$colors)) {
+      colorDefault <- c("#3DB26F")
+    } else {
+      colorDefault <- opts$colors
+    }
+
+    if (!is.null(mapName)) {
+
+      if (!mapName %in% availableGeodata()) {
+        stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
+      }
+
+      topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
+      lf <-  leaflet(data = d) %>%
+        addTopoJSON(topoData,
+                    weight = opts$borderWidth,
+                    color = opts$border_color,
+                    fill = FALSE)
+    } else {
+      lf <- leaflet(data = d) %>% addTiles()
+    }
+
+
+
+    labels <- sprintf(
+      paste0('<p><b>lng: </b>', format(d$a, big.mark = opts$marks[1],small.mark = opts$marks[2]),'</p><p><b>lat: </b>', format(d$b, big.mark = opts$marks[1], small.mark = opts$marks[2]),'</p>'
+      )) %>% lapply(htmltools::HTML)
+
+    lf <- lf %>%
+      addCircleMarkers(
+        lng = d$a,
+        lat = d$b,
+        radius = opts$radius,
+        color = colorDefault,
+        stroke = opts$stroke,
+        fillOpacity = opts$fill_opacity,
+        label = labels
+      )
+  } else {
+    if (!is.null(mapName)) {
+      if (!mapName %in% availableGeodata()) {
+        stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
+      }
+
+      topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
+
+      lf <-  leaflet() %>%
+        addTopoJSON(topoData,
+                    weight = opts$borderWidth,
+                    color = opts$border_color,
+                    fill = FALSE)
+
+    }
+  }
+
+
+  if (!is.null(opts$tiles)) {
+    lf <- lf %>%
+      addProviderTiles(opts$tiles)
+  }
+
+  if (opts$graticule) {
+    lf <- lf %>%
+      addGraticule(interval = opts$graticule_interval,
+                   style = list(color = opts$graticule_color, weight = opts$graticule_weight))
+  }
+
+
+  lf %>%
+    addControl(caption,
+               position = "bottomright",
+               className="map-caption")
+}
+
 

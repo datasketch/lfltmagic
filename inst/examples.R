@@ -15,7 +15,9 @@ opts <- list(
 )
 lflt_bubbles_CatGlnGlt(data = df, opts = opts)
 
-
+df <- sampleData("Gln-Glt")
+lflt_bubbles_GlnGlt(data = df)
+lflt_bubbles_GlnGlt(data = df, mapName = NULL)
 
 
 

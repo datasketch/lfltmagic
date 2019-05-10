@@ -23,6 +23,8 @@ getDefaultOpts <- function(...){
     caption =  NULL,
     fill_opacity = 1,
     colors = NULL,
+    marks = c(".", ","),
+    nDigits = NULL,
     tiles = NULL,
     legend_show = TRUE,
     legend_size = 13,
