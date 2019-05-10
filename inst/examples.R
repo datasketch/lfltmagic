@@ -6,6 +6,21 @@ install()
 
 library(lfltmagic)
 
+
+df <- sampleData("Cat-Gln-Glt")
+lflt_bubbles_CatGlnGlt(data = df)
+lflt_bubbles_CatGlnGlt(data = df, mapName = NULL)
+opts <- list(
+  tiles = "OpenTopoMap"
+)
+lflt_bubbles_CatGlnGlt(data = df, opts = opts)
+
+
+
+
+
+
+
 # choropleth
 dta <- sampleData("Gcd")
 
