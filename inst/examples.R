@@ -19,9 +19,15 @@ df <- sampleData("Gln-Glt")
 lflt_bubbles_GlnGlt(data = df)
 lflt_bubbles_GlnGlt(data = df, mapName = NULL)
 
+df <- sampleData("Gnm-Num",50)
+lflt_bubbles_GnmNum(df)
+df <- sampleData("Gnm",50)
+opts <- list(min_radius = 5,
+             max_radius =  10,
+             agg_text = " ")
+lflt_bubbles_Gnm(df, opts = opts)
 
-
-
+lflt_bubbles_CatGlnGltNum(sampleData("Cat-Gln-Glt-Num", nrow = 10))
 
 # choropleth
 dta <- sampleData("Gcd")
@@ -49,3 +55,6 @@ lflt_choropleth_Gnm(data = dta)
 dta <- sampleData("Gnm-Num")
 lflt_choropleth_GnmNum()
 lflt_choropleth_GnmNum(data = dta)
+
+
+lflt_bubbles_GnmNum(sampleData("Gnm-Num"))
