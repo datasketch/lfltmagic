@@ -18,6 +18,8 @@ getDefaultOpts <- function(...){
     opacity = 0.7,
     stroke = FALSE,
     radius = 7,
+    min_radius = 1,
+    max_radius = 10,
     title =  NULL,
     subtitle =  NULL,
     caption =  NULL,
@@ -28,7 +30,13 @@ getDefaultOpts <- function(...){
     tiles = NULL,
     legend_show = TRUE,
     legend_size = 13,
-    legend_position = 'bottomleft'
+    legend_position = 'bottomleft',
+    shinyId = NULL,
+    percentage = FALSE,
+    suffix = NULL,
+    prefix = NULL,
+    agg = "sum",
+    agg_text = NULL
   )
   dopts
 }

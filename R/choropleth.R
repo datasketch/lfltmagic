@@ -660,7 +660,6 @@ lflt_choropleth_GnmNum <- function(data = NULL,
     if (is.null(opts$suffix)) opts$suffix <- ""
 
     if (opts$percentage & opts$suffix == "") {
-      aggFormAxis <- 'function() {return this.value+"%";}'
       opts$suffix <- "%"
     }
 
