@@ -8,6 +8,7 @@ getDefaultOpts <- function(...){
     projection_type = NULL,
     projection_orientation = c(90, 0, 0),
     dropNa = FALSE,
+    naColor = "#cccccc",
     graticule = FALSE,
     graticule_color = '#cccccc',
     graticule_interval = 50,
@@ -31,12 +32,12 @@ getDefaultOpts <- function(...){
     legend_show = TRUE,
     legend_size = 13,
     legend_position = 'bottomleft',
-    shinyId = NULL,
     percentage = FALSE,
     suffix = NULL,
     prefix = NULL,
     agg = "sum",
-    agg_text = NULL
+    agg_text = NULL,
+    scale = "discrete"
   )
   dopts
 }

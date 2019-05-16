@@ -84,7 +84,7 @@ lflt_bubbles_GcdNum <- function(data = NULL,
         stroke = opts$stroke,
         fillOpacity = opts$fill_opacity,
         label = labels,
-        layerId = opts$shinyId
+        layerId = d$a
       )
   } else {
     topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
@@ -242,7 +242,7 @@ lflt_bubbles_GnmNum <- function(data = NULL,
         stroke = opts$stroke,
         fillOpacity = opts$fill_opacity,
         label = labels,
-        layerId = opts$shinyId
+        layerId = d$a
       )
   } else {
     topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
@@ -394,7 +394,7 @@ lflt_bubbles_CatGlnGlt <- function(data = NULL,
         stroke = opts$stroke,
         fillOpacity = opts$fill_opacity,
         label = ~type,
-        layerId = opts$shinyId
+        layerId = ~type
       )
 
     if(opts$legend_show) {
@@ -526,7 +526,7 @@ lflt_bubbles_CatGlnGltNum <- function(data = NULL,
         stroke = opts$stroke,
         fillOpacity = opts$fill_opacity,
         label = labels,
-        layerId = opts$shinyId
+        layerId = ~type
       )
 
     if(opts$legend_show) {
@@ -642,8 +642,8 @@ lflt_bubbles_GlnGlt <- function(data = NULL,
         color = colorDefault,
         stroke = opts$stroke,
         fillOpacity = opts$fill_opacity,
-        label = labels,
-        layerId = opts$shinyId
+        label = labels#,
+        #layerId = opts$shinyId
       )
   } else {
     if (!is.null(mapName)) {
