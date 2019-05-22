@@ -2,7 +2,7 @@
 % Please edit documentation in R/choropleth.R
 \name{lflt_choropleth_Gcd}
 \alias{lflt_choropleth_Gcd}
-\title{Leaflet choropleths by geographical code}
+\title{Leaflet choropleths by geo code}
 \usage{
 lflt_choropleth_Gcd(data = NULL, mapName = "world_countries",
   opts = NULL)
@@ -14,7 +14,7 @@ lflt_choropleth_Gcd(data = NULL, mapName = "world_countries",
 leaflet viz
 }
 \description{
-Leaflet choropleths by geographical code
+Leaflet choropleths by geo code
 }
 \section{ctypes}{
  Gcd

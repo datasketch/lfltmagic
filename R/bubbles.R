@@ -484,16 +484,7 @@ lflt_bubbles_CatGlnGltNum <- function(data = NULL,
     colorDefault <- discreteColor(colorDefault, d)
     categorias <- unique(d$a)
 
-    d <- sp::SpatialPointsDataFrame(
-      cbind(
-        d$b,  # lng
-        d$c  # lat
-      ),
-      data.frame(
-        type = factor(d$a),
-        orig = d$d,
-        num = scales::rescale(d$d, to = c(opts$min_radius, opts$max_radius)))
-    )
+    d$num <- scales::rescale(d$d, to = c(opts$min_radius, opts$max_radius))
 
 
     if (!is.null(mapName)) {
@@ -503,30 +494,34 @@ lflt_bubbles_CatGlnGltNum <- function(data = NULL,
       }
 
       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
-      lf <-  leaflet(data = d) %>%
+      lf <-  leaflet() %>%
         addTopoJSON(topoData,
                     weight = opts$borderWidth,
                     color = opts$border_color,
                     fill = FALSE)
     } else {
-      lf <- leaflet(data = d) %>% addTiles()
+      lf <- leaflet() %>% addTiles()
     }
 
     pal <- colorFactor(colorDefault, domain = categorias)
 
     labels <- sprintf(
-      paste0('<b>', d$type, '</b></br><b>', nms[4] ,': </b>',
-             format(d$orig, big.mark = opts$marks[1],small.mark = opts$marks[2])
+      paste0('<b>', d$a, '</b></br><b>', nms[4] ,': </b>',
+             format(d$d, big.mark = opts$marks[1],small.mark = opts$marks[2])
       )) %>% lapply(htmltools::HTML)
+
+    d$aa <- paste0(d$a, 1:length(d$a))
 
     lf <- lf %>%
       addCircleMarkers(
-        radius = ~num,
-        color = ~pal(type),
+        lng = d$b,
+        lat = d$c,
+        radius = d$num,
+        color = pal(d$a),
         stroke = opts$stroke,
         fillOpacity = opts$fill_opacity,
         label = labels,
-        layerId = ~type
+        layerId = d$aa
       )
 
     if(opts$legend_show) {

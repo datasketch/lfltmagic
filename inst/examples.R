@@ -1,11 +1,7 @@
-
 library(devtools)
 load_all()
 document()
 install()
-
-library(lfltmagic)
-
 
 df <- sampleData("Cat-Gln-Glt")
 lflt_bubbles_CatGlnGlt(data = df)

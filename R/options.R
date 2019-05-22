@@ -37,7 +37,10 @@ getDefaultOpts <- function(...){
     prefix = NULL,
     agg = "sum",
     agg_text = NULL,
-    scale = "discrete"
+    scale = "discrete",
+    count = TRUE,
+    default_color = "transparent",
+    zoom = 5
   )
   dopts
 }

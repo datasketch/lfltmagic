@@ -50,7 +50,8 @@ lflt_choropleth_GnmNum <- function(data = NULL,
            addTopoJSON(topoData,
                        weight = opts$borderWidth,
                        color = opts$border_color,
-                       fill = FALSE)
+                       fillColor = opts$default_color
+                       )
 
 
 
@@ -103,9 +104,15 @@ lflt_choropleth_GnmNum <- function(data = NULL,
     dato <- ifelse(is.na(topoInfo@data$b), "",
                    paste0(prefix_agg, ' ', nms[2], ': ', opts$prefix , topoInfo@data$b, opts$suffix))
 
+    if (opts$count) {
     labels <- sprintf(
       paste0('<p><b>', topoInfo@data$name, '</b></br>',dato ,'</p>'
       )) %>% lapply(htmltools::HTML)
+    } else {
+    labels <- sprintf(
+        paste0('<p><b>', topoInfo@data$name, '</b></br></p>'
+        )) %>% lapply(htmltools::HTML)
+    }
 
    lf  <-  leaflet(topoInfo) %>%
       addPolygons(
@@ -114,9 +121,12 @@ lflt_choropleth_GnmNum <- function(data = NULL,
         color = opts$border_color,
         fillOpacity = 0.7,
         fillColor = pal(topoInfo@data$b),
-        layerId = opts$shinyId,
+        layerId =  topoInfo@data$name,
         label = labels
-      )  %>%
+      )
+
+   if (opts$count) {
+      lf <- lf %>%
         addLegend(pal = pal,
                   values = ~b,
                   position = "bottomleft",
@@ -128,6 +138,7 @@ lflt_choropleth_GnmNum <- function(data = NULL,
                                            big.mark = opts$marks[1],
                                            decimal.mark = opts$marks[2],
                                            digits = nDig))
+   }
 
 
   }
@@ -150,6 +161,40 @@ lflt_choropleth_GnmNum <- function(data = NULL,
 
 }
 
+#' Leaflet choropleths by geo name
+#'
+#' Leaflet choropleths by geo name
+#'
+#' @name lflt_choropleth_Gnm
+#' @param x A data.frame
+#' @return leaflet viz
+#' @section ctypes: Gnm
+#' @export
+#' @examples
+#' lflt_choropleth_Gnm(sampleData("Gnm", nrow = 10))
+lflt_choropleth_Gnm <- function(data = NULL,
+                                mapName = "world_countries",
+                                opts = NULL) {
+
+  if (is.null(data)) {
+    d <- NULL
+} else {
+  f <- fringe(data)
+  nms <- getClabels(f)
+  d <- f$d
+
+
+  d <- d %>%
+    dplyr::group_by_all() %>%
+    dplyr::summarise(b = n())
+
+  prefix_agg <- ifelse(is.null(opts$agg_text), "count ", opts$agg_text)
+
+  names(d) <- c(f$dic_$d$label, paste(prefix_agg, f$dic_$d$label))
+  opts$agg_text <- " "
+}
+  lflt_choropleth_GnmNum(d, mapName = mapName, opts = opts)
+}
 
 
 #' Leaflet choropleths by numerical variable
@@ -257,10 +302,16 @@ lflt_choropleth_GcdNum <- function(data = NULL,
     dato <- ifelse(is.na(topoInfo@data$b), "",
                    paste0(prefix_agg, ' ', nms[2], ': ', opts$prefix , topoInfo@data$b, opts$suffix))
 
+
+    if (opts$count) {
     labels <- sprintf(
       paste0('<p><b>', topoInfo@data$id, '</b></br>', dato,'</p>'
       )) %>% lapply(htmltools::HTML)
-
+    } else {
+      labels <- sprintf(
+        paste0('<p><b>', topoInfo@data$id, '</b></br></p>'
+        )) %>% lapply(htmltools::HTML)
+    }
     lf  <-  leaflet(topoInfo) %>%
       addPolygons(
         weight = opts$borderWidth,
@@ -268,9 +319,12 @@ lflt_choropleth_GcdNum <- function(data = NULL,
         color = opts$border_color,
         fillOpacity = 0.7,
         fillColor = pal(topoInfo@data$b),
-        layerId = opts$shinyId,
+        layerId = topoInfo@data$id,
         label = labels
-      )  %>%
+      )
+
+    if (opts$count) {
+    lf <-  lf  %>%
       addLegend(pal = pal,
                 values = ~b,
                 position = "bottomleft",
@@ -282,6 +336,7 @@ lflt_choropleth_GcdNum <- function(data = NULL,
                                          big.mark = opts$marks[1],
                                          decimal.mark = opts$marks[2],
                                          digits = nDig))
+    }
 
 
   }
@@ -304,3 +359,38 @@ lflt_choropleth_GcdNum <- function(data = NULL,
 
 }
 
+
+#' Leaflet choropleths by geo code
+#'
+#' Leaflet choropleths by geo code
+#'
+#' @name lflt_choropleth_Gcd
+#' @param x A data.frame
+#' @return leaflet viz
+#' @section ctypes: Gcd
+#' @export
+#' @examples
+#' lflt_choropleth_Gcd(sampleData("Gcd", nrow = 10))
+lflt_choropleth_Gcd <- function(data = NULL,
+                                mapName = "world_countries",
+                                opts = NULL) {
+
+  if (is.null(data)){
+    d <- NULL
+} else {
+  f <- fringe(data)
+  nms <- getClabels(f)
+  d <- f$d
+
+
+  d <- d %>%
+    dplyr::group_by_all() %>%
+    dplyr::summarise(b = n())
+
+  prefix_agg <- ifelse(is.null(opts$agg_text), "count ", opts$agg_text)
+
+  names(d) <- c(f$dic_$d$label, paste(prefix_agg, f$dic_$d$label))
+}
+  opts$agg_text <- " "
+  lflt_choropleth_GcdNum(d, mapName = mapName, opts = opts)
+}
