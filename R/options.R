@@ -14,8 +14,8 @@ getDefaultOpts <- function(...){
     graticule_interval = 50,
     graticule_weight = 1,
     border_color = "#2d2d2d",
-    borderWidth = 1,
-    borderOpacity = 1,
+    border_width = 1, #cambiar borderWidth
+    #border_opacity = 1, #cambiar  borderOpacity
     opacity = 0.7,
     stroke = FALSE,
     radius = 7,

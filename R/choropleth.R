@@ -48,7 +48,7 @@ lflt_choropleth_GnmNum <- function(data = NULL,
   topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
   lf <-  leaflet() %>%
            addTopoJSON(topoData,
-                       weight = opts$borderWidth,
+                       weight = opts$border_width,
                        color = opts$border_color,
                        fillColor = opts$default_color
                        )
@@ -116,7 +116,7 @@ lflt_choropleth_GnmNum <- function(data = NULL,
 
    lf  <-  leaflet(topoInfo) %>%
       addPolygons(
-        weight = opts$borderWidth,
+        weight = opts$border_width,
         opacity = 1,
         color = opts$border_color,
         fillOpacity = 0.7,
@@ -247,7 +247,7 @@ lflt_choropleth_GcdNum <- function(data = NULL,
   topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
   lf <-  leaflet() %>%
     addTopoJSON(topoData,
-                weight = opts$borderWidth,
+                weight = opts$border_width,
                 color = opts$border_color,
                 fill = FALSE)
 
@@ -314,7 +314,7 @@ lflt_choropleth_GcdNum <- function(data = NULL,
     }
     lf  <-  leaflet(topoInfo) %>%
       addPolygons(
-        weight = opts$borderWidth,
+        weight = opts$border_width,
         opacity = 1,
         color = opts$border_color,
         fillOpacity = 0.7,

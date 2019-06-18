@@ -57,7 +57,7 @@ lflt_bubbles_GcdNum <- function(data = NULL,
 
     lf <-  leaflet(data = d) %>%
       addTopoJSON(topoData,
-                  weight = opts$borderWidth,
+                  weight = opts$border_width,
                   color = opts$border_color,
                   fill = FALSE)
 
@@ -91,7 +91,7 @@ lflt_bubbles_GcdNum <- function(data = NULL,
 
     lf <-  leaflet() %>%
       addTopoJSON(topoData,
-                  weight = opts$borderWidth,
+                  weight = opts$border_width,
                   color = opts$border_color,
                   fill = FALSE)
   }
@@ -216,7 +216,7 @@ lflt_bubbles_GnmNum <- function(data = NULL,
 
     lf <-  leaflet(data = d) %>%
       addTopoJSON(topoData,
-                  weight = opts$borderWidth,
+                  weight = opts$border_width,
                   color = opts$border_color,
                   fill = FALSE)
 
@@ -249,7 +249,7 @@ lflt_bubbles_GnmNum <- function(data = NULL,
 
     lf <-  leaflet() %>%
       addTopoJSON(topoData,
-                  weight = opts$borderWidth,
+                  weight = opts$border_width,
                   color = opts$border_color,
                   fill = FALSE)
   }
@@ -378,7 +378,7 @@ lflt_bubbles_CatGlnGlt <- function(data = NULL,
       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
       lf <-  leaflet(data = d) %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
     } else {
@@ -414,7 +414,7 @@ lflt_bubbles_CatGlnGlt <- function(data = NULL,
 
       lf <-  leaflet() %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
 
@@ -496,7 +496,7 @@ lflt_bubbles_CatGlnGltNum <- function(data = NULL,
       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
       lf <-  leaflet() %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
     } else {
@@ -541,7 +541,7 @@ lflt_bubbles_CatGlnGltNum <- function(data = NULL,
 
       lf <-  leaflet() %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
 
@@ -616,7 +616,7 @@ lflt_bubbles_GlnGlt <- function(data = NULL,
       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
       lf <-  leaflet(data = d) %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
     } else {
@@ -650,7 +650,7 @@ lflt_bubbles_GlnGlt <- function(data = NULL,
 
       lf <-  leaflet() %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
 
@@ -740,7 +740,7 @@ lflt_bubbles_GlnGltNum <- function(data = NULL,
       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
       lf <-  leaflet(data = d) %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
     } else {
@@ -774,7 +774,7 @@ lflt_bubbles_GlnGltNum <- function(data = NULL,
 
       lf <-  leaflet() %>%
         addTopoJSON(topoData,
-                    weight = opts$borderWidth,
+                    weight = opts$border_width,
                     color = opts$border_color,
                     fill = FALSE)
 
