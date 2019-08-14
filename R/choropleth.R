@@ -21,7 +21,6 @@ lflt_choropleth_GnmNum <- function(data = NULL,
   opts <- getOpts(opts = opts)
 
   title <-  opts$title %||% ""
-  subtitle <- opts$subtitle %||% ""
   caption <- opts$caption %||% ""
 
   prefix_agg <- ifelse(is.null(opts$agg_text), opts$agg, opts$agg_text)
@@ -45,14 +44,17 @@ lflt_choropleth_GnmNum <- function(data = NULL,
   centroides <- file.path("geodata",lfmap$geoname,paste0(lfmap$basename,".csv"))
   centroides <- read_csv(system.file(centroides,package = "geodata"))
 
-  topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
-  lf <-  leaflet() %>%
-           addTopoJSON(topoData,
-                       weight = opts$border_width,
-                       color = opts$border_color,
-                       fillColor = opts$default_color
-                       )
+  topoData <- suppressWarnings(
+    readLines(geodataTopojsonPath(mapName))) %>% paste(collapse = "\n")
+  b_box <- geojson::bbox_get(topoData)
 
+  lf <- leaflet() %>%
+    leaflet(options = leafletOptions(zoomControl = opts$zoom
+    )) %>%
+    addTopoJSON(topoData,
+                weight = opts$border_width,
+                color = opts$border_color,
+                fill = FALSE)
 
 
   nDig <- opts$nDigits
@@ -86,12 +88,11 @@ lflt_choropleth_GnmNum <- function(data = NULL,
     topoInfo@data$name_alt <- iconv(tolower(topoInfo@data$name), to = "ASCII//TRANSLIT")
     topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
 
-
     if (opts$scale == "discrete") {
-    pal <- colorBin(pale,
-                    domain = topoInfo@data$b, na.color = opts$naColor,  bins = nBins)
+      pal <- colorBin(pale,
+                      domain = topoInfo@data$b, na.color = opts$na_color,  bins = nBins)
     } else {
-    pal <- colorNumeric(pale, domain = topoInfo@data$b, na.color = opts$naColor)
+      pal <- colorNumeric(pale, domain = topoInfo@data$b, na.color = opts$na_color)
     }
 
     if (is.null(opts$prefix)) opts$prefix <- ""
@@ -102,34 +103,36 @@ lflt_choropleth_GnmNum <- function(data = NULL,
     }
 
     dato <- ifelse(is.na(topoInfo@data$b), "",
-                   paste0(prefix_agg, ' ', nms[2], ': ', opts$prefix , topoInfo@data$b, opts$suffix))
+                   paste0(prefix_agg, ' ', nms[2], ': ', opts$prefix , format(topoInfo@data$b, big.mark = opts$marks[1], decimal.mark = opts$marks[2], small.mark = opts$marks[2]), opts$suffix))
 
     if (opts$count) {
-    labels <- sprintf(
-      paste0('<p><b>', topoInfo@data$name, '</b></br>',dato ,'</p>'
-      )) %>% lapply(htmltools::HTML)
+      labels <-
+        paste0('<p><b>', topoInfo@data$name, '</b></br>',dato ,'</p>'
+        ) %>% lapply(htmltools::HTML)
     } else {
-    labels <- sprintf(
+      d$b <- 1
+      labels <-
         paste0('<p><b>', topoInfo@data$name, '</b></br></p>'
-        )) %>% lapply(htmltools::HTML)
+        ) %>% lapply(htmltools::HTML)
     }
 
-   lf  <-  leaflet(topoInfo) %>%
+    lf  <-  leaflet(topoInfo, options = leafletOptions(zoomControl = opts$zoom)) %>%
       addPolygons(
         weight = opts$border_width,
         opacity = 1,
         color = opts$border_color,
-        fillOpacity = 0.7,
+        fillOpacity = opts$fill_opacity,
         fillColor = pal(topoInfo@data$b),
-        layerId =  topoInfo@data$name,
+        layerId =  as.character(topoInfo@data$name),
         label = labels
       )
 
-   if (opts$count) {
+    if (opts$count) {
+      if (opts$legend_show) {
       lf <- lf %>%
         addLegend(pal = pal,
                   values = ~b,
-                  position = "bottomleft",
+                  position = opts$legend_position,
                   opacity = 1.0,
                   bins = nBins,
                   title = opts$legend_title,
@@ -138,26 +141,37 @@ lflt_choropleth_GnmNum <- function(data = NULL,
                                            big.mark = opts$marks[1],
                                            decimal.mark = opts$marks[2],
                                            digits = nDig))
-   }
+      }
+    }
 
+    lf
 
   }
 
 
-  if (mapName != "world_countries") {
-    lf <- lf %>%
-      setView(lng = mean(centroides$lon, na.rm = T), lat = mean(centroides$lat, na.rm = T), zoom = opts$zoom)
-  }
+  lf <- lf %>%
+    setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
+
 
   if (!is.null(opts$tiles)) {
     lf <- lf %>%
       addProviderTiles(opts$tiles)
   }
 
+  if (opts$graticule) {
+    lf <- lf %>%
+      addGraticule(interval = opts$graticule_interval,
+                   style = list(color = opts$graticule_color, weight = opts$graticule_weight))
+  }
+
 
   lf %>%
-    addControl(caption, position = "bottomright", className="map-caption")
-
+    addControl(caption,
+               position = "bottomright",
+               className="map-caption") %>%
+    addControl(title,
+               position = "topleft",
+               className="map-title")
 
 }
 
@@ -178,28 +192,28 @@ lflt_choropleth_Gnm <- function(data = NULL,
 
   if (is.null(data)) {
     d <- NULL
-} else {
-  f <- fringe(data)
-  nms <- getClabels(f)
-  d <- f$d
+  } else {
+    f <- fringe(data)
+    nms <- getClabels(f)
+    d <- f$d
 
 
-  d <- d %>%
-    dplyr::group_by_all() %>%
-    dplyr::summarise(b = n())
+    d <- d %>%
+      dplyr::group_by_all() %>%
+      dplyr::summarise(b = n())
 
-  prefix_agg <- ifelse(is.null(opts$agg_text), "count ", opts$agg_text)
+    prefix_agg <- ifelse(is.null(opts$agg_text), "count ", opts$agg_text)
 
-  names(d) <- c(f$dic_$d$label, paste(prefix_agg, f$dic_$d$label))
-  opts$agg_text <- " "
-}
+    names(d) <- c(f$dic_$d$label, paste(prefix_agg, f$dic_$d$label))
+    opts$agg_text <- " "
+  }
   lflt_choropleth_GnmNum(d, mapName = mapName, opts = opts)
 }
 
 
-#' Leaflet choropleths by numerical variable
+#' Leaflet choropleths by code variable
 #'
-#' Leaflet choropleths by numerical variable
+#' Leaflet choropleths by code variable
 #'
 #' @name lflt_choropleth_GcdNum
 #' @param x A data.frame
@@ -218,9 +232,7 @@ lflt_choropleth_GcdNum <- function(data = NULL,
 
   opts <- getOpts(opts = opts)
 
-
   title <-  opts$title %||% ""
-  subtitle <- opts$subtitle %||% ""
   caption <- opts$caption %||% ""
 
   prefix_agg <- ifelse(is.null(opts$agg_text), opts$agg, opts$agg_text)
@@ -244,13 +256,17 @@ lflt_choropleth_GcdNum <- function(data = NULL,
   centroides <- file.path("geodata",lfmap$geoname,paste0(lfmap$basename,".csv"))
   centroides <- read_csv(system.file(centroides,package = "geodata"))
 
-  topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
-  lf <-  leaflet() %>%
+  topoData <- suppressWarnings(
+    readLines(geodataTopojsonPath(mapName))) %>% paste(collapse = "\n")
+  b_box <- geojson::bbox_get(topoData)
+
+  lf <- leaflet() %>%
+    leaflet(options = leafletOptions(zoomControl = opts$zoom
+    )) %>%
     addTopoJSON(topoData,
                 weight = opts$border_width,
                 color = opts$border_color,
                 fill = FALSE)
-
 
 
   nDig <- opts$nDigits
@@ -287,9 +303,9 @@ lflt_choropleth_GcdNum <- function(data = NULL,
 
     if (opts$scale == "discrete") {
       pal <- colorBin(pale,
-                      domain = topoInfo@data$b, na.color = opts$naColor,  bins = nBins)
+                      domain = topoInfo@data$b, na.color = opts$na_color,  bins = nBins)
     } else {
-      pal <- colorNumeric(pale, domain = topoInfo@data$b, na.color = opts$naColor)
+      pal <- colorNumeric(pale, domain = topoInfo@data$b, na.color = opts$na_color)
     }
 
     if (is.null(opts$prefix)) opts$prefix <- ""
@@ -300,65 +316,77 @@ lflt_choropleth_GcdNum <- function(data = NULL,
     }
 
     dato <- ifelse(is.na(topoInfo@data$b), "",
-                   paste0(prefix_agg, ' ', nms[2], ': ', opts$prefix , topoInfo@data$b, opts$suffix))
-
+                   paste0(prefix_agg, ' ', nms[2], ': ', opts$prefix , format(topoInfo@data$b, big.mark = opts$marks[1], decimal.mark = opts$marks[2], small.mark = opts$marks[2]), opts$suffix))
 
     if (opts$count) {
-    labels <- sprintf(
-      paste0('<p><b>', topoInfo@data$id, '</b></br>', dato,'</p>'
-      )) %>% lapply(htmltools::HTML)
+      labels <-
+        paste0('<p><b>', topoInfo@data$id, '</b></br>',dato ,'</p>'
+        ) %>% lapply(htmltools::HTML)
     } else {
-      labels <- sprintf(
+      d$b <- 1
+      labels <-
         paste0('<p><b>', topoInfo@data$id, '</b></br></p>'
-        )) %>% lapply(htmltools::HTML)
+        ) %>% lapply(htmltools::HTML)
     }
-    lf  <-  leaflet(topoInfo) %>%
+
+    lf  <-  leaflet(topoInfo, options = leafletOptions(zoomControl = opts$zoom)) %>%
       addPolygons(
         weight = opts$border_width,
         opacity = 1,
         color = opts$border_color,
-        fillOpacity = 0.7,
+        fillOpacity = opts$fill_opacity,
         fillColor = pal(topoInfo@data$b),
-        layerId = topoInfo@data$id,
+        layerId =  as.character(topoInfo@data$id),
         label = labels
       )
 
     if (opts$count) {
-    lf <-  lf  %>%
-      addLegend(pal = pal,
-                values = ~b,
-                position = "bottomleft",
-                opacity = 1.0,
-                bins = nBins,
-                title = opts$legend_title,
-                labFormat = labelFormat0(prefix = opts$prefix,
-                                         suffix = opts$suffix,
-                                         big.mark = opts$marks[1],
-                                         decimal.mark = opts$marks[2],
-                                         digits = nDig))
+      if (opts$legend_show) {
+        lf <- lf %>%
+          addLegend(pal = pal,
+                    values = ~b,
+                    position = opts$legend_position,
+                    opacity = 1.0,
+                    bins = nBins,
+                    title = opts$legend_title,
+                    labFormat = labelFormat0(prefix = opts$prefix,
+                                             suffix = opts$suffix,
+                                             big.mark = opts$marks[1],
+                                             decimal.mark = opts$marks[2],
+                                             digits = nDig))
+      }
     }
 
+    lf
 
   }
 
 
-  if (mapName != "world_countries") {
-    lf <- lf %>%
-      setView(lng = mean(centroides$lon, na.rm = T), lat = mean(centroides$lat, na.rm = T), zoom = opts$zoom)
-  }
+  lf <- lf %>%
+    setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
+
 
   if (!is.null(opts$tiles)) {
     lf <- lf %>%
       addProviderTiles(opts$tiles)
   }
 
+  if (opts$graticule) {
+    lf <- lf %>%
+      addGraticule(interval = opts$graticule_interval,
+                   style = list(color = opts$graticule_color, weight = opts$graticule_weight))
+  }
+
 
   lf %>%
-    addControl(caption, position = "bottomright", className="map-caption")
-
+    addControl(caption,
+               position = "bottomright",
+               className="map-caption") %>%
+    addControl(title,
+               position = "topleft",
+               className="map-title")
 
 }
-
 
 #' Leaflet choropleths by geo code
 #'
@@ -375,22 +403,25 @@ lflt_choropleth_Gcd <- function(data = NULL,
                                 mapName = "world_countries",
                                 opts = NULL) {
 
-  if (is.null(data)){
+  if (is.null(data)) {
     d <- NULL
-} else {
-  f <- fringe(data)
-  nms <- getClabels(f)
-  d <- f$d
+  } else {
+    f <- fringe(data)
+    nms <- getClabels(f)
+    d <- f$d
 
 
-  d <- d %>%
-    dplyr::group_by_all() %>%
-    dplyr::summarise(b = n())
+    d <- d %>%
+      dplyr::group_by_all() %>%
+      dplyr::summarise(b = n())
 
-  prefix_agg <- ifelse(is.null(opts$agg_text), "count ", opts$agg_text)
+    prefix_agg <- ifelse(is.null(opts$agg_text), "count ", opts$agg_text)
 
-  names(d) <- c(f$dic_$d$label, paste(prefix_agg, f$dic_$d$label))
-}
-  opts$agg_text <- " "
+    names(d) <- c(f$dic_$d$label, paste(prefix_agg, f$dic_$d$label))
+    opts$agg_text <- " "
+  }
   lflt_choropleth_GcdNum(d, mapName = mapName, opts = opts)
 }
+
+
+

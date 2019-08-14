@@ -10,7 +10,8 @@ Depends:
     datafringe,
     geodata,
     leaflet,
-    leaflet.extras
+    leaflet.extras,
+    htmltools
 License: MIT
 LazyData: true
 RoxygenNote: 6.1.1

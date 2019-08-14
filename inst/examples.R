@@ -2,7 +2,7 @@ library(devtools)
 load_all()
 document()
 install()
-
+library(lfltmagic)
 df <- sampleData("Cat-Gln-Glt")
 lflt_bubbles_CatGlnGlt(data = df)
 lflt_bubbles_CatGlnGlt(data = df, mapName = NULL)
@@ -17,10 +17,13 @@ lflt_bubbles_GlnGlt(data = df, mapName = NULL)
 
 df <- sampleData("Gnm-Num",50)
 lflt_bubbles_GnmNum(df)
-df <- sampleData("Gnm",50)
-opts <- list(min_radius = 5,
+df <- sampleData("Gnm",4)
+opts <- list(title = "hola",
+             min_radius = 5,
              max_radius =  10,
-             agg_text = " ")
+             agg_text = " ",
+             stroke = T,
+             marks = c("-", "."))
 lflt_bubbles_Gnm(df, opts = opts)
 
 lflt_bubbles_CatGlnGltNum(sampleData("Cat-Gln-Glt-Num", nrow = 10))
@@ -32,7 +35,8 @@ lflt_bubbles_GcdNum(mapName = "col_departments",
 data = sampleData("Gcd-Num"),
                     opts = list(borderColor = 'red'))
 
-lflt_choropleth_Gcd(mapName = "col_departments",
+data <- sampleData('Gnm', 300)
+lflt_choropleth_Gnm(data = data,
                     opts = list(borderColor = 'red'))
 lflt_choropleth_Gcd(data = dta) %>%  setView(0, 0, 3)
 lflt_choropleth_Gcd(data = dta,

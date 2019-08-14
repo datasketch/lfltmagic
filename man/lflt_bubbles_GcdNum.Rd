@@ -2,7 +2,7 @@
 % Please edit documentation in R/bubbles.R
 \name{lflt_bubbles_GcdNum}
 \alias{lflt_bubbles_GcdNum}
-\title{Leaflet bubbles geo code num}
+\title{Leaflet bubbles geo name num}
 \usage{
 lflt_bubbles_GcdNum(data = NULL, mapName = "world_countries",
   opts = NULL, ...)

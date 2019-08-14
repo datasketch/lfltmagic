@@ -300,8 +300,6 @@ layerMap <- function(mapName, borderColor, borderWeigth, fillColor, fillOpacity 
   lfmap$centroides <- file.path("geodata",lfmap$geoname,paste0(lfmap$basename,".csv"))
   centroides <- read_csv(system.file(lfmap$centroides,package = "geodata"))
 
-  tj <- topojson_read(system.file(lfmap$path, package = "geodata"))
-
   tj <- readLines(system.file(lfmap$path, package = "geodata")) %>% paste(collapse = "\n")
 
   mapLf <- leaflet()%>%

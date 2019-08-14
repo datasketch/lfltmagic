@@ -2,7 +2,7 @@
 % Please edit documentation in R/choropleth.R
 \name{lflt_choropleth_GcdNum}
 \alias{lflt_choropleth_GcdNum}
-\title{Leaflet choropleths by numerical variable}
+\title{Leaflet choropleths by code variable}
 \usage{
 lflt_choropleth_GcdNum(data = NULL, mapName = "world_countries",
   opts = NULL)
@@ -14,7 +14,7 @@ lflt_choropleth_GcdNum(data = NULL, mapName = "world_countries",
 leaflet viz
 }
 \description{
-Leaflet choropleths by numerical variable
+Leaflet choropleths by code variable
 }
 \section{ctypes}{
  Gcd-Num
