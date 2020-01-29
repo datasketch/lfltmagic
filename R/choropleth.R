@@ -363,7 +363,12 @@ lflt_choropleth_GcdNum <- function(data = NULL,
 
 
   lf <- lf %>%
-    setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
+    setView(
+      lng = mean(c(b_box[1],b_box[3])),
+      lat = mean(c(b_box[2], b_box[4])),
+      zoom = opts$zoom_level
+    ) %>%
+    fitBounds(b_box[1], b_box[2], b_box[3], b_box[4])
 
 
   if (!is.null(opts$tiles)) {
