@@ -4,8 +4,7 @@
 \alias{save_lfltmagic}
 \title{save}
 \usage{
-save_lfltmagic(viz, filename, format = NULL, width = 660,
-  height = 500, ...)
+save_lfltmagic(viz, filename, format = NULL, width = 660, height = 500, ...)
 }
 \description{
 save

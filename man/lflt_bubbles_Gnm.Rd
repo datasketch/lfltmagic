@@ -4,8 +4,7 @@
 \alias{lflt_bubbles_Gnm}
 \title{Leaflet bubbles geo name}
 \usage{
-lflt_bubbles_Gnm(data = NULL, mapName = "world_countries",
-  opts = NULL, ...)
+lflt_bubbles_Gnm(data = NULL, mapName = "world_countries", opts = NULL, ...)
 }
 \arguments{
 \item{x}{A data.frame}

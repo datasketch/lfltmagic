@@ -4,8 +4,7 @@
 \alias{lflt_choropleth_Gcd}
 \title{Leaflet choropleths by geo code}
 \usage{
-lflt_choropleth_Gcd(data = NULL, mapName = "world_countries",
-  opts = NULL)
+lflt_choropleth_Gcd(data = NULL, mapName = "world_countries", opts = NULL)
 }
 \arguments{
 \item{x}{A data.frame}

@@ -741,128 +741,202 @@ lflt_bubbles_GlnGlt <- function(data = NULL,
 #' @export
 #' @examples
 #' lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num", nrow = 10))
-lflt_bubbles_GlnGltNum <- function(data = NULL,
-                                   mapName = "world_countries",
+lflt_bubbles_GlnGltNum <- function(data,
+                                   map_name = "world_countries",
+                                   add_tiles = TRUE,
+                                   tile_name = NULL,
+                                   topo_weight = 1,
+                                   topo_color = "#CCCCCC",
+                                   topo_fill = FALSE,
+                                   legend_show = TRUE,
+                                   popup = NULL,
+                                   colors = c('#f0f05a','#f03f4e'),
                                    opts = NULL, ...) {
 
-  if (is.null(data) & is.null(mapName)) return("You must call a data or mapName argument")
+  defaultOptions <- list(
+    addTiles = add_tiles,
+    topo_weight = topo_weight,
+    topo_color = topo_color,
+    topo_fill = topo_fill,
+    legend_show = legend_show,
+    colors = colors,
+    popup = popup
+  )
+  opts <- modifyList(defaultOptions, opts %||% list())
 
-  opts <- getOpts(opts = opts)
+  f <- fringe(data)
+  nms <- getClabels(f)
+  d <- f$d
+  d <- d %>% drop_na()
 
-  title <-  opts$title %||% ""
-  caption <- opts$caption %||% ""
-
-
-  if (!is.null(data)) {
-    f <- fringe(data)
-    nms <- getClabels(f)
-    d <- f$d
-    d <- d %>% drop_na()
-
-    if (is.null(opts$nDigits)) opts$nDigits <- 2
-    d$a <- round(d$a, opts$nDigits)
-    d$b <- round(d$b, opts$nDigits)
-    d$c <- round(d$c, opts$nDigits)
-
-    if (is.null(opts$prefix)) opts$prefix <- ""
-    if (is.null(opts$suffix)) opts$suffix <- ""
-
-    if (opts$percentage) {
-      d$c <- (d$c/sum(d$c))*100
-    }
-
-    if (opts$percentage & opts$suffix == "") {
-      opts$suffix <- "%"
-    }
-
-    d$z <- scales::rescale(d$c, to = c(opts$min_radius, opts$max_radius))
-
-    if (is.null(opts$colors)) {
-      colorDefault <- c("#3DB26F")
-    } else {
-      colorDefault <- opts$colors
-    }
-
-    if (!is.null(mapName)) {
-
-      if (!mapName %in% availableGeodata()) {
-        stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
-      }
-
-      topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
-      b_box <- geojson::bbox_get(topoData)
-
-      lf <-  leaflet(data = d, options = leafletOptions(zoomControl = opts$zoom
-      )) %>%
-        addTopoJSON(topoData,
-                    weight = opts$border_width,
-                    color = opts$border_color,
-                    fill = FALSE) %>%
-        setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
-
-    } else {
-      lf <- leaflet(data = d, options = leafletOptions(zoomControl = opts$zoom,
-                                                       minZoom = 0, maxZoom = opts$zoom_level)) %>% addTiles()
-    }
+  topoData <- geodata::geodataTopojsonPath(map_name)
+  topoData <- readLines(topoData) %>% paste(collapse = "\n")
 
 
-
-    labels <- sprintf(
-      paste0('(lng: ',d$a, ', lat: ', d$b,')</br><b>', nms[3], ': </b>', opts$prefix, format(d$c, big.mark = opts$marks[1],small.mark = opts$marks[2]), opts$suffix
-      )) %>% lapply(htmltools::HTML)
-
-    lf <- lf %>%
-      addCircleMarkers(
-        lng = d$a,
-        lat = d$b,
-        radius = d$z,
-        color = colorDefault,
-        stroke = opts$stroke,
-        fillOpacity = opts$fill_opacity,
-        label = labels,
-        layerId = opts$shinyId
-      )
-  } else {
-    if (!is.null(mapName)) {
-      if (!mapName %in% availableGeodata()) {
-        stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
-      }
-
-      topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
-      b_box <- geojson::bbox_get(topoData)
-
-      lf <-  leaflet(options = leafletOptions(zoomControl = opts$zoom
-      )) %>%
-        addTopoJSON(topoData,
-                    weight = opts$border_width,
-                    color = opts$border_color,
-                    fill = FALSE) %>%
-        setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
-
-    }
+  if (!is.null(opts$popup)) {
+    d <- d  %>% group_by(d, a, b) %>% mutate(popup = glue::glue(opts$popup))
   }
 
+  print(d)
+  pal <- colorNumeric(opts$colors, domain = c(0, max(d$c)))
 
-  if (!is.null(opts$tiles)) {
-    lf <- lf %>%
-      addProviderTiles(opts$tiles)
+  lf <- leaflet(d) %>%
+    #addTiles() %>%
+    addTopoJSON(topoData, weight = opts$topo_weight, color = opts$topo_color, fill = opts$topo_fill) %>%
+    #addMarkers(lng=d$lon, lat = d$lat, popup=d$popup)
+    addCircleMarkers(
+      lng=~a,
+      lat = ~b,
+      radius = 10 * sqrt(d$c/max(d$c)),
+      color = pal(d$c),
+      stroke = TRUE,
+      fillOpacity = 0.9,
+      popup = d$popup#ifelse(!is.null(opts$popup), d$popup, NULL)
+    ) #%>%
+  # addLegend(pal = pal, values = ~n_casos, opacity = 0.7, title = NULL,
+  #           position = "bottomright")
+
+
+  if (add_tiles) {
+    lf <- lf %>% addTiles()
   }
 
-  if (opts$graticule) {
+  if (!is.null(tile_name)) {
     lf <- lf %>%
-      addGraticule(interval = opts$graticule_interval,
-                   style = list(color = opts$graticule_color, weight = opts$graticule_weight))
+      addProviderTiles(providers[[tile_name]])
   }
 
+  if (legend_show) {
+    lf <- lf %>%
+      addLegend(pal = pal, values = ~c, opacity = 0.7, title = NULL,
+                position = "bottomright")
+  }
 
-  lf %>%
-    addControl(caption,
-               position = "bottomright",
-               className="map-caption") %>%
-    addControl(title,
-               position = "topleft",
-               className="map-title")
+  lf
 }
 
+# lflt_bubbles_GlnGltNum <- function(data = NULL,
+#                                    mapName = "world_countries",
+#                                    opts = NULL, ...) {
+#
+#   if (is.null(data) & is.null(mapName)) return("You must call a data or mapName argument")
+#
+#   opts <- getOpts(opts = opts)
+#
+#   title <-  opts$title %||% ""
+#   caption <- opts$caption %||% ""
+#
+#
+#   if (!is.null(data)) {
+#     f <- fringe(data)
+#     nms <- getClabels(f)
+#     d <- f$d
+#     d <- d %>% drop_na()
+#
+#     if (is.null(opts$nDigits)) opts$nDigits <- 2
+#     d$a <- round(d$a, opts$nDigits)
+#     d$b <- round(d$b, opts$nDigits)
+#     d$c <- round(d$c, opts$nDigits)
+#
+#     if (is.null(opts$prefix)) opts$prefix <- ""
+#     if (is.null(opts$suffix)) opts$suffix <- ""
+#
+#     if (opts$percentage) {
+#       d$c <- (d$c/sum(d$c))*100
+#     }
+#
+#     if (opts$percentage & opts$suffix == "") {
+#       opts$suffix <- "%"
+#     }
+#
+#     d$z <- scales::rescale(d$c, to = c(opts$min_radius, opts$max_radius))
+#
+#     if (is.null(opts$colors)) {
+#       colorDefault <- c("#3DB26F")
+#     } else {
+#       colorDefault <- opts$colors
+#     }
+#
+#     if (!is.null(mapName)) {
+#
+#       if (!mapName %in% availableGeodata()) {
+#         stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
+#       }
+#
+#       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
+#       b_box <- geojson::bbox_get(topoData)
+#
+#       lf <-  leaflet(data = d, options = leafletOptions(zoomControl = opts$zoom
+#       )) %>%
+#         addTopoJSON(topoData,
+#                     weight = opts$border_width,
+#                     color = opts$border_color,
+#                     fill = FALSE) %>%
+#         setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
+#
+#     } else {
+#       lf <- leaflet(data = d, options = leafletOptions(zoomControl = opts$zoom,
+#                                                        minZoom = 0, maxZoom = opts$zoom_level)) %>% addTiles()
+#     }
+#
+#
+#
+#     labels <- sprintf(
+#       paste0('(lng: ',d$a, ', lat: ', d$b,')</br><b>', nms[3], ': </b>', opts$prefix, format(d$c, big.mark = opts$marks[1],small.mark = opts$marks[2]), opts$suffix
+#       )) %>% lapply(htmltools::HTML)
+#
+#     lf <- lf %>%
+#       addCircleMarkers(
+#         lng = d$a,
+#         lat = d$b,
+#         radius = d$z,
+#         color = colorDefault,
+#         stroke = opts$stroke,
+#         fillOpacity = opts$fill_opacity,
+#         label = labels,
+#         layerId = opts$shinyId
+#       )
+#   } else {
+#     if (!is.null(mapName)) {
+#       if (!mapName %in% availableGeodata()) {
+#         stop("Pick an available map for the mapName argument (geodata::availableGeodata())")
+#       }
+#
+#       topoData <- readLines(geodataTopojsonPath(mapName)) %>% paste(collapse = "\n")
+#       b_box <- geojson::bbox_get(topoData)
+#
+#       lf <-  leaflet(options = leafletOptions(zoomControl = opts$zoom
+#       )) %>%
+#         addTopoJSON(topoData,
+#                     weight = opts$border_width,
+#                     color = opts$border_color,
+#                     fill = FALSE) %>%
+#         setView(lng = mean(c(b_box[1],b_box[3])), lat = mean(c(b_box[2], b_box[4])), zoom = opts$zoom_level)
+#
+#     }
+#   }
+#
+#
+#   if (!is.null(opts$tiles)) {
+#     lf <- lf %>%
+#       addProviderTiles(opts$tiles)
+#   }
+#
+#   if (opts$graticule) {
+#     lf <- lf %>%
+#       addGraticule(interval = opts$graticule_interval,
+#                    style = list(color = opts$graticule_color, weight = opts$graticule_weight))
+#   }
+#
+#
+#   lf %>%
+#     addControl(caption,
+#                position = "bottomright",
+#                className="map-caption") %>%
+#     addControl(title,
+#                position = "topleft",
+#                className="map-title")
+# }
+#
 
 

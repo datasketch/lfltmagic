@@ -4,8 +4,7 @@
 \alias{lflt_bubbles_GcdNum}
 \title{Leaflet bubbles geo name num}
 \usage{
-lflt_bubbles_GcdNum(data = NULL, mapName = "world_countries",
-  opts = NULL, ...)
+lflt_bubbles_GcdNum(data = NULL, mapName = "world_countries", opts = NULL, ...)
 }
 \arguments{
 \item{x}{A data.frame}

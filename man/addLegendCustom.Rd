@@ -4,8 +4,15 @@
 \alias{addLegendCustom}
 \title{export}
 \usage{
-addLegendCustom(map, colors, labels, sizes, opacity = 0.8,
-  position = "bottomleft", title = " ")
+addLegendCustom(
+  map,
+  colors,
+  labels,
+  sizes,
+  opacity = 0.8,
+  position = "bottomleft",
+  title = " "
+)
 }
 \description{
 export

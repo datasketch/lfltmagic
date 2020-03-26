@@ -4,8 +4,12 @@
 \alias{lflt_bubbles_CatGlnGltNum}
 \title{Leaflet bubbles by category size}
 \usage{
-lflt_bubbles_CatGlnGltNum(data = NULL, mapName = "world_countries",
-  opts = NULL, ...)
+lflt_bubbles_CatGlnGltNum(
+  data = NULL,
+  mapName = "world_countries",
+  opts = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A data.frame}

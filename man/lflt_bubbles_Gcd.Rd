@@ -4,8 +4,7 @@
 \alias{lflt_bubbles_Gcd}
 \title{Leaflet bubbles geo code}
 \usage{
-lflt_bubbles_Gcd(data = NULL, mapName = "world_countries",
-  opts = NULL, ...)
+lflt_bubbles_Gcd(data = NULL, mapName = "world_countries", opts = NULL, ...)
 }
 \arguments{
 \item{x}{A data.frame}

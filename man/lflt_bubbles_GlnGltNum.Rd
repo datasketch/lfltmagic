@@ -4,8 +4,20 @@
 \alias{lflt_bubbles_GlnGltNum}
 \title{Leaflet bubbles}
 \usage{
-lflt_bubbles_GlnGltNum(data = NULL, mapName = "world_countries",
-  opts = NULL, ...)
+lflt_bubbles_GlnGltNum(
+  data,
+  map_name = "world_countries",
+  add_tiles = TRUE,
+  tile_name = NULL,
+  topo_weight = 1,
+  topo_color = "#CCCCCC",
+  topo_fill = FALSE,
+  legend_show = TRUE,
+  popup = NULL,
+  colors = c("#f0f05a", "#f03f4e"),
+  opts = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A data.frame}

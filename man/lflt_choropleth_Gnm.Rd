@@ -4,8 +4,7 @@
 \alias{lflt_choropleth_Gnm}
 \title{Leaflet choropleths by geo name}
 \usage{
-lflt_choropleth_Gnm(data = NULL, mapName = "world_countries",
-  opts = NULL)
+lflt_choropleth_Gnm(data = NULL, mapName = "world_countries", opts = NULL)
 }
 \arguments{
 \item{x}{A data.frame}
