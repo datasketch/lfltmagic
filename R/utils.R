@@ -1,4 +1,104 @@
+#'
+#' @export
 
+topo_info <- function(map_name) {
+  rgdal::readOGR(geodataTopojsonPath(map_name))
+}
+
+#'
+#'@export
+data_centroid <- function(geoname, basename) {
+  centroides <- file.path("geodata", geoname, paste0(basename,".csv"))
+  centroides <- read_csv(system.file(centroides,package = "geodata")) %>% drop_na()
+  centroides
+}
+
+
+#'
+#'@export
+topo_bbox <- function(lon, lat) {
+  xy <- cbind(lon, lat)
+  S <- sp::SpatialPoints(xy)
+  bbox <- sp::bbox(S)
+  bbox
+}
+
+#'
+#'@export
+topo_data <- function(map_name) {
+  topoData <- geodata::geodataTopojsonPath(map_name)
+  topoData <- readLines(topoData) %>% paste(collapse = "\n")
+  topoData
+}
+
+#'
+#'@export
+lf_base <- function(topoData, border_weight, border_color, topo_fill) {
+  leaflet() %>%
+    addTopoJSON(topoData,
+                weight = border_weight,
+                color = border_color,
+                fill = topo_fill)
+}
+
+
+##'
+# #'@export
+# palette_lf <- function(colors, color_scale, ) {
+#
+# }
+
+#'
+#'@export
+lf_labels <- function(data, labels, popup) {
+
+  data <- data  %>%
+           group_by(name,name_alt, a) %>%
+            mutate(labels = ifelse(is.na(a), glue::glue("<strong>{name}</strong>"), glue::glue(labels)) %>% lapply(htmltools::HTML),
+                   popup = ifelse(is.na(a), NA, glue::glue(popup)))
+  data
+}
+
+#'
+#'@export
+lf_polygons <- function(topoInfo, border_weight, border_color, topo_fill, fill_opacity ) {
+
+
+
+  leaflet(topoInfo) %>%
+    addPolygons( weight = border_weight,
+                 color = border_color,
+                 fillOpacity = topo_fill,
+                 opacity = fill_opacity,
+                 fillColor = pal(topoInfo@data$b),
+                 layerId =  as.character(topoInfo@data$name),
+                 label = topoInfo@data$labels,
+                 popup = topoInfo@data$popup
+    )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################3333
 sort_list <- function(l){
   l[sort(names(l))]
 }
