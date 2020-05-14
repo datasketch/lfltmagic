@@ -7,11 +7,16 @@ Description: A wrapper for highcharter
 Depends:
     R (>= 3.0.0),
     tools,
-    datafringe,
+    homodatum,
+    readr,
+    tidyr,
+    dplyr,
+    purrr,
     geodata,
     leaflet,
-    leaflet.extras,
-    htmltools
+    d3.format,
+    dsvizopts,
+    leaflet.extras
 License: MIT
 LazyData: true
 RoxygenNote: 7.1.0
