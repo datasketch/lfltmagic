@@ -10,7 +10,7 @@
 #' @export
 #' @examples
 #' lflt_bubbles_GnmNum(sampleData("Gnm-Num", nrow = 10))
-lflt_bubbles_GnmNum <- function(data = NULL, ...) {
+lflt_bubbles_GnmNum <- function(data, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
 

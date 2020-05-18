@@ -4,12 +4,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
 
   map_name <- opts$extra$map_name
   topoInfo <- topo_info(map_name)
-
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   bbox <- topo_bbox(centroides$lon, centroides$lat)
-
-
+ #print(topoInfo@data)
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
@@ -20,25 +18,43 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     dic <- homodatum::fringe_dic(f)
     dic$id <- names(nms)
     frtype_d <- f$frtype
-    needs_num_agg <- frtype_d %in% c("Gcd", "Gnm", "Gnm-Cat", "Gcd-Cat", "Gln-Glt-Cat")
-    if(needs_num_agg){
+
+    if(frtype_d %in% c("Gcd", "Gnm")){
       d <- d %>%
         dplyr::group_by_all() %>%
-        dplyr::summarise(Count = n())
+        dplyr::summarise(b = n())
       ind_nms <- length(nms)+1
       nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'Count')
-      dic_num <- data.frame(id = "Count", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num)
-    } else {
-      if (frtype_d %in% c("Gcd-Num", "Gnm-Num")) {
-        d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
-      if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
-        d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
-      if (frtype_d %in% c("Gln-Glt", "Glt-Gln")) {
-        d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na()
-      }
-    }
+      names(nms) <- c(names(nms)[-ind_nms], 'b')
+      dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
+      dic <- dic %>% bind_rows(dic_num) }
+    if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
+      d <- d %>%
+        dplyr::group_by_all() %>%
+        dplyr::summarise(c = n())
+      ind_nms <- length(nms)+1
+      nms[ind_nms] <- 'Count'
+      names(nms) <- c(names(nms)[-ind_nms], 'c')
+      dic_num <- data.frame(id = "c", label = "Count", hdType= as_hdType(x = "Num"))
+      dic <- dic %>% bind_rows(dic_num)}
+    if (frtype_d %in% "Gln-Glt-Cat") {
+      d <- d %>%
+        dplyr::group_by_all() %>%
+        dplyr::summarise(d = n())
+      ind_nms <- length(nms)+1
+      nms[ind_nms] <- 'Count'
+      names(nms) <- c(names(nms)[-ind_nms], 'd')
+      dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
+      dic <- dic %>% bind_rows(dic_num) }
+
+
+    if (frtype_d %in% c("Gcd-Num", "Gnm-Num", "Cat-Num")) {
+      d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
+    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
+      d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
+    if (frtype_d %in% c("Gln-Glt", "Glt-Gln")) {
+      d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
+
 
     if (grepl("Gnm|Gcd|Cat", frtype_d)) {
       d <- d %>%
@@ -52,16 +68,46 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
     topoInfo@data <- topoInfo@data %>%
-      mutate(labels = ifelse(is.na(a), glue::glue("<strong>{name}</strong>") %>% lapply(htmltools::HTML),
+      mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:15px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
                              glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
       )
-    # #if (is.null(by_col)) topoInfo@data <- d %>% drop_na
-    # d
-
   }
+
+  title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
+                                ';color:', opts$theme$title_color,
+                                ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
+  subtitle <- tags$div(HTML(paste0("<p style='margin-top:0px;font-family:", opts$theme$text_family,
+                                   ';color:', opts$theme$subtitle_color,
+                                   ';font-size:', opts$theme$subtitle_size,"px;'>", opts$title$subtitle %||% "","</p>")))
+  caption <- tags$div(HTML(paste0("<p style='font-family:", opts$theme$text_family,
+                                  ';color:', opts$theme$caption_color,
+                                  ';font-size:', opts$theme$caption_size,"px;'>", opts$title$caption %||% "","</p>")))
+  legend_title <- HTML(paste0("<p style='font-family:", opts$theme$text_family,
+                              ';color:', opts$theme$legend_color,
+                              ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
+
   list(
     d = topoInfo,
-    theme = opts$theme
+    data = data,
+    b_box = bbox,
+    color_scale = opts$extra$map_color_scale,
+    n_quantile = opts$extra$maps_quantile,
+    n_bins = opts$extra$map_bins,
+    na_label = opts$preprocess$na_label,
+    suffix = opts$style$suffix,
+    prefix = opts$style$prefix,
+    format_num = opts$style$format_num_sample,
+    locale = opts$style$locale,
+    titles = list(title = title,
+                  subtitle = subtitle,
+                  caption = caption),
+    legend_title = legend_title,
+    theme = opts$theme,
+    graticule = list(map_graticule = opts$extra$map_graticule,
+                     map_graticule_color = opts$extra$map_graticule_color,
+                     map_graticule_interval = opts$extra$map_graticule_interval,
+                     map_graticule_weight = opts$extra$map_graticule_weight)
+    # USE IN POINT OR BUBBLES
   )
 }
 
