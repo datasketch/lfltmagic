@@ -1,40 +1,64 @@
-
-#'
-#'@export
-lf_polygons <- function(topoInfo, opts_data, opts_theme) {
-
-  print(opts_theme)
-
-  if ("b" %in% names(topoInfo$d@data)) {
-  pal <- colorNumeric(
-    palette = c("#FEAFEA", "#000AAA"),
-    domain = topoInfo$d@data$b, na.color = "blue" )
-  cs <- pal(topoInfo$d@data$b)
+#' @export
+lflt_palette <- function(opts) {
+  if (opts$color_scale == "Category") {
+    color_mapping <- "colorFactor"
+    l <- list(levels = opts$levels,
+              ordered = opts$ordered)
+  } else if (opts$color_scale == "Quantile") {
+    color_mapping <- "colorQuantile"
+    l <- list(n = opts$n_quantile)
+  } else if (opts$color_scale == 'Bins') {
+    color_mapping <- "colorBin"
+    l <- list(bins = opts$bins)
   } else {
-  cs <- "red"
+    color_mapping <- "colorNumeric"
+    l <- list()
   }
-  # print(pal)
-  l <- leaflet(topoInfo$d) %>%
-    addPolygons( weight = opts_theme$border_weight,
-                 opacity = 1,
-                 color = cs,
-                 fillOpacity = 0.7,#opts_theme$topo_fill_opacity,
-                 label = ~labels
-    )
+  l$palette <- opts$palette
+  l$domain <- opts$domain
+  l$na.color <- opts$na.color
+  do.call(color_mapping, l)
+}
 
-  if (is.null(opts_theme$map_tiles)) {
-    l <- l %>% setMapWidgetStyle(list(background = opts_theme$background_color))
+#' labels
+lflt_tooltip <- function(nms, tooltip) {
+  if (is.null(nms)) stop("Enter names")
+  nms_names <- names(nms)
+  if (is.null(tooltip)) {
+    l <- map(seq_along(nms), function(i){
+      paste0("<strong>", nms[[i]], ":</strong> {", nms_names[i], "_label}")
+    }) %>% unlist()
+    tooltip <- paste0(l, collapse = "<br/>")
   } else {
-    l <- l %>%  addProviderTiles(opts_theme$map_tiles)
+    points <- gsub("\\{|\\}", "",
+                   stringr::str_extract_all(tooltip, "\\{.*?\\}")[[1]])
+    if (identical(points, character())) {
+      tooltip <- tooltip
+    } else {
+      l <- purrr::map(1:length(points), function(i){
+        true_points <-  paste0("{",names(nms[match(points[i], nms)]),"_label}")
+        tooltip <<- gsub(paste0("\\{",points[i], "\\}"), true_points, tooltip)
+      })[[length(points)]]}
   }
+  tooltip
+}
 
-  legend_position <- opts_theme$legend_verticalAlign
- print(legend_position)
-  l #%>%
-    # addLegend("bottomright", pal = pal, values = topoInfo@data$b,
-    #           title = "",
-    #           labFormat = labelFormat(prefix = "$", suffix = "#"),
-    #           opacity = 1,
-    #           na.label = "bla"#opts_data$na_label
-    # )
+#' Format
+lflt_format <- function(d, dic, nms, opts) {
+  var_nums <- dic$id[dic$hdType %in% c("Num", "Gln", "Glt")]
+  l_num <- map(var_nums, function(v) {
+    d[[paste0(v, "_label")]] <<- ifelse(is.na(d[[v]]), NA,
+                                        paste0(opts$prefix,
+                                               makeup::makeup_num(v = d[[v]],
+                                                                  opts$format_num_sample,
+                                                                  locale = opts$locale),
+                                               opts$suffix))
+  })
+  var_cats <- dic$id[dic$hdType %in% c("Cat", "Gnm", "Gcd")]
+  l_cat <- map(var_cats, function(v) {
+    d[[paste0(v, "_label")]] <<- ifelse(is.na(d[[v]]), NA,
+                                        makeup::makeup_chr(v = d[[v]],
+                                                           opts$format_cat_sample))
+  })
+  d
 }
