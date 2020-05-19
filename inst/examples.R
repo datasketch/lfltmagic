@@ -81,11 +81,38 @@ lflt_choropleth_Gcd(sampleData("Gcd", 300))
 lflt_choropleth_Gcd(sampleData("Gcd", 3000),
                     topo_fill_opacity = 1,
                     palette_colors = c("#FEAFEA", "#000CCC"))
-#
-#
-# lflt_bubbles_GnmNum(data, map_name = "col_pacifico")
 
 
+
+# Gnm-Num bubbles examples ------------------------------------------------
+lflt_bubbles_GnmNum(sampleData("Gnm-Num", 100),
+                    palette_colors = 'orange',
+                    background_color = "#000",
+                    topo_fill_opacity = 0.2)
+data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000))
+lflt_bubbles_GnmNum(data,
+                    map_name = "col_pacifico",
+                    map_min_size = 5,map_max_size = 30)
+lflt_bubbles_Gnm(sampleData("Gnm", 300),
+                 palette_colors = 'purple')
+
+
+# Gcd Num bubbles examples ------------------------------------------------
+
+lflt_bubbles_GcdNum(sampleData("Gcd-Num"))
+
+data <- data.frame(State = c("BR.PA", "BR.RS", "BR.RS", "BR.TO", "BR.MT", "BR.MA", "BR.ES"),
+                   Population = runif(7, 300000, 6000000))
+lflt_bubbles_GcdNum(data,
+                    map_name = "bra_states")
+lflt_bubbles_GcdNum(data,
+                    map_name = "bra_states",
+                    format_num_sample = "1 244,2",
+                    map_min_size = 5,
+                    map_max_size = 30, tooltip = "<b>Información</b> </br> {State}: {Population}")
+
+lflt_bubbles_Gcd(sampleData("Gcd", 300),
+                 palette_colors = 'purple')
 # Gln-Glt-Num examples ----------------------------------------------------
 lflt_bubbles_GlnGltNum()
 lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"))

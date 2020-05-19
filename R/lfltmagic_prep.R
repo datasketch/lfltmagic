@@ -7,7 +7,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   bbox <- topo_bbox(centroides$lon, centroides$lat)
- #print(topoInfo@data)
+
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
@@ -58,11 +58,19 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- d %>% drop_na() }
 
     if (grepl("Gnm|Gcd|Cat", frtype_d)) {
+
+      centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
+      centroides <- centroides[,c("name_alt","lat", "lon")]
+
+      topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
+      topoInfo@data <- left_join(topoInfo@data, centroides, by = "name_alt")
+
       d <- d %>%
         mutate(name_alt = iconv(tolower(a), to = "ASCII//TRANSLIT"))
-      topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
+
       topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
       topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
+
     } else {
       topoInfo@data <- d
       topoInfo@data$name <- opts$preprocess$na_label
@@ -73,7 +81,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
                              glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
       )
   }
-
+  #print(topoInfo@data)
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))

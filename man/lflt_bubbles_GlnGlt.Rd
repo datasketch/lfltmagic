@@ -2,7 +2,7 @@
 % Please edit documentation in R/bubbles_GlnGlt.R
 \name{lflt_bubbles_GlnGlt}
 \alias{lflt_bubbles_GlnGlt}
-\title{Leaflet bubbless by numerical variable}
+\title{Leaflet bubbles with constant radius}
 \usage{
 lflt_bubbles_GlnGlt(data = NULL, ...)
 }
@@ -13,12 +13,12 @@ lflt_bubbles_GlnGlt(data = NULL, ...)
 leaflet viz
 }
 \description{
-Leaflet bubbless by numerical variable
+Leaflet bubbles with constant radius
 }
 \section{ctypes}{
- Gnm-Num
+ Gln-Glt
 }
 
 \examples{
-lflt_bubbles_GlnGlt(sampleData("Gnm-Num", nrow = 10))
+lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
 }

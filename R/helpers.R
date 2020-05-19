@@ -52,8 +52,9 @@ lflt_format <- function(d, dic, nms, opts) {
     d[[paste0(v, "_label")]] <<- ifelse(is.na(d[[v]]), NA,
                                         paste0(opts$prefix,
                                                makeup::makeup_num(v = d[[v]],
-                                                                  opts$format_num_sample,
-                                                                  locale = opts$locale),
+                                                                  opts$format_num_sample#,
+                                                                  #locale = opts$locale
+                                               ),
                                                opts$suffix))
   })
   var_cats <- dic$id[dic$hdType %in% c("Cat", "Gnm", "Gcd")]
@@ -74,7 +75,7 @@ lflt_legend_format <- function (prefix = "",
                                 transform = identity)
 {
   formatNum <- function(x) {
-    makeup::makeup_num(transform(x), sample, locale = locale)
+    makeup::makeup_num(transform(x), sample)#, locale = locale)
   }
   function(type, ...) {
     switch(type, numeric = (function(cuts) {
@@ -147,7 +148,7 @@ lflt_basic_points <- function(l) {
                  color = color_map)
   if (!is.null(l$data)) {
     lf <- leaflet(l$d,
-                 option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+                  option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
       addPolygons( weight = l$theme$border_weight,
                    fillOpacity = l$theme$topo_fill_opacity,
                    opacity = 1,
@@ -156,6 +157,36 @@ lflt_basic_points <- function(l) {
         lng = ~a,
         lat = ~b,
         radius = ~scales::rescale(c, to = c(l$min_size, l$max_size)),
+        color = l$theme$palette_colors[1],
+        stroke = l$map_stroke,
+        fillOpacity = l$bubble_opacity,
+        label = ~labels,
+        layerId = ~a
+      ) }
+
+  lf
+}
+
+
+
+#' Basic layer bubbles
+lflt_basic_bubbles <- function(l) {
+
+  color_map <- l$theme$na_color
+
+  lf <- leaflet(l$d,
+                option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+    addPolygons( weight = l$theme$border_weight,
+                 fillOpacity = l$theme$topo_fill_opacity,
+                 opacity = 1,
+                 label = ~name,
+                 color = color_map)
+  if (!is.null(l$data)) {
+    lf <- lf %>%
+      addCircleMarkers(
+        lng = ~lon,
+        lat = ~lat,
+        radius = ~scales::rescale(b, to = c(l$min_size, l$max_size)),
         color = l$theme$palette_colors[1],
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
