@@ -120,7 +120,7 @@ lflt_basic_choropleth <- function(l) {
                  label = ~labels
     )
   if (!is.null(l$data) & l$theme$legend_show) {
-        lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+    lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
                            position = l$theme$legend_position,
                            na.label = l$na_label,
                            title = l$legend_title,
@@ -130,6 +130,39 @@ lflt_basic_choropleth <- function(l) {
                              between = paste0(l$suffix, " - ", l$prefix),
                            ))
   }
+  lf
+}
+
+
+#' Basic layer points
+lflt_basic_points <- function(l) {
+
+  color_map <- l$theme$na_color
+  lf <- leaflet(l$d,
+                option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+    addPolygons( weight = l$theme$border_weight,
+                 fillOpacity = l$theme$topo_fill_opacity,
+                 opacity = 1,
+                 label = ~labels,
+                 color = color_map)
+  if (!is.null(l$data)) {
+    lf <- leaflet(l$d,
+                 option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+      addPolygons( weight = l$theme$border_weight,
+                   fillOpacity = l$theme$topo_fill_opacity,
+                   opacity = 1,
+                   color = color_map) %>%
+      addCircleMarkers(
+        lng = ~a,
+        lat = ~b,
+        radius = ~scales::rescale(c, to = c(l$min_size, l$max_size)),
+        color = l$theme$palette_colors[1],
+        stroke = l$map_stroke,
+        fillOpacity = l$bubble_opacity,
+        label = ~labels,
+        layerId = ~a
+      ) }
+
   lf
 }
 

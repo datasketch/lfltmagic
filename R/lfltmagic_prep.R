@@ -52,9 +52,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
     if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
-    if (frtype_d %in% c("Gln-Glt", "Glt-Gln")) {
+    if (frtype_d %in% c("Gln-Glt", "Glt-Gln", "Num-Num")) {
       d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
-
+    if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num")) {
+      d <- d %>% drop_na() }
 
     if (grepl("Gnm|Gcd|Cat", frtype_d)) {
       d <- d %>%
@@ -103,6 +104,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
                   caption = caption),
     legend_title = legend_title,
     theme = opts$theme,
+    min_size = opts$extra$map_min_size,
+    max_size = opts$extra$map_max_size,
+    bubble_opacity = opts$extra$bubble_opacity,
+    map_stroke = opts$extra$map_stroke,
     graticule = list(map_graticule = opts$extra$map_graticule,
                      map_graticule_color = opts$extra$map_graticule_color,
                      map_graticule_interval = opts$extra$map_graticule_interval,

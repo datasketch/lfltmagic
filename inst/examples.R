@@ -84,9 +84,24 @@ lflt_choropleth_Gcd(sampleData("Gcd", 3000),
 #
 #
 # lflt_bubbles_GnmNum(data, map_name = "col_pacifico")
-# lflt_bubbles_GlnGlt(data = sampleData("Gln-Glt"))
-#
-# data <- data.frame(Lon = runif(15, -75, -70) , Lat = runif(15, -4, 7))
-# lflt_bubbles_GlnGlt(data,
-#                     map_name = "col_departments",
-#                     tooltip = "Coord 1: {Lon} <br/> Coord 2: {Lat}")
+
+
+# Gln-Glt-Num examples ----------------------------------------------------
+lflt_bubbles_GlnGltNum()
+lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"))
+lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"),
+                       map_stroke = TRUE,
+                       palette_colors = "#FEAFEA")
+lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"),
+                       map_tiles = "OpenStreetMap")
+
+lflt_bubbles_GlnGlt(sampleData("Gln-Glt"))
+lflt_bubbles_GlnGlt(sampleData("Gln-Glt"), map_radius = 10)
+
+data <- data.frame(Lon = runif(35, -75, -70) , Lat = runif(35, -3.5, 6))
+lflt_bubbles_GlnGlt(data,
+                    map_name = "col_departments",
+                    tooltip = "Coord 1: {Lon} <br/> Coord 2: {Lat}",
+                    palette_colors = "#000000",
+                    na_color = "#FEAFEA",
+                    topo_fill_opacity = 0.2)
