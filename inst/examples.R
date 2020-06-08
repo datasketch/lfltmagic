@@ -1,5 +1,7 @@
 library(lfltmagic)
-
+# devtools::load_all()
+# devtools::document()
+# devtools::install()
 
 # Gnm-Num examples --------------------------------------------------------
 
@@ -19,16 +21,16 @@ lflt_choropleth_GnmNum(map_name = "col_departments",
                        topo_fill_opacity = 0.2,
                        border_weight = 2)
 
-data <- sampleData("Gnm-Num", 100)
+data <- sample_data("Gnm-Num", 100)
 lflt_choropleth_GnmNum(data, palette_colors = c("#FEAFEA", "#000AAA"))
 lflt_choropleth_GnmNum(data, map_color_scale = "Quantile")
 lflt_choropleth_GnmNum(data, map_color_scale = "Bins")
 lflt_choropleth_GnmNum(data, map_color_scale = "Bins", map_bins = 3)
 
 
-lflt_choropleth_GnmNum(data = sampleData("Gnm-Num", 100),
+lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
                        legend_title = "Titulo de legenda")
-lflt_choropleth_GnmNum(data = sampleData("Gnm-Num", 100),
+lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
                        map_graticule = TRUE)
 
 data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000))
@@ -57,7 +59,7 @@ lflt_choropleth_GnmNum(data,
                        title = "Un titulo muy laaaaaaaaaargo",
                        subtitle = "Un subtitulo", map_zoom = F)
 
-lflt_choropleth_Gnm(sampleData('Gnm', 300))
+lflt_choropleth_Gnm(sample_data('Gnm', 300))
 # Gcd Num examples  -------------------------------------------------------
 
 lflt_choropleth_GcdNum()
@@ -77,15 +79,15 @@ lflt_choropleth_GcdNum(data, map_name = "bra_states",
                        subtitle = "Fake map of Brazil population",
                        caption = "Random data")
 
-lflt_choropleth_Gcd(sampleData("Gcd", 300))
-lflt_choropleth_Gcd(sampleData("Gcd", 3000),
+lflt_choropleth_Gcd(sample_data("Gcd", 300))
+lflt_choropleth_Gcd(sample_data("Gcd", 3000),
                     topo_fill_opacity = 1,
                     palette_colors = c("#FEAFEA", "#000CCC"))
 
 
 
 # Gnm-Num bubbles examples ------------------------------------------------
-lflt_bubbles_GnmNum(sampleData("Gnm-Num", 100),
+lflt_bubbles_GnmNum(sample_data("Gnm-Num", 100),
                     palette_colors = 'orange',
                     background_color = "#000",
                     topo_fill_opacity = 0.2)
@@ -93,13 +95,13 @@ data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = ru
 lflt_bubbles_GnmNum(data,
                     map_name = "col_pacifico",
                     map_min_size = 5,map_max_size = 30)
-lflt_bubbles_Gnm(sampleData("Gnm", 300),
+lflt_bubbles_Gnm(sample_data("Gnm", 300),
                  palette_colors = 'purple')
 
 
 # Gcd Num bubbles examples ------------------------------------------------
 
-lflt_bubbles_GcdNum(sampleData("Gcd-Num"))
+lflt_bubbles_GcdNum(sample_data("Gcd-Num"))
 
 data <- data.frame(State = c("BR.PA", "BR.RS", "BR.RS", "BR.TO", "BR.MT", "BR.MA", "BR.ES"),
                    Population = runif(7, 300000, 6000000))
@@ -111,19 +113,19 @@ lflt_bubbles_GcdNum(data,
                     map_min_size = 5,
                     map_max_size = 30, tooltip = "<b>Información</b> </br> {State}: {Population}")
 
-lflt_bubbles_Gcd(sampleData("Gcd", 300),
+lflt_bubbles_Gcd(sample_data("Gcd", 300),
                  palette_colors = 'purple')
 # Gln-Glt-Num examples ----------------------------------------------------
 lflt_bubbles_GlnGltNum()
-lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"))
-lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"),
+lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"))
+lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"),
                        map_stroke = TRUE,
                        palette_colors = "#FEAFEA")
-lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num"),
+lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"),
                        map_tiles = "OpenStreetMap")
 
-lflt_bubbles_GlnGlt(sampleData("Gln-Glt"))
-lflt_bubbles_GlnGlt(sampleData("Gln-Glt"), map_radius = 10)
+lflt_bubbles_GlnGlt(sample_data("Gln-Glt"))
+lflt_bubbles_GlnGlt(sample_data("Gln-Glt"), map_radius = 10)
 
 data <- data.frame(Lon = runif(35, -75, -70) , Lat = runif(35, -3.5, 6))
 lflt_bubbles_GlnGlt(data,

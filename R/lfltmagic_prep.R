@@ -12,9 +12,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
   } else {
+
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
-    d <- homodatum::fringe_data(f)
+    d <- homodatum::fringe_d(f)
     dic <- homodatum::fringe_dic(f)
     dic$id <- names(nms)
     frtype_d <- f$frtype
@@ -54,7 +55,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
     if (frtype_d %in% c("Gln-Glt", "Glt-Gln", "Num-Num")) {
       d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
-    if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num")) {
+    if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num", "Gln-Glt-Num-Cat-Cat", "Num-Num-Num-Cat-Cat")) {
       d <- d %>% drop_na() }
 
     if (grepl("Gnm|Gcd|Cat", frtype_d)) {
@@ -75,6 +76,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       topoInfo@data <- d
       topoInfo@data$name <- opts$preprocess$na_label
     }
+    print(opts$chart$tooltip)
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:15px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
@@ -82,6 +84,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       )
   }
   #print(topoInfo@data)
+  print(data)
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))

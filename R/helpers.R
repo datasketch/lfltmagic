@@ -25,7 +25,7 @@ lflt_palette <- function(opts) {
 lflt_tooltip <- function(nms, tooltip, style) {
   if (is.null(nms)) stop("Enter names")
   nms_names <- names(nms)
-  if (is.null(tooltip)) {
+  if (is.null(tooltip) | tooltip == "") {
     l <- map(seq_along(nms), function(i){
       paste0("<span style='font-size:15px;'><strong>", nms[[i]], ":</strong> {", nms_names[i], "_label}</span>")
     }) %>% unlist()
@@ -118,6 +118,7 @@ lflt_basic_choropleth <- function(l) {
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
                  color = color_map,
+                 layerId = ~a,
                  label = ~labels
     )
   if (!is.null(l$data) & l$theme$legend_show) {
