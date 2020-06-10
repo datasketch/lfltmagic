@@ -117,7 +117,7 @@ lflt_bubbles_Gcd(sample_data("Gcd", 300),
                  palette_colors = 'purple')
 # Gln-Glt-Num examples ----------------------------------------------------
 lflt_bubbles_GlnGltNum()
-lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"))
+lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"), map_min_zoom = 5)
 lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"),
                        map_stroke = TRUE,
                        palette_colors = "#FEAFEA")

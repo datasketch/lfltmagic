@@ -113,7 +113,7 @@ lflt_basic_choropleth <- function(l) {
   }
 
   lf <- leaflet(l$d,
-                option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
     addPolygons( weight = l$theme$border_weight,
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
@@ -141,7 +141,7 @@ lflt_basic_points <- function(l) {
 
   color_map <- l$theme$na_color
   lf <- leaflet(l$d,
-                option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
     addPolygons( weight = l$theme$border_weight,
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
@@ -149,7 +149,7 @@ lflt_basic_points <- function(l) {
                  color = color_map)
   if (!is.null(l$data)) {
     lf <- leaflet(l$d,
-                  option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+                  option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
       addPolygons( weight = l$theme$border_weight,
                    fillOpacity = l$theme$topo_fill_opacity,
                    opacity = 1,
@@ -176,7 +176,7 @@ lflt_basic_bubbles <- function(l) {
   color_map <- l$theme$na_color
 
   lf <- leaflet(l$d,
-                option = leafletOptions(zoomControl= l$theme$map_zoom)) %>%
+                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
     addPolygons( weight = l$theme$border_weight,
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,

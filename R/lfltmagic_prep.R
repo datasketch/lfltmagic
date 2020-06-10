@@ -19,6 +19,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     dic <- homodatum::fringe_dic(f)
     dic$id <- names(nms)
     frtype_d <- f$frtype
+    d_frtype <- strsplit(frtype_d, split = "-") %>% unlist()
+
 
     if(frtype_d %in% c("Gcd", "Gnm")){
       d <- d %>%
@@ -57,8 +59,9 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
     if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num", "Gln-Glt-Num-Cat-Cat", "Num-Num-Num-Cat-Cat")) {
       d <- d %>% drop_na() }
-
-    if (grepl("Gnm|Gcd|Cat", frtype_d)) {
+    cond_cat <- grep("Gnm|Gcd|Cat", d_frtype)
+    if (identical(cond_cat, integer())) cond_cat <- 0
+    if (cond_cat %in% 1) {
 
       centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
       centroides <- centroides[,c("name_alt","lat", "lon")]
@@ -76,15 +79,13 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       topoInfo@data <- d
       topoInfo@data$name <- opts$preprocess$na_label
     }
-    print(opts$chart$tooltip)
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
     topoInfo@data <- topoInfo@data %>%
-      mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:15px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
+      mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
                              glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
       )
   }
-  #print(topoInfo@data)
-  print(data)
+
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
@@ -122,7 +123,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     graticule = list(map_graticule = opts$extra$map_graticule,
                      map_graticule_color = opts$extra$map_graticule_color,
                      map_graticule_interval = opts$extra$map_graticule_interval,
-                     map_graticule_weight = opts$extra$map_graticule_weight)
+                     map_graticule_weight = opts$extra$map_graticule_weight),
+    min_zoom = opts$extra$map_min_zoom
     # USE IN POINT OR BUBBLES
   )
 }
