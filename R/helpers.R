@@ -99,6 +99,17 @@ lflt_legend_format <- function (prefix = "",
 #' Basic layer choroplets
 lflt_basic_choropleth <- function(l) {
 
+  color_map <- l$theme$na_color
+
+  lf <- leaflet(l$d,
+                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
+    addPolygons( weight = l$theme$border_weight,
+                 fillOpacity = l$theme$topo_fill_opacity,
+                 opacity = 1,
+                 label = ~name,
+                 color = l$border_color,
+                 fillColor = color_map)
+
   if (!is.null(l$data)) {
     opts_pal <- list(color_scale = l$color_scale,
                      palette = l$theme$palette_colors,
@@ -108,16 +119,14 @@ lflt_basic_choropleth <- function(l) {
                      n_quantile = l$n_quantile)
     pal <- lflt_palette(opts_pal)
     color_map <- pal(l$d@data[["b"]])
-  } else {
-    color_map <- l$theme$na_color
-  }
 
   lf <- leaflet(l$d,
                 option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
     addPolygons( weight = l$theme$border_weight,
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
-                 color = color_map,
+                 color = l$border_color,
+                 fillColor = color_map,
                  layerId = ~a,
                  label = ~labels
     )
@@ -131,6 +140,7 @@ lflt_basic_choropleth <- function(l) {
                              prefix = l$prefix, suffix = l$suffix,
                              between = paste0(l$suffix, " - ", l$prefix),
                            ))
+  }
   }
   lf
 }
@@ -146,14 +156,16 @@ lflt_basic_points <- function(l) {
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
                  label = ~labels,
-                 color = color_map)
+                 color = l$border_color,
+                 fillColor = color_map)
   if (!is.null(l$data)) {
     lf <- leaflet(l$d,
                   option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
       addPolygons( weight = l$theme$border_weight,
                    fillOpacity = l$theme$topo_fill_opacity,
                    opacity = 1,
-                   color = color_map) %>%
+                   color = l$border_color,
+                   fillColor = color_map) %>%
       addCircleMarkers(
         lng = ~a,
         lat = ~b,
@@ -181,7 +193,8 @@ lflt_basic_bubbles <- function(l) {
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
                  label = ~name,
-                 color = color_map)
+                 color = l$border_color,
+                 fillColor = color_map)
   if (!is.null(l$data)) {
     lf <- lf %>%
       addCircleMarkers(

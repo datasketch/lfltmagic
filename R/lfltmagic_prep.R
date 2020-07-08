@@ -104,7 +104,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     data = data,
     b_box = bbox,
     color_scale = opts$extra$map_color_scale,
-    n_quantile = opts$extra$maps_quantile,
+    border_color = opts$theme$border_color,
+    n_quantile = opts$extra$map_quantile,
     n_bins = opts$extra$map_bins,
     na_label = opts$preprocess$na_label,
     suffix = opts$style$suffix,
@@ -121,9 +122,9 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     bubble_opacity = opts$extra$bubble_opacity,
     map_stroke = opts$extra$map_stroke,
     graticule = list(map_graticule = opts$extra$map_graticule,
-                     map_graticule_color = opts$extra$map_graticule_color,
+                     map_graticule_color = opts$theme$grid_color,
                      map_graticule_interval = opts$extra$map_graticule_interval,
-                     map_graticule_weight = opts$extra$map_graticule_weight),
+                     map_graticule_weight = opts$theme$grid_size),
     min_zoom = opts$extra$map_min_zoom
     # USE IN POINT OR BUBBLES
   )

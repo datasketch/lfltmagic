@@ -10,6 +10,7 @@ lflt_choropleth_GnmNum(map_tiles = "OpenStreetMap")
 lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_graticule = TRUE,
                        map_graticule_interval = 3,
+                       grid_size =2,
                        map_graticule_color = "#000")
 lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_tiles = "OpenStreetMap"
@@ -23,7 +24,7 @@ lflt_choropleth_GnmNum(map_name = "col_departments",
 
 data <- sample_data("Gnm-Num", 100)
 lflt_choropleth_GnmNum(data, palette_colors = c("#FEAFEA", "#000AAA"))
-lflt_choropleth_GnmNum(data, map_color_scale = "Quantile")
+lflt_choropleth_GnmNum(data, map_color_scale = "Quantile", map_quantile = 5)
 lflt_choropleth_GnmNum(data, map_color_scale = "Bins")
 lflt_choropleth_GnmNum(data, map_color_scale = "Bins", map_bins = 3)
 
@@ -33,12 +34,14 @@ lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
 lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
                        map_graticule = TRUE)
 
-data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000))
+data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), pepito = runif(4, 1, 1000))
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
                        palette_colors = c("#FEAFEA", "#000CCC"),
                        map_color_scale = "Bins", prefix = "$")
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
-                       tooltip = "<b>{Ciudad}:</b> {Val}", format_cat_sample = "Titulo")
+                       tooltip = "<b>Hola Lena esta ciudad es {Ciudad}:</b> que tiene {pepito} pepitos",
+                       format_cat_sample = "Titulo",
+                       text_color = "red")
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
                        title = "Pacífico Colombiano",
                        map_zoom = FALSE,
@@ -49,7 +52,7 @@ lflt_choropleth_GnmNum(data,
                        palette_colors = c("#FEAFEA", "#000CCC"),
                        branding_include = TRUE,
                        map_tiles = "OpenStreetMap",
-                       tooltip = "<p style='font-size:15px;font-weight:bold;'>{Ciudad}</p>",
+                       tooltip = "<p style='font-size:15px; color:#FEAFEA;font-weight:bold;'>{Ciudad}</p>",
                        format_cat_sample = "Titulo")
 lflt_choropleth_GnmNum(data,
                        map_name = "col_pacifico",
