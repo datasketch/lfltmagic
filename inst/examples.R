@@ -6,7 +6,7 @@ library(lfltmagic)
 # Gnm-Num examples --------------------------------------------------------
 
 lflt_choropleth_GnmNum()
-lflt_choropleth_GnmNum(map_tiles = "OpenStreetMap")
+lflt_choropleth_GnmNum(map_tiles = "CartoDB")
 lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_graticule = TRUE,
                        map_graticule_interval = 3,
