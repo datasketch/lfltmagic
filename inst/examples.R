@@ -11,7 +11,7 @@ lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_graticule = TRUE,
                        map_graticule_interval = 3,
                        grid_size =2,
-                       map_graticule_color = "#000")
+                       grid_color = "red")
 lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_tiles = "OpenStreetMap"
 )
@@ -39,7 +39,7 @@ lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
                        palette_colors = c("#FEAFEA", "#000CCC"),
                        map_color_scale = "Bins", prefix = "$")
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
-                       tooltip = "<b>Hola Lena esta ciudad es {Ciudad}:</b> que tiene {pepito} pepitos",
+                        tooltip = "<b>Hola Lena esta ciudad es {Ciudad}:</b> que tiene {pepito} pepitos",
                        format_cat_sample = "Titulo",
                        text_color = "red")
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
