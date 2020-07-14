@@ -120,27 +120,27 @@ lflt_basic_choropleth <- function(l) {
     pal <- lflt_palette(opts_pal)
     color_map <- pal(l$d@data[["b"]])
 
-  lf <- leaflet(l$d,
-                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addPolygons( weight = l$theme$border_weight,
-                 fillOpacity = l$theme$topo_fill_opacity,
-                 opacity = 1,
-                 color = l$border_color,
-                 fillColor = color_map,
-                 layerId = ~a,
-                 label = ~labels
-    )
-  if (!is.null(l$data) & l$theme$legend_show) {
-    lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
-                           position = l$theme$legend_position,
-                           na.label = l$na_label,
-                           title = l$legend_title,
-                           labFormat = lflt_legend_format(
-                             sample =l$format_num, locale = l$locale,
-                             prefix = l$prefix, suffix = l$suffix,
-                             between = paste0(l$suffix, " - ", l$prefix),
-                           ))
-  }
+    lf <- leaflet(l$d,
+                  option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
+      addPolygons( weight = l$theme$border_weight,
+                   fillOpacity = l$theme$topo_fill_opacity,
+                   opacity = 1,
+                   color = l$border_color,
+                   fillColor = color_map,
+                   layerId = ~a,
+                   label = ~labels
+      )
+    if (!is.null(l$data) & l$theme$legend_show) {
+      lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+                             position = l$theme$legend_position,
+                             na.label = l$na_label,
+                             title = l$legend_title,
+                             labFormat = lflt_legend_format(
+                               sample =l$format_num, locale = l$locale,
+                               prefix = l$prefix, suffix = l$suffix,
+                               between = paste0(l$suffix, " - ", l$prefix),
+                             ))
+    }
   }
   lf
 }
@@ -267,3 +267,28 @@ lflt_titles <- function(map, titles) {
                className="map-subtitle")
 
 }
+
+
+# Find name or id
+#' @export
+geoType <- function(data, map_name) {
+
+  f <- homodatum::fringe(data)
+  nms <- homodatum::fringe_labels(f)
+  d <- homodatum::fringe_d(f)
+
+  lfmap <- geodataMeta(map_name)
+  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  vs <- NULL
+  values <- intersect(d[["a"]], centroides[["id"]])
+
+  if (identical(values, character(0))) {
+    values <- intersect(d[["a"]], centroides[["name"]])
+    if(!identical(values, character())) vs <- "Gnm"
+  } else {
+    vs <- "Gcd"
+  }
+  vs
+}
+
+
