@@ -211,6 +211,14 @@ lflt_basic_bubbles <- function(l) {
   lf
 }
 
+
+url_logo <- function(logo, background_color) {
+  if (grepl("http", logo)) logo_url <- logo
+  logo_path <- local_logo_path(logo, background_color)
+  logo_url <- knitr::image_uri(f = logo_path)
+  logo_url
+}
+
 #' Background and branding Map
 lflt_background <- function(map, theme) {
 
@@ -220,9 +228,9 @@ lflt_background <- function(map, theme) {
     lf <- map %>%  addProviderTiles(theme$map_tiles)
   }
   if (theme$branding_include) {
-    img <- local_logo_path(logo = theme$logo, background = theme$background_color)
+    img <- url_logo(logo = theme$logo, background = theme$background_color)
     lf <- lf %>%
-      leafem::addLogo(img, src = "local", width = 150, height = 40, position = "bottomright")
+      leafem::addLogo(img,  width = theme$logo_width, height = theme$logo_height, position = "bottomright")
   }
   lf
 }
