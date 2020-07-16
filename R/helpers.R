@@ -225,7 +225,19 @@ lflt_basic_bubbles <- function(l) {
         label = ~labels,
         layerId = ~a
       )
-    }
+  }
+
+  if ((!is.null(l$data) & is(l$d$b, "character")) & l$theme$legend_show) {
+    lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+                           position = l$theme$legend_position,
+                           na.label = l$na_label,
+                           title = l$legend_title,
+                           labFormat = lflt_legend_format(
+                             sample =l$format_num, locale = l$locale,
+                             prefix = l$prefix, suffix = l$suffix,
+                             between = paste0(l$suffix, " - ", l$prefix),
+                           ))
+  }
 
   lf
 }
