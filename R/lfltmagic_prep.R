@@ -8,6 +8,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   bbox <- topo_bbox(centroides$lon, centroides$lat)
 
+  color_scale <- opts$extra$map_color_scale
+
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
@@ -31,15 +33,32 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       names(nms) <- c(names(nms)[-ind_nms], 'b')
       dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
       dic <- dic %>% bind_rows(dic_num) }
+
     if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
       d <- d %>%
+        filter(complete.cases(b)) %>%
         dplyr::group_by_all() %>%
-        dplyr::summarise(c = n())
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'c')
-      dic_num <- data.frame(id = "c", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num)}
+        dplyr::summarise(c = n()) %>%
+        dplyr::arrange(a) %>%
+        dplyr::filter(c == max(c)) %>%
+        dplyr::group_by(a) %>%
+        dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
+        dplyr::distinct(a, b)
+
+      color_scale <- "Category"
+    }
+
+    # if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
+    #   d <- d %>%
+    #     dplyr::group_by_all() %>%
+    #     dplyr::summarise(c = n())
+    #   ind_nms <- length(nms)+1
+    #   nms[ind_nms] <- 'Count'
+    #   names(nms) <- c(names(nms)[-ind_nms], 'c')
+    #   dic_num <- data.frame(id = "c", label = "Count", hdType= as_hdType(x = "Num"))
+    #   dic <- dic %>% bind_rows(dic_num)
+    #   }
+
     if (frtype_d %in% "Gln-Glt-Cat") {
       d <- d %>%
         dplyr::group_by_all() %>%
@@ -50,11 +69,24 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
       dic <- dic %>% bind_rows(dic_num) }
 
+      color_scale <- "Category"
 
     if (frtype_d %in% c("Gcd-Num", "Gnm-Num", "Cat-Num")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
+
     if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
-      d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
+      d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>%
+        drop_na(a, c) %>%
+        dplyr::group_by(a) %>%
+        dplyr::filter(c == max(c)) %>%
+        dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
+        dplyr::distinct(a, b, c)
+
+        color_scale <- "Category"
+      }
+
+    # if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
+    #   d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
     if (frtype_d %in% c("Gln-Glt", "Glt-Gln", "Num-Num")) {
       d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
     if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num", "Gln-Glt-Num-Cat-Cat", "Num-Num-Num-Cat-Cat")) {
@@ -103,7 +135,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     d = topoInfo,
     data = data,
     b_box = bbox,
-    color_scale = opts$extra$map_color_scale,
+    color_scale = color_scale,
     border_color = opts$theme$border_color,
     n_quantile = opts$extra$map_quantile,
     n_bins = opts$extra$map_bins,
