@@ -2,8 +2,9 @@
 lflt_palette <- function(opts) {
   if (opts$color_scale == "Category") {
     color_mapping <- "colorFactor"
-    l <- list(levels = opts$levels,
-              ordered = opts$ordered)
+    # l <- list(levels = opts$levels,
+    #           ordered = opts$ordered)
+    l <- list()
   } else if (opts$color_scale == "Quantile") {
     color_mapping <- "colorQuantile"
     l <- list(n = opts$n_quantile)
