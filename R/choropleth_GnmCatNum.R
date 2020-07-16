@@ -3,17 +3,17 @@
 #'
 #' Leaflet choropleths by categorical variable
 #'
-#' @name lflt_choropleth_GcdCatNum
+#' @name lflt_choropleth_GnmCatNum
 #' @param x A data.frame
 #' @return leaflet viz
-#' @section ctypes: Gcd-Cat-Num
+#' @section ctypes: Gnm-Cat-Num
 #' @export
 #' @examples
-#' lflt_choropleth_GcdCatNum(sample_data("Gcd-Cat-Num", nrow = 10))
-lflt_choropleth_GcdCatNum <- function(data = NULL, ...) {
+#' lflt_choropleth_GnmCatNum(sample_data("Gnm-Cat-Num", nrow = 10))
+lflt_choropleth_GnmCatNum <- function(data = NULL, ...) {
   opts <- dsvizopts::merge_dsviz_options(...)
 
-  l <- lfltmagic_prep(data = data, opts = opts, by_col = "id")
+  l <- lfltmagic_prep(data = data, opts = opts)
 
   lf <- lflt_basic_choropleth(l) %>%
     lflt_background(l$theme) %>%
@@ -30,11 +30,11 @@ lflt_choropleth_GcdCatNum <- function(data = NULL, ...) {
 #'
 #' Leaflet choropleths by categorical variable
 #'
-#' @name lflt_choropleth_GcdCat
+#' @name lflt_choropleth_GnmCat
 #' @param x A data.frame
 #' @return leaflet viz
-#' @section ctypes: Gcd-Cat
+#' @section ctypes: Gnm-Cat
 #' @export
 #' @examples
-#' lflt_choropleth_GcdCat(sample_data("Gcd-Cat", nrow = 10))
-lflt_choropleth_GcdCat <- lflt_choropleth_GcdCatNum
+#' lflt_choropleth_GnmCat(sample_data("Gnm-Cat", nrow = 10))
+lflt_choropleth_GnmCat <- lflt_choropleth_GnmCatNum
