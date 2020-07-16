@@ -39,7 +39,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         filter(complete.cases(b)) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(c = n()) %>%
-        dplyr::arrange(a) %>%
         dplyr::filter(c == max(c)) %>%
         dplyr::group_by(a) %>%
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
@@ -58,6 +57,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- d %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(d = n())
+
       ind_nms <- length(nms)+1
       nms[ind_nms] <- 'Count'
       names(nms) <- c(names(nms)[-ind_nms], 'd')
@@ -80,8 +80,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         color_scale <- "Category"
       }
 
-    # if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
-    #   d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a, c)}
     if (frtype_d %in% c("Gln-Glt", "Glt-Gln", "Num-Num")) {
       d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
     if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num", "Gln-Glt-Num-Cat-Cat", "Num-Num-Num-Cat-Cat")) {
