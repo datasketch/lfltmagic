@@ -197,17 +197,35 @@ lflt_basic_bubbles <- function(l) {
                  color = l$border_color,
                  fillColor = color_map)
   if (!is.null(l$data)) {
+
+    if (is(l$d$b, "character")){
+      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["b"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["b"]])
+    } else {
+      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      color <- l$theme$palette_colors[1]
+    }
+
+
     lf <- lf %>%
       addCircleMarkers(
         lng = ~lon,
         lat = ~lat,
-        radius = ~scales::rescale(b, to = c(l$min_size, l$max_size)),
-        color = l$theme$palette_colors[1],
+        radius = radius,
+        color = color,
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
         layerId = ~a
-      ) }
+      )
+    }
 
   lf
 }
