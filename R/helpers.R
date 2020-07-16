@@ -121,10 +121,16 @@ lflt_basic_choropleth <- function(l) {
     pal <- lflt_palette(opts_pal)
     color_map <- pal(l$d@data[["b"]])
 
+    fill_opacity <- l$theme$topo_fill_opacity
+    if (is(l$d$b, "character")){
+      fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
+    }
+
+
     lf <- leaflet(l$d,
                   option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
       addPolygons( weight = l$theme$border_weight,
-                   fillOpacity = l$theme$topo_fill_opacity,
+                   fillOpacity = fill_opacity,
                    opacity = 1,
                    color = l$border_color,
                    fillColor = color_map,
