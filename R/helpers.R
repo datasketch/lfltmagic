@@ -15,6 +15,7 @@ lflt_palette <- function(opts) {
     color_mapping <- "colorNumeric"
     l <- list()
   }
+
   l$palette <- opts$palette
   l$domain <- opts$domain
   l$na.color <- opts$na_color
@@ -111,6 +112,9 @@ lflt_basic_choropleth <- function(l) {
                  fillColor = color_map)
 
   if (!is.null(l$data)) {
+    if(sum(is.na(l$d@data$b)) == nrow(l$d@data)) {
+      lf <- lf
+    } else {
     opts_pal <- list(color_scale = l$color_scale,
                      palette = l$theme$palette_colors,
                      na_color = l$theme$na_color,
@@ -141,7 +145,7 @@ lflt_basic_choropleth <- function(l) {
                                between = paste0(l$suffix, " - ", l$prefix),
                              ))
     }
-  }
+  }}
   lf
 }
 
