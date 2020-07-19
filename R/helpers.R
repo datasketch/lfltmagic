@@ -296,3 +296,13 @@ geoType <- function(data, map_name) {
 }
 
 
+# fake data
+#' @export
+fakeData <- function(map_name = NULL, ...) {
+  if (is.null(map_name)) return()
+  lfmap <- geodataMeta(map_name)
+  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  d <- data.frame(name =sample(centroides$name, 11), fake_value = rnorm(11, 33, 333))
+  d
+}
+
