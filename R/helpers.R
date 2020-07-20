@@ -2,8 +2,9 @@
 lflt_palette <- function(opts) {
   if (opts$color_scale == "Category") {
     color_mapping <- "colorFactor"
-    l <- list(levels = opts$levels,
-              ordered = opts$ordered)
+    # l <- list(levels = opts$levels,
+    #           ordered = opts$ordered)
+    l <- list()
   } else if (opts$color_scale == "Quantile") {
     color_mapping <- "colorQuantile"
     l <- list(n = opts$n_quantile)
@@ -124,10 +125,16 @@ lflt_basic_choropleth <- function(l) {
     pal <- lflt_palette(opts_pal)
     color_map <- pal(l$d@data[["b"]])
 
+    fill_opacity <- l$theme$topo_fill_opacity
+    if (is(l$d$b, "character")){
+      fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
+    }
+
+
     lf <- leaflet(l$d,
                   option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
       addPolygons( weight = l$theme$border_weight,
-                   fillOpacity = l$theme$topo_fill_opacity,
+                   fillOpacity = fill_opacity,
                    opacity = 1,
                    color = l$border_color,
                    fillColor = color_map,
@@ -200,17 +207,47 @@ lflt_basic_bubbles <- function(l) {
                  color = l$border_color,
                  fillColor = color_map)
   if (!is.null(l$data)) {
+
+    if (is(l$d$b, "character")){
+      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["b"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["b"]])
+    } else {
+      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      color <- l$theme$palette_colors[1]
+    }
+
+
     lf <- lf %>%
       addCircleMarkers(
         lng = ~lon,
         lat = ~lat,
-        radius = ~scales::rescale(b, to = c(l$min_size, l$max_size)),
-        color = l$theme$palette_colors[1],
+        radius = radius,
+        color = color,
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
         layerId = ~a
-      ) }
+      )
+  }
+
+  if ((!is.null(l$data) & is(l$d$b, "character")) & l$theme$legend_show) {
+    lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+                           position = l$theme$legend_position,
+                           na.label = l$na_label,
+                           title = l$legend_title,
+                           labFormat = lflt_legend_format(
+                             sample =l$format_num, locale = l$locale,
+                             prefix = l$prefix, suffix = l$suffix,
+                             between = paste0(l$suffix, " - ", l$prefix),
+                           ))
+  }
 
   lf
 }
