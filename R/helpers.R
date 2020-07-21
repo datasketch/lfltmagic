@@ -219,7 +219,7 @@ lflt_basic_bubbles <- function(l) {
       pal <- lflt_palette(opts_pal)
       color <- pal(l$d@data[["b"]])
     } else {
-      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      radius <- scales::rescale(l$d$b, to = c(l$min_size, l$max_size))
       color <- l$theme$palette_colors[1]
     }
 
