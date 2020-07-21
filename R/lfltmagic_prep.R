@@ -62,9 +62,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       nms[ind_nms] <- 'Count'
       names(nms) <- c(names(nms)[-ind_nms], 'd')
       dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num) }
+      dic <- dic %>% bind_rows(dic_num)
 
       color_scale <- "Category"
+    }
 
     if (frtype_d %in% c("Gcd-Num", "Gnm-Num", "Cat-Num")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
