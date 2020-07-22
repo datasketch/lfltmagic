@@ -26,15 +26,17 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- d %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(b = n())
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'b')
-      dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num) }
+
+        ind_nms <- length(nms)+1
+        nms[ind_nms] <- 'Count'
+        names(nms) <- c(names(nms)[-ind_nms], 'b')
+        dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
+        dic <- dic %>% bind_rows(dic_num)
+        }
 
     if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
       d <- d %>%
-        filter(complete.cases(b)) %>%
+        drop_na(a) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(c = n()) %>%
         dplyr::filter(c == max(c)) %>%
@@ -47,11 +49,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         names(nms) <- c(names(nms)[-ind_nms], 'c')
         dic_num <- data.frame(id = "c", label = "Count", hdType= as_hdType(x = "Num"))
         dic <- dic %>% bind_rows(dic_num)
-    }
+        }
 
     if (frtype_d %in% "Gln-Glt-Cat") {
       d <- d %>%
-        filter(complete.cases(c)) %>%
+        drop_na(a, b) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(d = n()) %>%
         dplyr::filter(d == max(d)) %>%
@@ -59,19 +61,18 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         dplyr::mutate(e = n(), c = ifelse(e == 1, c, "tie")) %>%
         dplyr::distinct(a, b, c, d)
 
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'd')
-      dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num)
-    }
+        ind_nms <- length(nms)+1
+        nms[ind_nms] <- 'Count'
+        names(nms) <- c(names(nms)[-ind_nms], 'd')
+        dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
+        dic <- dic %>% bind_rows(dic_num)}
 
     if (frtype_d %in% c("Gcd-Num", "Gnm-Num", "Cat-Num")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
 
     if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>%
-        drop_na(a, c) %>%
+        drop_na(a) %>%
         dplyr::group_by(a) %>%
         dplyr::filter(c == max(c)) %>%
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
@@ -79,7 +80,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
 
     if (frtype_d %in% c("Gln-Glt-Cat-Num")) {
-      d1 <- summarizeData(d, opts$summarize$agg, to_agg = d, a, b, c) %>%
+      d <- summarizeData(d, opts$summarize$agg, to_agg = d, a, b, c) %>%
         drop_na(a, b) %>%
         dplyr::group_by(a, b) %>%
         dplyr::filter(d == max(d)) %>%
