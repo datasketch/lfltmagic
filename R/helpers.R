@@ -169,7 +169,24 @@ lflt_basic_points <- function(l) {
                  label = ~labels,
                  color = l$border_color,
                  fillColor = color_map)
+
   if (!is.null(l$data)) {
+
+    if (is(l$d$c, "character")){
+      radius <- scales::rescale(l$d$d, to = c(l$min_size, l$max_size))
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["c"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["c"]])
+    } else {
+      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      color <- l$theme$palette_colors[1]
+    }
+
     lf <- leaflet(l$d,
                   option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
       addPolygons( weight = l$theme$border_weight,
@@ -180,13 +197,27 @@ lflt_basic_points <- function(l) {
       addCircleMarkers(
         lng = ~a,
         lat = ~b,
-        radius = ~scales::rescale(c, to = c(l$min_size, l$max_size)),
-        color = l$theme$palette_colors[1],
+        radius = radius,
+        color = color,
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
         layerId = ~a
-      ) }
+      )
+
+    if (is(l$d$c, "character") & l$theme$legend_show) {
+      lf <- lf %>% addLegend(pal = pal, values = ~c, opacity = 1,
+                             position = l$theme$legend_position,
+                             na.label = l$na_label,
+                             title = l$legend_title,
+                             labFormat = lflt_legend_format(
+                               sample =l$format_num, locale = l$locale,
+                               prefix = l$prefix, suffix = l$suffix,
+                               between = paste0(l$suffix, " - ", l$prefix),
+                             ))
+    }
+
+    }
 
   lf
 }
@@ -235,9 +266,8 @@ lflt_basic_bubbles <- function(l) {
         label = ~labels,
         layerId = ~a
       )
-  }
 
-  if ((!is.null(l$data) & is(l$d$b, "character")) & l$theme$legend_show) {
+  if (is(l$d$b, "character") & l$theme$legend_show) {
     lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
                            position = l$theme$legend_position,
                            na.label = l$na_label,
@@ -247,6 +277,7 @@ lflt_basic_bubbles <- function(l) {
                              prefix = l$prefix, suffix = l$suffix,
                              between = paste0(l$suffix, " - ", l$prefix),
                            ))
+    }
   }
 
   lf
