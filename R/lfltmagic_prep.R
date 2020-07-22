@@ -24,6 +24,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
 
     if(frtype_d %in% c("Gcd", "Gnm")){
       d <- d %>%
+        mutate(a = na_if(a, "-99")) %>%
+        drop_na(a) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(b = n())
 
