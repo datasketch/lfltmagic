@@ -73,12 +73,21 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
 
     if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
-      d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>%
-        drop_na(a) %>%
+      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a)
+
+      tooltips <- d_agg %>%
+        mutate(html_row = paste0("<span style='font-size:15px;'><strong>", b, ":</strong> ", c, "</span>")) %>%
+        group_by(a) %>%
+        summarise(d = paste0(html_row, collapse = "<br/>")) %>%
+        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "</span>", "<br/>", d))
+
+      d <- d_agg %>%
         dplyr::group_by(a) %>%
         dplyr::filter(c == max(c)) %>%
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
-        dplyr::distinct(a, b, c)
+        dplyr::distinct(a, b, c) %>%
+        left_join(tooltips, by = "a")
+
     }
 
     if (frtype_d %in% c("Gln-Glt-Cat-Num")) {
@@ -122,10 +131,24 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       topoInfo@data$name <- opts$preprocess$na_label
     }
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
-    topoInfo@data <- topoInfo@data %>%
-      mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
-                             glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
-      )
+
+    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
+      topoInfo@data <- topoInfo@data %>%
+        mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
+                                 lapply(htmltools::HTML), d %>% lapply(htmltools::HTML))
+        )
+      # topoInfo@data <- topoInfo@data %>%
+      #   mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
+      #                            lapply(htmltools::HTML),
+      #                          glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+      #   )
+    } else {
+      topoInfo@data <- topoInfo@data %>%
+        mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
+                                 lapply(htmltools::HTML),
+                               glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+        )
+    }
   }
 
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
