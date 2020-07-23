@@ -8,8 +8,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   bbox <- topo_bbox(centroides$lon, centroides$lat)
 
-  color_scale <- opts$extra$map_color_scale
-
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
@@ -26,17 +24,21 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
 
     if(frtype_d %in% c("Gcd", "Gnm")){
       d <- d %>%
+        mutate(a = na_if(a, "-99")) %>%
+        drop_na(a) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(b = n())
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'b')
-      dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num) }
+
+        ind_nms <- length(nms)+1
+        nms[ind_nms] <- 'Count'
+        names(nms) <- c(names(nms)[-ind_nms], 'b')
+        dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
+        dic <- dic %>% bind_rows(dic_num)
+        }
 
     if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
       d <- d %>%
-        filter(complete.cases(b)) %>%
+        drop_na(a) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(c = n()) %>%
         dplyr::filter(c == max(c)) %>%
@@ -49,42 +51,65 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         names(nms) <- c(names(nms)[-ind_nms], 'c')
         dic_num <- data.frame(id = "c", label = "Count", hdType= as_hdType(x = "Num"))
         dic <- dic %>% bind_rows(dic_num)
-
-        color_scale <- "Category"
-    }
+        }
 
     if (frtype_d %in% "Gln-Glt-Cat") {
       d <- d %>%
+        drop_na(a, b) %>%
         dplyr::group_by_all() %>%
-        dplyr::summarise(d = n())
+        dplyr::summarise(d = n()) %>%
+        dplyr::filter(d == max(d)) %>%
+        dplyr::group_by(a, b) %>%
+        dplyr::mutate(e = n(), c = ifelse(e == 1, c, "tie")) %>%
+        dplyr::distinct(a, b, c, d)
 
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'd')
-      dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num)
-
-      color_scale <- "Category"
-    }
+        ind_nms <- length(nms)+1
+        nms[ind_nms] <- 'Count'
+        names(nms) <- c(names(nms)[-ind_nms], 'd')
+        dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
+        dic <- dic %>% bind_rows(dic_num)}
 
     if (frtype_d %in% c("Gcd-Num", "Gnm-Num", "Cat-Num")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
 
-    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat")) {
-      d <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>%
-        drop_na(a, c) %>%
+    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
+      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a)
+
+      tooltips <- d_agg %>%
+        mutate(html_row = paste0("<span style='font-size:15px;'><strong>", b, ":</strong> ", c, "</span>")) %>%
+        group_by(a) %>%
+        summarise(d = paste0(html_row, collapse = "<br/>")) %>%
+        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "</span>", "<br/>", d))
+
+      d <- d_agg %>%
         dplyr::group_by(a) %>%
         dplyr::filter(c == max(c)) %>%
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
-        dplyr::distinct(a, b, c)
+        dplyr::distinct(a, b, c) %>%
+        left_join(tooltips, by = "a")
 
-        color_scale <- "Category"
-      }
+    }
+
+    if (frtype_d %in% c("Gln-Glt-Cat-Num")) {
+      d <- summarizeData(d, opts$summarize$agg, to_agg = d, a, b, c) %>%
+        drop_na(a, b) %>%
+        dplyr::group_by(a, b) %>%
+        dplyr::filter(d == max(d)) %>%
+        dplyr::mutate(e = n(), d = ifelse(e == 1, d, "tie")) %>%
+        dplyr::distinct(a, b, c, d)
+    }
 
     if (frtype_d %in% c("Gln-Glt", "Glt-Gln", "Num-Num")) {
       d <- d %>% mutate(c = opts$extra$map_radius) %>% drop_na() }
     if (frtype_d %in% c("Gln-Glt-Num", "Glt-Gln-Num", "Num-Num-Num", "Gln-Glt-Num-Cat-Cat", "Num-Num-Num-Cat-Cat")) {
       d <- d %>% drop_na() }
+
+    # define type of color scale
+    color_scale <- opts$extra$map_color_scale
+    if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat", "Gln-Glt-Cat", "Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat-Num")){
+      color_scale <- "Category"
+    }
+
     cond_cat <- grep("Gnm|Gcd|Cat", d_frtype)
     if (identical(cond_cat, integer())) cond_cat <- 0
     if (cond_cat %in% 1) {
@@ -106,10 +131,24 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       topoInfo@data$name <- opts$preprocess$na_label
     }
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
-    topoInfo@data <- topoInfo@data %>%
-      mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
-                             glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
-      )
+
+    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
+      topoInfo@data <- topoInfo@data %>%
+        mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
+                                 lapply(htmltools::HTML), d %>% lapply(htmltools::HTML))
+        )
+      # topoInfo@data <- topoInfo@data %>%
+      #   mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
+      #                            lapply(htmltools::HTML),
+      #                          glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+      #   )
+    } else {
+      topoInfo@data <- topoInfo@data %>%
+        mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
+                                 lapply(htmltools::HTML),
+                               glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+        )
+    }
   }
 
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
