@@ -126,7 +126,7 @@ lflt_basic_choropleth <- function(l) {
     color_map <- pal(l$d@data[["b"]])
 
     fill_opacity <- l$theme$topo_fill_opacity
-    if (is(l$d$b, "character")){
+    if (is(l$d$c, "numeric")){
       fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
     }
 
@@ -239,7 +239,10 @@ lflt_basic_bubbles <- function(l) {
                  fillColor = color_map)
   if (!is.null(l$data)) {
 
-    if (is(l$d$b, "character")){
+    radius <- 0
+    color <- l$theme$palette_colors[1]
+
+    if (is(l$d$c, "numeric")){
       radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$theme$palette_colors,
@@ -249,9 +252,18 @@ lflt_basic_bubbles <- function(l) {
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
       color <- pal(l$d@data[["b"]])
-    } else {
+    } else if (is(l$d$b, "numeric")){
       radius <- scales::rescale(l$d$b, to = c(l$min_size, l$max_size))
-      color <- l$theme$palette_colors[1]
+    } else if (is(l$d$b, "character")){
+      radius <- ifelse(!is.na(l$d$b), 5, 0)
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["b"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["b"]])
     }
 
 

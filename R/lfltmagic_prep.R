@@ -37,21 +37,32 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         }
 
     if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
-      d <- d %>%
+      d_agg <- d %>%
         drop_na(a) %>%
         dplyr::group_by_all() %>%
-        dplyr::summarise(c = n()) %>%
+        dplyr::summarise(c = n())
+
+      tooltips <- d_agg %>%
+        mutate(html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "</span>")) %>%
+        group_by(a) %>%
+        summarise(d = ifelse(n()>1,
+                             paste0("<strong>", nms[[2]], ":</strong> ", paste0(b, collapse = "/"), "</span>"),
+                             html_row_unique)) %>%
+        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", d))
+
+      d <- d_agg %>%
         dplyr::filter(c == max(c)) %>%
         dplyr::group_by(a) %>%
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
-        dplyr::distinct(a, b, c)
+        dplyr::distinct(a, b) %>%
+        left_join(tooltips, by = "a")
 
-        ind_nms <- length(nms)+1
-        nms[ind_nms] <- 'Count'
-        names(nms) <- c(names(nms)[-ind_nms], 'c')
-        dic_num <- data.frame(id = "c", label = "Count", hdType= as_hdType(x = "Num"))
-        dic <- dic %>% bind_rows(dic_num)
+      if(nrow(d) < nrow(d_agg)){
+        warning("Multiple categorical classes found for at least one geography.
+                Geographies are colored based on majority class and all counts are displayed in tooltips.
+                Potential ties are indicated by new category 'tie'.")
         }
+      }
 
     if (frtype_d %in% "Gln-Glt-Cat") {
       d <- d %>%
@@ -73,13 +84,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
 
     if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
-      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a)
+      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% mutate(a = na_if(a, "-99")) %>% drop_na(a)
 
       tooltips <- d_agg %>%
-        mutate(html_row = paste0("<span style='font-size:15px;'><strong>", b, ":</strong> ", c, "</span>")) %>%
+        mutate(html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "<br/><strong>", nms[[3]], ":</strong> ", c),
+               html_row = paste0("<strong>", b, ":</strong> ", c)) %>%
         group_by(a) %>%
-        summarise(d = paste0(html_row, collapse = "<br/>")) %>%
-        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "</span>", "<br/>", d))
+        summarise(d = ifelse(n()>1, paste0(html_row, collapse = "<br/>"), html_row_unique)) %>%
+        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", d, "</span>"))
 
       d <- d_agg %>%
         dplyr::group_by(a) %>%
@@ -87,6 +99,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
         dplyr::distinct(a, b, c) %>%
         left_join(tooltips, by = "a")
+
+      if(nrow(d) < nrow(d_agg)){
+        warning("Multiple categorical classes found for at least one geography.
+                Geographies are colored based on majority class and all counts are displayed in tooltips.
+                Potential ties are indicated by new category 'tie'.")
+      }
 
     }
 
@@ -132,16 +150,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
 
-    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
+    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num","Gnm-Cat", "Gcd-Cat")) {
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
                                  lapply(htmltools::HTML), d %>% lapply(htmltools::HTML))
         )
-      # topoInfo@data <- topoInfo@data %>%
-      #   mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
-      #                            lapply(htmltools::HTML),
-      #                          glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
-      #   )
     } else {
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
