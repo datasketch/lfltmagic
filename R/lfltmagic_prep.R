@@ -73,7 +73,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
 
     if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num")) {
-      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% drop_na(a)
+      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% mutate(a = na_if(a, "-99")) %>% drop_na(a)
 
       tooltips <- d_agg %>%
         mutate(html_row = paste0("<span style='font-size:15px;'><strong>", b, ":</strong> ", c, "</span>")) %>%
@@ -87,6 +87,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         dplyr::mutate(d = n(), b = ifelse(d == 1, b, "tie")) %>%
         dplyr::distinct(a, b, c) %>%
         left_join(tooltips, by = "a")
+
+      if(nrow(d) < nrow(d_agg)){
+        warning("Multiple categorical classes found for at least one geography. Data to be shown on map will be based on majority class.")
+      }
 
     }
 
