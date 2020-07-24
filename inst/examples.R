@@ -19,20 +19,20 @@ lflt_choropleth_GcdCat(sample_data("Gcd-Cat", 100))
 
 ## bubbles
 ### numerical data
-lflt_bubbles_GnmNum(sample_data("Gnm-Num", 100)) #
-lflt_bubbles_Gnm(sample_data("Gnm", 100)) #
-lflt_bubbles_GcdNum(sample_data("Gcd-Num", 100)) #
-lflt_bubbles_Gcd(sample_data("Gcd", 100)) #
-lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num", 100)) #
-lflt_bubbles_GlnGlt(sample_data("Gln-Glt", 100)) #
+lflt_bubbles_GnmNum(sample_data("Gnm-Num", 100))
+lflt_bubbles_Gnm(sample_data("Gnm", 100))
+lflt_bubbles_GcdNum(sample_data("Gcd-Num", 100))
+lflt_bubbles_Gcd(sample_data("Gcd", 100))
+lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num", 100))
+lflt_bubbles_GlnGlt(sample_data("Gln-Glt", 100))
 
 ### categorical data
-lflt_bubbles_GnmCatNum(sample_data("Gnm-Cat-Num", 100)) # size missing
-lflt_bubbles_GnmCat(sample_data("Gnm-Cat", 100)) # size missing
-lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", 100)) # size missing
-lflt_bubbles_GcdCat(sample_data("Gcd-Cat", 100)) # size missing
-lflt_bubbles_GlnGltCatNum(sample_data("Gln-Glt-Cat-Num", 100)) # size missing
-lflt_bubbles_GlnGltCat(sample_data("Gln-Glt-Cat", 100)) # size missing
+lflt_bubbles_GnmCatNum(sample_data("Gnm-Cat-Num", 100))
+lflt_bubbles_GnmCat(sample_data("Gnm-Cat", 100))
+lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", 100))
+lflt_bubbles_GcdCat(sample_data("Gcd-Cat", 100))
+lflt_bubbles_GlnGltCatNum(sample_data("Gln-Glt-Cat-Num", 100))
+lflt_bubbles_GlnGltCat(sample_data("Gln-Glt-Cat", 100))
 
 # Gnm-Num examples --------------------------------------------------------
 

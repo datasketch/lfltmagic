@@ -1,6 +1,6 @@
 #' Legend by palette type
 lflt_palette <- function(opts) {
-  if (opts$color_scale == "Category") {
+  if (opts$color_scale %in% c("Category", "Custom")) {
     color_mapping <- "colorFactor"
     # l <- list(levels = opts$levels,
     #           ordered = opts$ordered)
@@ -143,14 +143,20 @@ lflt_basic_choropleth <- function(l) {
     if(sum(is.na(l$d@data$b)) == nrow(l$d@data)) {
       lf <- lf
     } else {
-    opts_pal <- list(color_scale = l$color_scale,
-                     palette = l$theme$palette_colors,
-                     na_color = l$theme$na_color,
-                     domain = l$d@data[["b"]],
-                     n_bins = l$n_bins,
-                     n_quantile = l$n_quantile)
+      domain <- l$d@data[["b"]]
+      if(l$color_scale == "Custom"){
+        intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
+        domain <- intervals
+      }
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = domain,
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+
     pal <- lflt_palette(opts_pal)
-    color_map <- pal(l$d@data[["b"]])
+    color_map <- pal(domain)
 
     fill_opacity <- l$theme$topo_fill_opacity
     if (is(l$d$c, "numeric")){
@@ -169,7 +175,8 @@ lflt_basic_choropleth <- function(l) {
                    label = ~labels
       )
     if (!is.null(l$data) & l$theme$legend_show) {
-      lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+
+      lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
                              position = l$theme$legend_position,
                              na.label = l$na_label,
                              title = l$legend_title,
