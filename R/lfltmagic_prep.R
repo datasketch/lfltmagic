@@ -177,6 +177,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
+  if(color_scale == "Custom" & is.null(opts$extra$map_cutoff_points)){
+    warning("No cutoff points specified for color scale 'Custom', overwriting color scale with default 'Numeric'.
+            To use custom colorS scale, please define custoff points in parameter 'map_cutoff_points'.")
+    color_scale <- "Numeric"
+  }
+
   list(
     d = topoInfo,
     data = data,
@@ -185,6 +191,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     border_color = opts$theme$border_color,
     n_quantile = opts$extra$map_quantile,
     n_bins = opts$extra$map_bins,
+    cutoff_points = opts$extra$map_cutoff_points,
     na_label = opts$preprocess$na_label,
     suffix = opts$style$suffix,
     prefix = opts$style$prefix,
