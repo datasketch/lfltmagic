@@ -68,6 +68,33 @@ lflt_format <- function(d, dic, nms, opts) {
   d
 }
 
+
+lflt_legend_bubbles <- function(map, colors, labels, sizes,
+                                title, na.label, position, opacity){
+  colorAdditions <- paste0(colors, ";
+                           position: absolute;
+                           right: 50px;
+                           border-radius: 50%;
+                           margin-right: 6px;
+                           margin-left: 0px;
+                           margin-top: 10%;
+                           width:", sizes, "px;
+                           height:", sizes, "px")
+  labelAdditions <- paste0("<div style='display: inline-block;
+                           height: ", sizes,"px;
+                           line-height: ", sizes, "px;
+                           font-size: 15px;
+                           margin-top: 10%;
+                           margin-left: 25px;
+                           margin-right: 4px;
+                           '>", makeup::makeup_num(cuts), "</div>")
+
+  return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
+                   opacity = opacity, title = title, na.label = na.label,
+                   position = position))
+}
+
+
 #'
 lflt_legend_format <- function (prefix = "",
                                 suffix = "",
@@ -241,6 +268,7 @@ lflt_basic_bubbles <- function(l) {
 
     radius <- 0
     color <- l$theme$palette_colors[1]
+    legend_color <- color
 
     if (is(l$d$c, "numeric")){
       radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
@@ -252,8 +280,11 @@ lflt_basic_bubbles <- function(l) {
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
       color <- pal(l$d@data[["b"]])
+      legend_color <- "#505050"
+      cuts <- create_legend_cuts(l$d$c)
     } else if (is(l$d$b, "numeric")){
       radius <- scales::rescale(l$d$b, to = c(l$min_size, l$max_size))
+      cuts <- create_legend_cuts(l$d$b)
     } else if (is(l$d$b, "character")){
       radius <- ifelse(!is.na(l$d$b), 5, 0)
       opts_pal <- list(color_scale = l$color_scale,
@@ -279,18 +310,30 @@ lflt_basic_bubbles <- function(l) {
         layerId = ~a
       )
 
-  if (is(l$d$b, "character") & l$theme$legend_show) {
-    lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
-                           position = l$theme$legend_position,
-                           na.label = l$na_label,
-                           title = l$legend_title,
-                           labFormat = lflt_legend_format(
-                             sample =l$format_num, locale = l$locale,
-                             prefix = l$prefix, suffix = l$suffix,
-                             between = paste0(l$suffix, " - ", l$prefix),
-                           ))
-    }
-  }
+    if (l$theme$legend_show){
+
+      if (is(l$d$b, "numeric") | is(l$d$c, "numeric")){
+        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
+                                         labels = cuts,
+                                         color = legend_color,
+                                         opacity = 1,
+                                         position = l$theme$legend_position,
+                                         na.label = l$na_label,
+                                         title = l$legend_title)
+      }
+
+      if (is(l$d$b, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+                               position = "bottomright",
+                               na.label = l$na_label,
+                               title = l$legend_title,
+                               labFormat = lflt_legend_format(
+                                 sample =l$format_num, locale = l$locale,
+                                 prefix = l$prefix, suffix = l$suffix,
+                                 between = paste0(l$suffix, " - ", l$prefix),
+                               ))
+      }
+  }}
 
   lf
 }
