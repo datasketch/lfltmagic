@@ -45,10 +45,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       tooltips <- d_agg %>%
         mutate(html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "</span>")) %>%
         group_by(a) %>%
-        summarise(d = ifelse(n()>1,
+        summarise(tooltip = ifelse(n()>1,
                              paste0("<strong>", nms[[2]], ":</strong> ", paste0(b, collapse = "/"), "</span>"),
                              html_row_unique)) %>%
-        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", d))
+        mutate(tooltip = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", tooltip))
 
       d <- d_agg %>%
         dplyr::filter(c == max(c)) %>%
@@ -90,8 +90,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         mutate(html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "<br/><strong>", nms[[3]], ":</strong> ", c),
                html_row = paste0("<strong>", b, ":</strong> ", c)) %>%
         group_by(a) %>%
-        summarise(d = ifelse(n()>1, paste0(html_row, collapse = "<br/>"), html_row_unique)) %>%
-        mutate(d = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", d, "</span>"))
+        summarise(tooltip = ifelse(n()>1, paste0(html_row, collapse = "<br/>"), html_row_unique)) %>%
+        mutate(tooltip = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", tooltip, "</span>"))
 
       d <- d_agg %>%
         dplyr::group_by(a) %>%
@@ -109,12 +109,33 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
 
     if (frtype_d %in% c("Gln-Glt-Cat-Num")) {
-      d <- summarizeData(d, opts$summarize$agg, to_agg = d, a, b, c) %>%
-        drop_na(a, b) %>%
+      d_agg <- summarizeData(d, opts$summarize$agg, to_agg = d, a, b, c) %>%
+        drop_na(a, b)
+
+      tooltips <- d_agg %>%
+        mutate(d = makeup::makeup_num(d),
+               html_row_unique = paste0("<strong>", nms[[3]], ":</strong> ", c, "<br/><strong>", nms[[4]], ":</strong> ", d),
+               html_row = paste0("<strong>", c, ":</strong> ", d)) %>%
+        group_by(a, b) %>%
+        summarise(tooltip = ifelse(n()>1, paste0(html_row, collapse = "<br/>"), html_row_unique)) %>%
+        mutate(tooltip = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",
+                                paste0(opts$prefix,makeup::makeup_num(v = a,sample="1,500.00"), opts$suffix), "<br/>
+                          <strong>", nms[[2]], ":</strong> ",
+                                paste0(opts$prefix,makeup::makeup_num(v = b,sample="1,500.00"), opts$suffix), "<br/>",
+                          tooltip, "</span>"))
+
+      d <- d_agg %>%
         dplyr::group_by(a, b) %>%
         dplyr::filter(d == max(d)) %>%
         dplyr::mutate(e = n(), d = ifelse(e == 1, d, "tie")) %>%
-        dplyr::distinct(a, b, c, d)
+        dplyr::distinct(a, b, c, d) %>%
+        left_join(tooltips, by = c("a", "b"))
+
+      if(nrow(d) < nrow(d_agg)){
+        warning("Multiple categorical classes found for at least one geography.
+                Geographies are colored based on majority class and all counts are displayed in tooltips.
+                Potential ties are indicated by new category 'tie'.")
+      }
     }
 
     if (frtype_d %in% c("Gln-Glt", "Glt-Gln", "Num-Num")) {
@@ -150,10 +171,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
     topoInfo@data <- lflt_format(topoInfo@data, dic, nms, opts$style)
 
-    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num","Gnm-Cat", "Gcd-Cat")) {
+    if (frtype_d %in% c("Gcd-Cat-Num", "Gnm-Cat-Num","Gnm-Cat", "Gcd-Cat", "Gln-Glt-Cat-Num")) {
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a), glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>%
-                                 lapply(htmltools::HTML), d %>% lapply(htmltools::HTML))
+                                 lapply(htmltools::HTML), tooltip %>% lapply(htmltools::HTML))
         )
     } else {
       topoInfo@data <- topoInfo@data %>%
