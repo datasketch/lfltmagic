@@ -137,7 +137,12 @@ lflt_basic_choropleth <- function(l) {
                  opacity = 1,
                  label = ~name,
                  color = l$border_color,
-                 fillColor = color_map)
+                 fillColor = color_map,
+                 highlight = highlightOptions(
+                   color= 'white',
+                   opacity = 0.8,
+                   weight= 3,
+                   bringToFront = TRUE))
 
   if (!is.null(l$data)) {
     if(sum(is.na(l$d@data$b)) == nrow(l$d@data)) {
@@ -172,7 +177,12 @@ lflt_basic_choropleth <- function(l) {
                    color = l$border_color,
                    fillColor = color_map,
                    layerId = ~a,
-                   label = ~labels
+                   label = ~labels,
+                   highlight = highlightOptions(
+                     color= 'white',
+                     opacity = 0.8,
+                     weight= 3,
+                     bringToFront = TRUE)
       )
     if (!is.null(l$data) & l$theme$legend_show) {
 
