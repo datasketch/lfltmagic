@@ -87,7 +87,7 @@ lflt_legend_bubbles <- function(map, colors, labels, sizes,
                            margin-top: 10%;
                            margin-left: 25px;
                            margin-right: 4px;
-                           '>", makeup::makeup_num(cuts), "</div>")
+                           '>", makeup::makeup_num(labels), "</div>")
 
   return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
                    opacity = opacity, title = title, na.label = na.label,
