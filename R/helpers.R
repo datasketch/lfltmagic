@@ -206,7 +206,11 @@ lflt_basic_points <- function(l) {
 
   if (!is.null(l$data)) {
 
-    if (is(l$d$c, "character")){
+    radius <- 0
+    color <- l$theme$palette_colors[1]
+    legend_color <- color
+
+    if (is(l$d$d, "numeric")){
       radius <- scales::rescale(l$d$d, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$theme$palette_colors,
@@ -216,9 +220,21 @@ lflt_basic_points <- function(l) {
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
       color <- pal(l$d@data[["c"]])
-    } else {
+      legend_color <- "#505050"
+      cuts <- create_legend_cuts(l$d$d)
+    } else if (is(l$d$c, "numeric")){
       radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
-      color <- l$theme$palette_colors[1]
+      cuts <- create_legend_cuts(l$d$c)
+    } else if (is(l$d$c, "character")){
+      radius <- ifelse(!is.na(l$d$c), 5, 0)
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["c"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["c"]])
     }
 
     lf <- leaflet(l$d,
@@ -239,17 +255,32 @@ lflt_basic_points <- function(l) {
         layerId = ~a
       )
 
-    if (is(l$d$c, "character") & l$theme$legend_show) {
-      lf <- lf %>% addLegend(pal = pal, values = ~c, opacity = 1,
-                             position = l$theme$legend_position,
-                             na.label = l$na_label,
-                             title = l$legend_title,
-                             labFormat = lflt_legend_format(
-                               sample =l$format_num, locale = l$locale,
-                               prefix = l$prefix, suffix = l$suffix,
-                               between = paste0(l$suffix, " - ", l$prefix),
-                             ))
+
+    if (l$theme$legend_show){
+
+      if (is(l$d$c, "numeric") | is(l$d$d, "numeric")){
+        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
+                                         labels = cuts,
+                                         color = legend_color,
+                                         opacity = 1,
+                                         position = l$theme$legend_position,
+                                         na.label = l$na_label,
+                                         title = l$legend_title)
+      }
+
+      if (is(l$d$c, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~c, opacity = 1,
+                               position = l$theme$legend_position,
+                               na.label = l$na_label,
+                               title = l$legend_title,
+                               labFormat = lflt_legend_format(
+                                 sample =l$format_num, locale = l$locale,
+                                 prefix = l$prefix, suffix = l$suffix,
+                                 between = paste0(l$suffix, " - ", l$prefix),
+                               ))
+      }
     }
+
 
     }
 
@@ -331,7 +362,7 @@ lflt_basic_bubbles <- function(l) {
 
       if (is(l$d$b, "character")) {
         lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
-                               position = "bottomright",
+                               position = l$theme$legend_position,
                                na.label = l$na_label,
                                title = l$legend_title,
                                labFormat = lflt_legend_format(
