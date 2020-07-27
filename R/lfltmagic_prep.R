@@ -87,7 +87,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d_agg <- summarizeData(d, opts$summarize$agg, to_agg = c, a, b) %>% mutate(a = na_if(a, "-99")) %>% drop_na(a)
 
       tooltips <- d_agg %>%
-        mutate(html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "<br/><strong>", nms[[3]], ":</strong> ", c),
+        mutate(c = makeup::makeup_num(c),
+               html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "<br/><strong>", nms[[3]], ":</strong> ", c),
                html_row = paste0("<strong>", b, ":</strong> ", c)) %>%
         group_by(a) %>%
         summarise(tooltip = ifelse(n()>1, paste0(html_row, collapse = "<br/>"), html_row_unique)) %>%
