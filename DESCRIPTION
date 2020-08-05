@@ -17,7 +17,8 @@ Depends:
     d3.format,
     dsvizopts,
     leaflet.extras,
-    htmltools
+    htmltools,
+    rgdal
 License: MIT
 LazyData: true
 RoxygenNote: 7.1.1
