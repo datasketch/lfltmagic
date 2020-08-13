@@ -345,11 +345,16 @@ lflt_basic_bubbles <- function(l) {
       color <- pal(l$d@data[["b"]])
     }
 
+    lon <- l$d$lon
+    lat <- l$d$lat
+
+    lon[is.na(radius)]=NA
+    lat[is.na(radius)]=NA
 
     lf <- lf %>%
       addCircleMarkers(
-        lng = ~lon,
-        lat = ~lat,
+        lng = lon,
+        lat = lat,
         radius = radius,
         color = color,
         stroke = l$map_stroke,
