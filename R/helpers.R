@@ -73,7 +73,7 @@ lflt_legend_bubbles <- function(map, colors, labels, sizes,
                                 title, na.label, position, opacity){
   colorAdditions <- paste0(colors, ";
                            position: absolute;
-                           right: 50px;
+                           right: 55px;
                            border-radius: 50%;
                            margin-right: 6px;
                            margin-left: 0px;
@@ -85,7 +85,7 @@ lflt_legend_bubbles <- function(map, colors, labels, sizes,
                            line-height: ", sizes, "px;
                            font-size: 15px;
                            margin-top: 10%;
-                           margin-left: 25px;
+                           margin-left: 30px;
                            margin-right: 4px;
                            '>", makeup::makeup_num(labels), "</div>")
 
@@ -345,11 +345,16 @@ lflt_basic_bubbles <- function(l) {
       color <- pal(l$d@data[["b"]])
     }
 
+    lon <- l$d$lon
+    lat <- l$d$lat
+
+    lon[is.na(radius)]=NA
+    lat[is.na(radius)]=NA
 
     lf <- lf %>%
       addCircleMarkers(
-        lng = ~lon,
-        lat = ~lat,
+        lng = lon,
+        lat = lat,
         radius = radius,
         color = color,
         stroke = l$map_stroke,
