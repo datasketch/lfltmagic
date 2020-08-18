@@ -72,22 +72,10 @@ lflt_format <- function(d, dic, nms, opts) {
 lflt_legend_bubbles <- function(map, colors, labels, sizes,
                                 title, na.label, position, opacity){
   colorAdditions <- paste0(colors, ";
-                           position: absolute;
-                           right: 55px;
-                           border-radius: 50%;
-                           margin-right: 6px;
-                           margin-left: 0px;
-                           margin-top: 10%;
-                           width:", sizes, "px;
-                           height:", sizes, "px")
-  labelAdditions <- paste0("<div style='display: inline-block;
-                           height: ", sizes,"px;
-                           line-height: ", sizes, "px;
-                           font-size: 15px;
-                           margin-top: 10%;
-                           margin-left: 30px;
-                           margin-right: 4px;
-                           '>", makeup::makeup_num(labels), "</div>")
+                           border-radius: 50%;  width:", sizes, "px; height:", sizes, "px;")
+  labelAdditions <- paste0("<div style='display: inline-block; height: ",
+                           max(sizes), "px; margin-bottom: 5px; line-height: ", max(sizes), "px; font-size: 15px; '>",
+                           makeup::makeup_num(labels), "</div>")
 
   return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
                    opacity = opacity, title = title, na.label = na.label,
