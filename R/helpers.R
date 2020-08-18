@@ -450,8 +450,9 @@ geoType <- function(data, map_name) {
   vs <- NULL
   values <- intersect(d[["a"]], centroides[["id"]])
 
-  if (identical(values, character(0))) {
+  if (identical(values, character(0))|identical(values, numeric(0))) {
     values <- intersect(d[["a"]], centroides[["name"]])
+
     if(!identical(values, character())) vs <- "Gnm"
   } else {
     vs <- "Gcd"
@@ -466,7 +467,7 @@ fakeData <- function(map_name = NULL, ...) {
   if (is.null(map_name)) return()
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
-  d <- data.frame(name =sample(centroides$name, 11), fake_value = rnorm(11, 33, 333))
+  d <- data.frame(name =sample(centroides$name, nrow(centroides)), fake_value = rnorm( nrow(centroides), 33, 333))
   d
 }
 
