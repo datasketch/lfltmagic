@@ -1,6 +1,6 @@
 #' Legend by palette type
 lflt_palette <- function(opts) {
-  if (opts$color_scale == "Category") {
+  if (opts$color_scale %in% c("Category", "Custom")) {
     color_mapping <- "colorFactor"
     # l <- list(levels = opts$levels,
     #           ordered = opts$ordered)
@@ -68,6 +68,21 @@ lflt_format <- function(d, dic, nms, opts) {
   d
 }
 
+
+lflt_legend_bubbles <- function(map, colors, labels, sizes,
+                                title, na.label, position, opacity){
+  colorAdditions <- paste0(colors, ";
+                           border-radius: 50%;  width:", sizes, "px; height:", sizes, "px;")
+  labelAdditions <- paste0("<div style='display: inline-block; height: ",
+                           max(sizes), "px; margin-bottom: 5px; line-height: ", max(sizes), "px; font-size: 15px; '>",
+                           makeup::makeup_num(labels), "</div>")
+
+  return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
+                   opacity = opacity, title = title, na.label = na.label,
+                   position = position))
+}
+
+
 #'
 lflt_legend_format <- function (prefix = "",
                                 suffix = "",
@@ -110,23 +125,34 @@ lflt_basic_choropleth <- function(l) {
                  opacity = 1,
                  label = ~name,
                  color = l$border_color,
-                 fillColor = color_map)
+                 fillColor = color_map,
+                 highlight = highlightOptions(
+                   color= 'white',
+                   opacity = 0.8,
+                   weight= 3,
+                   bringToFront = TRUE))
 
   if (!is.null(l$data)) {
     if(sum(is.na(l$d@data$b)) == nrow(l$d@data)) {
       lf <- lf
     } else {
-    opts_pal <- list(color_scale = l$color_scale,
-                     palette = l$theme$palette_colors,
-                     na_color = l$theme$na_color,
-                     domain = l$d@data[["b"]],
-                     n_bins = l$n_bins,
-                     n_quantile = l$n_quantile)
+      domain <- l$d@data[["b"]]
+      if(l$color_scale == "Custom"){
+        intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
+        domain <- intervals
+      }
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = domain,
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+
     pal <- lflt_palette(opts_pal)
-    color_map <- pal(l$d@data[["b"]])
+    color_map <- pal(domain)
 
     fill_opacity <- l$theme$topo_fill_opacity
-    if (is(l$d$b, "character")){
+    if (is(l$d$c, "numeric")){
       fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
     }
 
@@ -139,10 +165,16 @@ lflt_basic_choropleth <- function(l) {
                    color = l$border_color,
                    fillColor = color_map,
                    layerId = ~a,
-                   label = ~labels
+                   label = ~labels,
+                   highlight = highlightOptions(
+                     color= 'white',
+                     opacity = 0.8,
+                     weight= 3,
+                     bringToFront = TRUE)
       )
     if (!is.null(l$data) & l$theme$legend_show) {
-      lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+
+      lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
                              position = l$theme$legend_position,
                              na.label = l$na_label,
                              title = l$legend_title,
@@ -169,7 +201,40 @@ lflt_basic_points <- function(l) {
                  label = ~labels,
                  color = l$border_color,
                  fillColor = color_map)
+
   if (!is.null(l$data)) {
+
+    radius <- 0
+    color <- l$theme$palette_colors[1]
+    legend_color <- color
+
+    if (is(l$d$d, "numeric")){
+      radius <- scales::rescale(l$d$d, to = c(l$min_size, l$max_size))
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["c"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["c"]])
+      legend_color <- "#505050"
+      cuts <- create_legend_cuts(l$d$d)
+    } else if (is(l$d$c, "numeric")){
+      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+      cuts <- create_legend_cuts(l$d$c)
+    } else if (is(l$d$c, "character")){
+      radius <- ifelse(!is.na(l$d$c), 5, 0)
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["c"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["c"]])
+    }
+
     lf <- leaflet(l$d,
                   option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
       addPolygons( weight = l$theme$border_weight,
@@ -180,13 +245,42 @@ lflt_basic_points <- function(l) {
       addCircleMarkers(
         lng = ~a,
         lat = ~b,
-        radius = ~scales::rescale(c, to = c(l$min_size, l$max_size)),
-        color = l$theme$palette_colors[1],
+        radius = radius,
+        color = color,
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
         layerId = ~a
-      ) }
+      )
+
+
+    if (l$theme$legend_show){
+
+      if (is(l$d$c, "numeric") | is(l$d$d, "numeric")){
+        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
+                                         labels = cuts,
+                                         color = legend_color,
+                                         opacity = 1,
+                                         position = l$theme$legend_position,
+                                         na.label = l$na_label,
+                                         title = l$legend_title)
+      }
+
+      if (is(l$d$c, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~c, opacity = 1,
+                               position = l$theme$legend_position,
+                               na.label = l$na_label,
+                               title = l$legend_title,
+                               labFormat = lflt_legend_format(
+                                 sample =l$format_num, locale = l$locale,
+                                 prefix = l$prefix, suffix = l$suffix,
+                                 between = paste0(l$suffix, " - ", l$prefix),
+                               ))
+      }
+    }
+
+
+    }
 
   lf
 }
@@ -208,7 +302,11 @@ lflt_basic_bubbles <- function(l) {
                  fillColor = color_map)
   if (!is.null(l$data)) {
 
-    if (is(l$d$b, "character")){
+    radius <- 0
+    color <- l$theme$palette_colors[1]
+    legend_color <- color
+
+    if (is(l$d$c, "numeric")){
       radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$theme$palette_colors,
@@ -218,16 +316,33 @@ lflt_basic_bubbles <- function(l) {
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
       color <- pal(l$d@data[["b"]])
-    } else {
+      legend_color <- "#505050"
+      cuts <- create_legend_cuts(l$d$c)
+    } else if (is(l$d$b, "numeric")){
       radius <- scales::rescale(l$d$b, to = c(l$min_size, l$max_size))
-      color <- l$theme$palette_colors[1]
+      cuts <- create_legend_cuts(l$d$b)
+    } else if (is(l$d$b, "character")){
+      radius <- ifelse(!is.na(l$d$b), 5, 0)
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$theme$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$d@data[["b"]],
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$d@data[["b"]])
     }
 
+    lon <- l$d$lon
+    lat <- l$d$lat
+
+    lon[is.na(radius)]=NA
+    lat[is.na(radius)]=NA
 
     lf <- lf %>%
       addCircleMarkers(
-        lng = ~lon,
-        lat = ~lat,
+        lng = lon,
+        lat = lat,
         radius = radius,
         color = color,
         stroke = l$map_stroke,
@@ -235,19 +350,31 @@ lflt_basic_bubbles <- function(l) {
         label = ~labels,
         layerId = ~a
       )
-  }
 
-  if ((!is.null(l$data) & is(l$d$b, "character")) & l$theme$legend_show) {
-    lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
-                           position = l$theme$legend_position,
-                           na.label = l$na_label,
-                           title = l$legend_title,
-                           labFormat = lflt_legend_format(
-                             sample =l$format_num, locale = l$locale,
-                             prefix = l$prefix, suffix = l$suffix,
-                             between = paste0(l$suffix, " - ", l$prefix),
-                           ))
-  }
+    if (l$theme$legend_show){
+
+      if (is(l$d$b, "numeric") | is(l$d$c, "numeric")){
+        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
+                                         labels = cuts,
+                                         color = legend_color,
+                                         opacity = 1,
+                                         position = l$theme$legend_position,
+                                         na.label = l$na_label,
+                                         title = l$legend_title)
+      }
+
+      if (is(l$d$b, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+                               position = l$theme$legend_position,
+                               na.label = l$na_label,
+                               title = l$legend_title,
+                               labFormat = lflt_legend_format(
+                                 sample =l$format_num, locale = l$locale,
+                                 prefix = l$prefix, suffix = l$suffix,
+                                 between = paste0(l$suffix, " - ", l$prefix),
+                               ))
+      }
+  }}
 
   lf
 }
