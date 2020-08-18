@@ -7,6 +7,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   bbox <- topo_bbox(centroides$lon, centroides$lat)
+  color_scale <- opts$extra$map_color_scale
 
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
@@ -145,7 +146,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       d <- d %>% drop_na() }
 
     # define type of color scale
-    color_scale <- opts$extra$map_color_scale
     if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat", "Gln-Glt-Cat", "Gcd-Cat-Num", "Gnm-Cat-Num", "Gln-Glt-Cat-Num")){
       color_scale <- "Category"
     }
