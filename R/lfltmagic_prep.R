@@ -6,7 +6,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
   topoInfo <- topo_info(map_name)
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
-  bbox <- topo_bbox(centroides$lon, centroides$lat)
+  bbox <- topoInfo@bbox
+  if (is.null(bbox)) bbox <- topo_bbox(centroides$lon, centroides$lat)
   color_scale <- opts$extra$map_color_scale
 
   if (is.null(data)) {

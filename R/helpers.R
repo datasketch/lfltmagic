@@ -405,6 +405,7 @@ lflt_background <- function(map, theme) {
 
 #' Set the bounds of map
 lflt_bounds <- function(map, b_box) {
+
   map %>%
     fitBounds(b_box[1], b_box[2], b_box[3], b_box[4])
 }
@@ -450,9 +451,8 @@ geoType <- function(data, map_name) {
   vs <- NULL
   values <- intersect(d[["a"]], centroides[["id"]])
 
-  if (identical(values, character(0))|identical(values, numeric(0))) {
+  if (identical(values, character(0))||identical(values, numeric(0))) {
     values <- intersect(d[["a"]], centroides[["name"]])
-
     if(!identical(values, character())) vs <- "Gnm"
   } else {
     vs <- "Gcd"
