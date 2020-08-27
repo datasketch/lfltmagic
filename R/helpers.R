@@ -467,7 +467,10 @@ fakeData <- function(map_name = NULL, ...) {
   if (is.null(map_name)) return()
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
-  d <- data.frame(name =sample(centroides$name, nrow(centroides)), fake_value = rnorm( nrow(centroides), 33, 333))
+
+  nsample <- nrow(centroides)
+  if (nsample > 30) nsample <- 30
+  d <- data.frame(name = sample(centroides$name, nsample), fake_value = rnorm(nsample, 33, 333))
   d
 }
 
