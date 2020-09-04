@@ -148,43 +148,43 @@ lflt_basic_choropleth <- function(l) {
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
 
-    pal <- lflt_palette(opts_pal)
-    color_map <- pal(domain)
+      pal <- lflt_palette(opts_pal)
+      color_map <- pal(domain)
 
-    fill_opacity <- l$theme$topo_fill_opacity
-    if (is(l$d$c, "numeric")){
-      fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
-    }
+      fill_opacity <- l$theme$topo_fill_opacity
+      if (is(l$d$c, "numeric")){
+        fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
+      }
 
 
-    lf <- leaflet(l$d,
-                  option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-      addPolygons( weight = l$theme$border_weight,
-                   fillOpacity = fill_opacity,
-                   opacity = 1,
-                   color = l$border_color,
-                   fillColor = color_map,
-                   layerId = ~a,
-                   label = ~labels,
-                   highlight = highlightOptions(
-                     color= 'white',
-                     opacity = 0.8,
-                     weight= 3,
-                     bringToFront = TRUE)
-      )
-    if (!is.null(l$data) & l$theme$legend_show) {
+      lf <- leaflet(l$d,
+                    option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
+        addPolygons( weight = l$theme$border_weight,
+                     fillOpacity = fill_opacity,
+                     opacity = 1,
+                     color = l$border_color,
+                     fillColor = color_map,
+                     layerId = ~a,
+                     label = ~labels,
+                     highlight = highlightOptions(
+                       color= 'white',
+                       opacity = 0.8,
+                       weight= 3,
+                       bringToFront = TRUE)
+        )
+      if (!is.null(l$data) & l$theme$legend_show) {
 
-      lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
-                             position = l$theme$legend_position,
-                             na.label = l$na_label,
-                             title = l$legend_title,
-                             labFormat = lflt_legend_format(
-                               sample =l$format_num, locale = l$locale,
-                               prefix = l$prefix, suffix = l$suffix,
-                               between = paste0(l$suffix, " - ", l$prefix),
-                             ))
-    }
-  }}
+        lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
+                               position = l$theme$legend_position,
+                               na.label = l$na_label,
+                               title = l$legend_title,
+                               labFormat = lflt_legend_format(
+                                 sample =l$format_num, locale = l$locale,
+                                 prefix = l$prefix, suffix = l$suffix,
+                                 between = paste0(l$suffix, " - ", l$prefix),
+                               ))
+      }
+    }}
   lf
 }
 
@@ -280,7 +280,7 @@ lflt_basic_points <- function(l) {
     }
 
 
-    }
+  }
 
   lf
 }
@@ -374,7 +374,7 @@ lflt_basic_bubbles <- function(l) {
                                  between = paste0(l$suffix, " - ", l$prefix),
                                ))
       }
-  }}
+    }}
 
   lf
 }
@@ -474,3 +474,48 @@ fakeData <- function(map_name = NULL, ...) {
   d
 }
 
+
+# guess ftypes changed cat by Gnm or Gcd
+#' @export
+guess_ftypes <- function(data, map_name) {
+  if (is.null(map_name))
+    stop("Please type a map name")
+  if (is.null(data)) return()
+
+  data <- fringe(data)
+  d <- data$data
+  dic <- data$dic
+  lfmap <- geodataMeta(map_name)
+  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
+  centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
+
+
+  l_gcd <- map(names(d), function(i){
+    class_var <- data$frtype
+    gcd_in <- sum(centroides$id %in% iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
+    gcd_in > 0
+  })
+  names(l_gcd) <- names(d)
+  this_gcd <- names(which(l_gcd == TRUE))
+
+  if (identical(this_gcd, character())) {
+    l_gnm <- map(names(d), function(i){
+      class_var <- data$frtype
+      gnm_in <- sum(centroides$name %in%  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
+      gnm_in > 0
+    })
+    names(l_gnm) <- names(d)
+    this_gnm <- names(which(l_gnm == TRUE))
+    if (identical(this_gnm, character())) {
+      return()
+    } else {
+      dic$hdType[dic$id %in% this_gnm] <- "Gnm"
+    }
+  } else {
+    dic$hdType[dic$id %in% this_gcd] <- "Gcd"
+  }
+
+  dic$hdType
+
+}

@@ -95,6 +95,7 @@ lflt_bubbles_GnmNum(sample_data("Gnm-Num", 100),
                     background_color = "#000",
                     topo_fill_opacity = 0.2)
 data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000))
+guess_ftypes(data = data, map_name = "col_pacifico")
 lflt_bubbles_GnmNum(data,
                     map_name = "col_pacifico",
                     map_min_size = 5,map_max_size = 30)
