@@ -20,7 +20,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     d <- homodatum::fringe_d(f)
     dic <- homodatum::fringe_dic(f)
     dic$id <- names(nms)
-    frtype_d <- f$frtype
+    true_ctype <- geoType(d, map_name)
+    if (is.null(true_ctype)) true_ctype <- dic$id[1]
+    dic$hdType[dic$id == "a"] <- true_ctype
+    frtype_d <- paste0(dic$hdType, collapse = "-")#f$frtype
+
     d_frtype <- strsplit(frtype_d, split = "-") %>% unlist()
 
 
