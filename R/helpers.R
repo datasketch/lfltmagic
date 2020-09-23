@@ -1,5 +1,6 @@
 #' Legend by palette type
 lflt_palette <- function(opts) {
+  palette <- opts$palette
   if (opts$color_scale %in% c("Category", "Custom")) {
     color_mapping <- "colorFactor"
     # l <- list(levels = opts$levels,
@@ -13,11 +14,12 @@ lflt_palette <- function(opts) {
     l <- list(bins = opts$n_bins,
               pretty = FALSE)
   } else {
+    palette <- opts$sequential
     color_mapping <- "colorNumeric"
     l <- list()
   }
 
-  l$palette <- opts$palette
+  l$palette <- palette
   l$domain <- opts$domain
   l$na.color <- opts$na_color
   do.call(color_mapping, l)
@@ -141,8 +143,12 @@ lflt_basic_choropleth <- function(l) {
         intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
         domain <- intervals
       }
+
+
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$theme$palette_colors,
+                       sequential = l$theme$palette_colors_sequential,
+                       divergent = l$theme$palette_colors_divergent,
                        na_color = l$theme$na_color,
                        domain = domain,
                        n_bins = l$n_bins,
