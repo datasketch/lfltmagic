@@ -11,6 +11,8 @@
 #' @examples
 #' lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", nrow = 10))
 lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
+
+  data[[1]] <- as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id")

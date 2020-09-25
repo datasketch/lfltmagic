@@ -12,7 +12,7 @@ lflt_palette <- function(opts) {
   } else if (opts$color_scale == 'Bins') {
     color_mapping <- "colorBin"
     l <- list(bins = opts$n_bins,
-              pretty = FALSE)
+              pretty = opts$pretty)
   } else {
     palette <- opts$sequential
     color_mapping <- "colorNumeric"
@@ -152,9 +152,11 @@ lflt_basic_choropleth <- function(l) {
                        na_color = l$theme$na_color,
                        domain = domain,
                        n_bins = l$n_bins,
-                       n_quantile = l$n_quantile)
+                       n_quantile = l$n_quantile,
+                       pretty = l$bins_pretty)
 
       pal <- lflt_palette(opts_pal)
+
       color_map <- pal(domain)
 
       fill_opacity <- l$theme$topo_fill_opacity
