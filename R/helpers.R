@@ -484,7 +484,7 @@ guess_ftypes <- function(data, map_name) {
 
   data <- fringe(data)
   d <- data$data
-  dic <- data$dic
+  dic <- homodatum::fringe_dic(data, id_letters = TRUE)
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
@@ -508,7 +508,7 @@ guess_ftypes <- function(data, map_name) {
     names(l_gnm) <- names(d)
     this_gnm <- names(which(l_gnm == TRUE))
     if (identical(this_gnm, character())) {
-      return()
+    dic <- dic
     } else {
       dic$hdType[dic$id %in% this_gnm] <- "Gnm"
     }
@@ -516,6 +516,6 @@ guess_ftypes <- function(data, map_name) {
     dic$hdType[dic$id %in% this_gcd] <- "Gcd"
   }
 
-  dic$hdType
+  dic
 
 }

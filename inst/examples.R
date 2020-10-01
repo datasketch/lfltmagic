@@ -63,6 +63,8 @@ lflt_choropleth_GnmNum(data,
                        subtitle = "Un subtitulo", map_zoom = F)
 
 lflt_choropleth_Gnm(sample_data('Gnm', 300))
+lflt_choropleth_Gnm(data.frame("d" = c("antioquia", "chocó", "chocó", "cauca")), map_name = "col_departments")
+
 # Gcd Num examples  -------------------------------------------------------
 
 lflt_choropleth_GcdNum()
