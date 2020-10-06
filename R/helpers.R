@@ -478,10 +478,25 @@ fakeData <- function(map_name = NULL, ...) {
 
   nsample <- nrow(centroides)
   if (nsample > 30) nsample <- 30
-  d <- data.frame(name = sample(centroides$name, nsample), fake_value = rnorm(nsample, 33, 333))
+  d <- data.frame(name = sample(centroides$name, nsample), sample_value = rnorm(nsample, 33, 333))
   d
 }
 
+
+# fake data points
+#' @export
+fakepoints <- function(map_name = NULL, ...) {
+  if (is.null(map_name)) return()
+  lfmap <- geodataMeta(map_name)
+  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+
+  nsample <- nrow(centroides)
+  if (nsample > 30) nsample <- 30
+  d <- data.frame(lat = sample(centroides$lat, nsample),
+                  lon = sample(centroides$lon, nsample),
+                  dim_sample = abs(rnorm(nsample, 33, 333)))
+  d
+}
 
 # guess ftypes changed cat by Gnm or Gcd
 #' @export
