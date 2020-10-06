@@ -18,13 +18,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
-    dic <- homodatum::fringe_dic(f)
+    dic <- guess_ftypes(data, map_name = map_name)
     dic$id <- names(nms)
-    true_ctype <- geoType(d, map_name)
-    if (is.null(true_ctype)) true_ctype <- dic$id[1]
-    dic$hdType[dic$id == "a"] <- true_ctype
+    # true_ctype <- geoType(d, map_name)
+    # print(true_ctype )
+    # if (is.null(true_ctype)) true_ctype <- dic$id[1]
+    # dic$hdType[dic$id == "a"] <- true_ctype
     frtype_d <- paste0(dic$hdType, collapse = "-")#f$frtype
-
+    #frtype_d <- gsub("Num-Num", "Glt-")
     d_frtype <- strsplit(frtype_d, split = "-") %>% unlist()
 
 
@@ -35,12 +36,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         dplyr::group_by_all() %>%
         dplyr::summarise(b = n())
 
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'b')
-      dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num)
-    }
+        ind_nms <- length(nms)+1
+        nms[ind_nms] <- 'Count'
+        names(nms) <- c(names(nms)[-ind_nms], 'b')
+        dic_num <- data.frame(id = "b", label = "Count", hdType= as_hdType(x = "Num"))
+        dic <- dic %>% bind_rows(dic_num)
+        }
 
     if (frtype_d %in% c("Gnm-Cat", "Gcd-Cat")) {
       d_agg <- d %>%
@@ -52,8 +53,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         mutate(html_row_unique = paste0("<strong>", nms[[2]], ":</strong> ", b, "</span>")) %>%
         group_by(a) %>%
         summarise(tooltip = ifelse(n()>1,
-                                   paste0("<strong>", nms[[2]], ":</strong> ", paste0(b, collapse = "/"), "</span>"),
-                                   html_row_unique)) %>%
+                             paste0("<strong>", nms[[2]], ":</strong> ", paste0(b, collapse = "/"), "</span>"),
+                             html_row_unique)) %>%
         mutate(tooltip = paste0("<span style='font-size:15px;'><strong>", nms[[1]], ":</strong> ",a, "<br/>", tooltip))
 
       d <- d_agg %>%
@@ -67,8 +68,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         warning("Multiple categorical classes found for at least one geography.
                 Geographies are colored based on majority class and all counts are displayed in tooltips.
                 Potential ties are indicated by new category 'tie'.")
+        }
       }
-    }
 
     if (frtype_d %in% "Gln-Glt-Cat") {
       d <- d %>%
@@ -80,11 +81,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
         dplyr::mutate(e = n(), c = ifelse(e == 1, c, "tie")) %>%
         dplyr::distinct(a, b, c, d)
 
-      ind_nms <- length(nms)+1
-      nms[ind_nms] <- 'Count'
-      names(nms) <- c(names(nms)[-ind_nms], 'd')
-      dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
-      dic <- dic %>% bind_rows(dic_num)}
+        ind_nms <- length(nms)+1
+        nms[ind_nms] <- 'Count'
+        names(nms) <- c(names(nms)[-ind_nms], 'd')
+        dic_num <- data.frame(id = "d", label = "Count", hdType= as_hdType(x = "Num"))
+        dic <- dic %>% bind_rows(dic_num)}
 
     if (frtype_d %in% c("Gcd-Num", "Gnm-Num", "Cat-Num")) {
       d <- summarizeData(d, opts$summarize$agg, to_agg = b, a) %>% drop_na()}
@@ -129,7 +130,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
                                 paste0(opts$prefix,makeup::makeup_num(v = a,sample="1,500.00"), opts$suffix), "<br/>
                           <strong>", nms[[2]], ":</strong> ",
                                 paste0(opts$prefix,makeup::makeup_num(v = b,sample="1,500.00"), opts$suffix), "<br/>",
-                                tooltip, "</span>"))
+                          tooltip, "</span>"))
 
       d <- d_agg %>%
         dplyr::group_by(a, b) %>%
@@ -218,7 +219,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     border_color = opts$theme$border_color,
     n_quantile = opts$extra$map_quantile,
     n_bins = opts$extra$map_bins,
-    bins_pretty = opts$extra$map_bins_pretty,
     cutoff_points = opts$extra$map_cutoff_points,
     na_label = opts$preprocess$na_label,
     suffix = opts$style$suffix,

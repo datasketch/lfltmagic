@@ -498,10 +498,10 @@ guess_ftypes <- function(data, map_name) {
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
   centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
 
-
   l_gcd <- map(names(d), function(i){
     class_var <- data$frtype
-    gcd_in <- sum(centroides$id %in% iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
+    d[[i]] <- ifelse(is.numeric(d[[i]]), d[[i]],  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
+    gcd_in <- sum(centroides$id %in% d[[i]])
     gcd_in > 0
   })
   names(l_gcd) <- names(d)
@@ -510,6 +510,7 @@ guess_ftypes <- function(data, map_name) {
   if (identical(this_gcd, character())) {
     l_gnm <- map(names(d), function(i){
       class_var <- data$frtype
+      d[[i]] <- ifelse(is.numeric(d[[i]]), d[[i]],  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
       gnm_in <- sum(centroides$name %in%  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
       gnm_in > 0
     })
