@@ -501,6 +501,7 @@ fakepoints <- function(map_name = NULL, ...) {
 # guess ftypes changed cat by Gnm or Gcd
 #' @export
 guess_ftypes <- function(data, map_name) {
+  #data <- sample_data("Glt-Gln-Num-Cat-Num-Num-Cat")
   if (is.null(map_name))
     stop("Please type a map name")
   if (is.null(data)) return()
@@ -512,6 +513,8 @@ guess_ftypes <- function(data, map_name) {
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
   centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
+
+
 
   l_gcd <- map(names(d), function(i){
     class_var <- data$frtype
@@ -540,6 +543,59 @@ guess_ftypes <- function(data, map_name) {
     dic$hdType[dic$id %in% this_gcd] <- "Gcd"
   }
 
+
   dic
 
+}
+
+
+#' Test posibble coords
+#' @export
+
+guess_coords <- function(data, map_name) {
+
+  dic <- guess_ftypes(data, map_name)
+  data <- fringe(data)
+  d <- data$data
+  lfmap <- geodataMeta(map_name)
+  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+
+  if ("Num" %in% dic$hdType) {
+    d_num <- d[grep("Num", dic$hdType)]
+    min_lat <- min(centroides$lat) - 10
+    max_lat <- max(centroides$lat) + 10
+
+    l_glt <- map(names(d_num), function(i) {
+      min_d <- min(d_num[[i]], na.rm = T)
+      max_d <- max(d_num[[i]], na.rm = T)
+      if (min_d >= min_lat && max_d <= max_lat) {
+        i
+      } else {
+        return()
+      }
+    }) %>% unlist()
+
+    dic$hdType[dic$id == l_glt[1]] <- "Glt"
+
+    if ("Num" %in% dic$hdType) {
+      d_num <- d[grep("Num", dic$hdType)]
+      min_lon <- min(centroides$lon) - 10
+      max_lon <- max(centroides$lon) + 10
+
+      l_gln <- map(names(d_num), function(i) {
+        min_d <- min(d_num[[i]], na.rm = T)
+        max_d <- max(d_num[[i]], na.rm = T)
+        if (min_d >= min_lon && max_d <= max_lon) {
+          i
+        } else {
+          return()
+        }
+      }) %>% unlist()
+
+      dic$hdType[dic$id == l_gln[1]] <- "Gln"
+    }
+
+  }
+
+  dic
 }

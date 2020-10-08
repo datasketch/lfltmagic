@@ -3,6 +3,7 @@
 export(fakeData)
 export(fakepoints)
 export(geoType)
+export(guess_coords)
 export(guess_ftypes)
 export(lflt_bubbles_Gcd)
 export(lflt_bubbles_GcdCat)
