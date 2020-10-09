@@ -16,6 +16,7 @@ Depends:
     leaflet,
     d3.format,
     dsvizopts,
+    makeup,
     leaflet.extras,
     htmltools,
     rgdal

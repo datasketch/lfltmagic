@@ -23,6 +23,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     d <- homodatum::fringe_d(f)
     dic <- guess_coords(data, map_name = map_name) #un voto de fe al "adivinador"
     frtype_d <- paste0(dic$hdType, collapse = "-")
+    var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
+    var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
     if (grepl("Pct", frtype_d)) {
       dic$hdType[dic$hdType == "Pct"] <- "Num"
@@ -55,6 +57,31 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       nms[3] <- opts$summarize$agg_text %||% "Count"
       names(nms) <- c("a", "b", "c")
     }
+
+
+    # category, geocode, geoname formtat
+
+
+    if (!identical(var_cats, integer())) {
+      var_cats <- dic$id_letters[var_cats]
+      l_cats <- map(var_cats, function(f_cats){
+        d[[paste0(f_cats, "_label")]] <<- makeup_chr(d[[f_cats]], opts$style$format_sample_cat)
+      })}
+
+
+    # numeric format
+
+    if (!identical(var_nums, integer())) {
+      var_nums <- dic$id_letters[var_nums]
+      print(var_nums)
+      l_nums <- map(var_nums, function(f_nums){
+        d[[paste0(f_nums, "_label")]] <<- makeup_num(d[[f_nums]], sample = opts$style$format_sample_num)
+      })}
+
+
+
+
+
 
 
 

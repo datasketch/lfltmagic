@@ -26,7 +26,7 @@ lflt_palette <- function(opts) {
 }
 
 #' labels
-lflt_tooltip <- function(nms, tooltip, style) {
+lflt_tooltip <- function(nms, tooltip) {
   if (is.null(nms)) stop("Enter names")
   nms_names <- names(nms)
   if (is.null(tooltip) | tooltip == "") {
