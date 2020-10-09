@@ -16,15 +16,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
   } else {
 
     # data <- data.frame(lat=c(-74), lon = c(-3))
-    #data <- sample_data("Cat-Cat-Num-Num", 1000)
+    #data <- sample_data("Gnm-Cat-Num-Num-Gcd", 1000)
     map_name <- "world_countries"
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
     dic <- guess_coords(data, map_name = map_name) #un voto de fe al "adivinador"
     frtype_d <- paste0(dic$hdType, collapse = "-")
-    var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
-    var_nums <- grep("Num|Glt|Gln", dic$hdType)
+
 
     if (grepl("Pct", frtype_d)) {
       dic$hdType[dic$hdType == "Pct"] <- "Num"
@@ -44,6 +43,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       frtype_d <- paste0(frtype_d, "-Num")
       nms[2] <- opts$summarize$agg_text %||% "Count"
       names(nms) <- c("a", "b")
+      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "b")
+      dic <- dic %>% bind_rows(dic_num)
     }
 
 
@@ -56,8 +57,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       frtype_d <- paste0(frtype_d, "-Num")
       nms[3] <- opts$summarize$agg_text %||% "Count"
       names(nms) <- c("a", "b", "c")
+      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
+      dic <- dic %>% bind_rows(dic_num)
     }
 
+    var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
+    var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
     # category, geocode, geoname formtat
 
@@ -79,7 +84,32 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       })}
 
 
+    if (grepl("Gln|Glt", frtype_d)) {
+      d <- d %>%
+        mutate(labels = glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+    }
 
+
+    if (grepl("Gcd|Gnm", frtype_d)) {
+      centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
+      centroides <- centroides[,c("name_alt","lat", "lon")]
+
+      topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
+      topoInfo@data <- left_join(topoInfo@data, centroides, by = "name_alt")
+
+      d <- d %>%
+        mutate(name_alt = iconv(tolower(a), to = "ASCII//TRANSLIT"))
+
+      topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
+      topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
+
+      topoInfo@data <- topoInfo@data %>%
+        mutate(labels = ifelse(is.na(a),
+                               glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
+                               glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+        )
+
+    }
 
 
 
