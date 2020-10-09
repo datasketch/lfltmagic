@@ -130,6 +130,11 @@ lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"),
                        palette_colors = "#FEAFEA")
 lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num"),
                        map_tiles = "OpenStreetMap")
+data <- sample_data("Gln-Glt-Num")
+names(data)
+lflt_bubbles_GlnGltNum(data,
+                       map_stroke = TRUE,
+                       palette_colors = "#FEAFEA", tooltip="{Lorem (Gln)}")
 
 lflt_bubbles_GlnGlt(sample_data("Gln-Glt"))
 lflt_bubbles_GlnGlt(sample_data("Gln-Glt"), map_radius = 10)

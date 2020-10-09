@@ -492,8 +492,8 @@ fakepoints <- function(map_name = NULL, ...) {
 
   nsample <- nrow(centroides)
   if (nsample > 30) nsample <- 30
-  d <- data.frame(lat = sample(centroides$lat, nsample),
-                  lon = sample(centroides$lon, nsample),
+  d <- data.frame(lon = sample(centroides$lon, nsample),
+                  lat = sample(centroides$lat, nsample),
                   dim_sample = abs(rnorm(nsample, 33, 333)))
   d
 }
