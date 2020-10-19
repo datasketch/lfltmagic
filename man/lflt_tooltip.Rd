@@ -4,7 +4,7 @@
 \alias{lflt_tooltip}
 \title{labels}
 \usage{
-lflt_tooltip(nms, tooltip, style)
+lflt_tooltip(nms, tooltip)
 }
 \description{
 labels

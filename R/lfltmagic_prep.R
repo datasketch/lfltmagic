@@ -23,7 +23,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     d <- homodatum::fringe_d(f)
     dic <- guess_coords(data, map_name = map_name) #un voto de fe al "adivinador"
     frtype_d <- paste0(dic$hdType, collapse = "-")
-
+    if (sum(grepl("Cat", dic$hdType))>1) color_scale <- "Category"
 
     if (grepl("Pct", frtype_d)) {
       dic$hdType[dic$hdType == "Pct"] <- "Num"
@@ -62,9 +62,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
 
     var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
+    print(var_cats)
     var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
     # category, geocode, geoname formtat
+
+
 
 
     if (!identical(var_cats, integer())) {
@@ -112,19 +115,53 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
     }
 
 
-
-
-
-
-
-    print(nms)
     data <- d
   }
+
+
+  title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
+                                ';color:', opts$theme$title_color,
+                                ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
+  subtitle <- tags$div(HTML(paste0("<p style='margin-top:0px;font-family:", opts$theme$text_family,
+                                   ';color:', opts$theme$subtitle_color,
+                                   ';font-size:', opts$theme$subtitle_size,"px;'>", opts$title$subtitle %||% "","</p>")))
+  caption <- tags$div(HTML(paste0("<p style='font-family:", opts$theme$text_family,
+                                  ';color:', opts$theme$caption_color,
+                                  ';font-size:', opts$theme$caption_size,"px;'>", opts$title$caption %||% "","</p>")))
+  legend_title <- HTML(paste0("<p style='font-family:", opts$theme$text_family,
+                              ';color:', opts$theme$legend_color,
+                              ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
+
+
 
   list(
     d = topoInfo,
     data = data,
-    b_box = bbox
+    b_box = bbox,
+    color_scale = color_scale,
+    titles = list(title = title,
+                  subtitle = subtitle,
+                  caption = caption),
+    legend_title = legend_title,
+    border_color = opts$theme$border_color,
+    theme = opts$theme,
+    min_size = opts$extra$map_min_size,
+    max_size = opts$extra$map_max_size,
+    bubble_opacity = opts$extra$bubble_opacity,
+    map_stroke = opts$extra$map_stroke,
+    graticule = list(map_graticule = opts$extra$map_graticule,
+                     map_graticule_color = opts$theme$grid_color,
+                     map_graticule_interval = opts$extra$map_graticule_interval,
+                     map_graticule_weight = opts$theme$grid_size),
+    n_quantile = opts$extra$map_quantile,
+    n_bins = opts$extra$map_bins,
+    cutoff_points = opts$extra$map_cutoff_points,
+    na_label = opts$preprocess$na_label,
+    suffix = opts$style$suffix,
+    prefix = opts$style$prefix,
+    format_num = opts$style$format_num_sample,
+    locale = opts$style$locale,
+    min_zoom = opts$extra$map_min_zoom
   )
 
 
