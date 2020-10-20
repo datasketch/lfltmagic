@@ -15,9 +15,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
       mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
   } else {
 
-    # data <- data.frame(lat=c(-74), lon = c(-3))
-    #data <- sample_data("Gnm-Cat-Num-Num-Gcd", 1000)
-    map_name <- "world_countries"
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
