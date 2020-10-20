@@ -505,7 +505,6 @@ guess_ftypes <- function(data, map_name) {
   if (is.null(map_name))
     stop("Please type a map name")
   if (is.null(data)) return()
-
   data <- fringe(data)
   d <- data$data
   dic <- homodatum::fringe_dic(data, id_letters = TRUE)
@@ -517,19 +516,25 @@ guess_ftypes <- function(data, map_name) {
 
 
   l_gcd <- map(names(d), function(i){
-    class_var <- data$frtype
-    d[[i]] <- ifelse(is.numeric(d[[i]]), d[[i]],  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
-    gcd_in <- sum(centroides$id %in% d[[i]])
-    gcd_in > 0
+      if (is.numeric(d[[i]])){
+        d[[i]] <- d[[i]]
+      } else {
+        d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
+      }
+      gcd_in <- sum(centroides$id %in%  d[[i]])
+      gcd_in > 0
   })
   names(l_gcd) <- names(d)
   this_gcd <- names(which(l_gcd == TRUE))
 
   if (identical(this_gcd, character())) {
     l_gnm <- map(names(d), function(i){
-      class_var <- data$frtype
-      d[[i]] <- ifelse(is.numeric(d[[i]]), d[[i]],  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
-      gnm_in <- sum(centroides$name %in%  iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT"))
+      if (is.numeric(d[[i]])){
+       d[[i]] <- d[[i]]
+      } else {
+        d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
+      }
+      gnm_in <- sum(centroides$name %in%  d[[i]])
       gnm_in > 0
     })
     names(l_gnm) <- names(d)
