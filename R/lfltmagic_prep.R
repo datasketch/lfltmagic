@@ -106,6 +106,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
       topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
       topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
+      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
+
+      if(grepl("\\{name\\}", opts$chart$tooltip)) {
+        topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
+        nm <- names(nms)
+        nms <- c(nms, "name")
+        names(nms) <- c(nm, "name")
+      }
 
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a),
@@ -133,7 +141,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-
+print(topoInfo@data)
   list(
     d = topoInfo,
     data = data,
