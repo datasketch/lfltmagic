@@ -4,7 +4,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
   map_name <- opts$extra$map_name
   label_by <- opts$extra$map_label_by
-  print(label_by)
+
   topoInfo <- topo_info(map_name)
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
@@ -20,7 +20,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
-    dic <- f$dic
+    dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
     dic$hdType[1:length(pre_ftype)] <- pre_ftype
 
@@ -64,13 +64,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       dic <- dic %>% bind_rows(dic_num)
     }
 
+
     var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
-    print(var_cats)
     var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
     # category, geocode, geoname formtat
-
-
 
 
     if (!identical(var_cats, integer())) {
@@ -84,7 +82,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
     if (!identical(var_nums, integer())) {
       var_nums <- dic$id_letters[var_nums]
-      print(var_nums)
+
       l_nums <- map(var_nums, function(f_nums){
         d[[paste0(f_nums, "_label")]] <<- makeup_num(d[[f_nums]], sample = opts$style$format_sample_num)
       })}
@@ -116,7 +114,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         )
 
     }
-  print(d)
+
 
     data <- d
   }
@@ -135,7 +133,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-print(   topoInfo@data )
 
   list(
     d = topoInfo,

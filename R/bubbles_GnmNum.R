@@ -14,7 +14,7 @@ lflt_bubbles_GnmNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
 
-  l <- lfltmagic_prep(data = data, opts = opts)
+  l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
   lf <- lflt_basic_bubbles(l) %>%
           lflt_background(l$theme) %>%
             lflt_bounds(l$b_box) %>%

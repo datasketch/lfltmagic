@@ -12,7 +12,7 @@
 lflt_bubbles_GlnGltNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
-  l <- lfltmagic_prep(data = data, opts = opts)
+  l <- lfltmagic_prep(data = data, opts = opts, ftype="Gln-Glt-Num")
 
   lf <- lflt_basic_points(l) %>%
     lflt_background(l$theme) %>%
