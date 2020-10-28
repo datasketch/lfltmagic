@@ -1,8 +1,10 @@
 
 #' @export
-lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
+lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm-Num", ...) {
 
   map_name <- opts$extra$map_name
+  label_by <- opts$extra$map_label_by
+  print(label_by)
   topoInfo <- topo_info(map_name)
   lfmap <- geodataMeta(map_name)
   centroides <- data_centroid(lfmap$geoname, lfmap$basename)
@@ -12,13 +14,17 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
 
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
-      mutate(labels = glue::glue('<strong>{name}</strong>') %>% lapply(htmltools::HTML))
+      mutate(labels = glue::glue(paste0('<strong>{', label_by, '}</strong>')) %>% lapply(htmltools::HTML))
   } else {
 
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
-    dic <- guess_coords(data, map_name = map_name) #un voto de fe al "adivinador"
+    dic <- f$dic
+    pre_ftype <- strsplit(ftype, "-") %>% unlist()
+    dic$hdType[1:length(pre_ftype)] <- pre_ftype
+
+
     frtype_d <- paste0(dic$hdType, collapse = "-")
     if (sum(grepl("Cat", dic$hdType))>1) color_scale <- "Category"
 
@@ -105,12 +111,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
 
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a),
-                               glue::glue("<span style='font-size:13px;'><strong>{name}</strong></span>") %>% lapply(htmltools::HTML),
+                               glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"}</strong></span>")) %>% lapply(htmltools::HTML),
                                glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
         )
 
     }
-
+  print(d)
 
     data <- d
   }
@@ -129,7 +135,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ...) {
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-
+print(   topoInfo@data )
 
   list(
     d = topoInfo,

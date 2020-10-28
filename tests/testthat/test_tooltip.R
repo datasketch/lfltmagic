@@ -17,4 +17,9 @@ test_that("Tooltips", {
   t_t <- lflt_tooltip(nms = nms, tooltip = "La Categoria {Categories} tiene {Values_uno} y {Values_trhee} mariposas")
   expect_equal(t_t,  "La Categoria {c_label} tiene {d_label} y {f_label} mariposas")
 
+  t_t <- lflt_tooltip(nms = nms, tooltip = "Hola")
+  expect_equal(t_t,  "Hola")
+
+
+
 })

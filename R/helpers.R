@@ -125,7 +125,7 @@ lflt_basic_choropleth <- function(l) {
     addPolygons( weight = l$theme$border_weight,
                  fillOpacity = l$theme$topo_fill_opacity,
                  opacity = 1,
-                 label = ~name,
+                 label = ~labels,
                  color = l$border_color,
                  fillColor = color_map,
                  highlight = highlightOptions(
