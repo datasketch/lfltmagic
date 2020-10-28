@@ -22,7 +22,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     d <- homodatum::fringe_d(f)
     dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
-    dic$hdType[1:length(pre_ftype)] <- pre_ftype
+
+    if (length(dic$hdType) == 1) {
+      dic$hdType <- pre_ftype[1]
+    } else {
+      dic$hdType[1:length(pre_ftype)] <- pre_ftype
+    }
 
 
     frtype_d <- paste0(dic$hdType, collapse = "-")
@@ -98,6 +103,15 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
       centroides <- centroides[,c("name_alt","lat", "lon")]
 
+      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
+      topoInfo@data$id_label <- topoInfo@data$id
+
+      if(grepl("\\{name\\}", opts$chart$tooltip)) {
+        nm <- names(nms)
+        nms <- c(nms, "name")
+        names(nms) <- c(nm, "name")
+      }
+      print(topoInfo@data)
       topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
       topoInfo@data <- left_join(topoInfo@data, centroides, by = "name_alt")
 
@@ -105,19 +119,15 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         mutate(name_alt = iconv(tolower(a), to = "ASCII//TRANSLIT"))
 
       topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
-      topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
-      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
 
-      if(grepl("\\{name\\}", opts$chart$tooltip)) {
-        topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
-        nm <- names(nms)
-        nms <- c(nms, "name")
-        names(nms) <- c(nm, "name")
-      }
+      topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
+
+
+
 
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a),
-                               glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"}</strong></span>")) %>% lapply(htmltools::HTML),
+                               glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
                                glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
         )
 
@@ -141,7 +151,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-print(topoInfo@data)
+#print(topoInfo@data)
   list(
     d = topoInfo,
     data = data,
