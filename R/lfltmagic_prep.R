@@ -101,8 +101,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
     if (grepl("Gcd|Gnm", frtype_d)) {
       centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
-      centroides <- centroides[,c("name_alt","lat", "lon")]
 
+      centroides <- centroides[,c("name_alt","lat", "lon")]
+      print(topoInfo@data)
+      if ("NOMBRE_MPI" %in% names(topoInfo@data)) {
+        topoInfo@data <- topoInfo@data %>% rename(c("name" = "NOMBRE_MPI"))
+      }
       topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
       topoInfo@data$id_label <- topoInfo@data$id
 
@@ -111,7 +115,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         nms <- c(nms, "name")
         names(nms) <- c(nm, "name")
       }
-      print(topoInfo@data)
+
       topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
       topoInfo@data <- left_join(topoInfo@data, centroides, by = "name_alt")
 
@@ -151,7 +155,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-#print(topoInfo@data)
+
   list(
     d = topoInfo,
     data = data,
