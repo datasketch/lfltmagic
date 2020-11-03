@@ -103,7 +103,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
 
       centroides <- centroides[,c("name_alt","lat", "lon")]
-      print(topoInfo@data)
+
       if ("NOMBRE_MPI" %in% names(topoInfo@data)) {
         topoInfo@data <- topoInfo@data %>% rename(c("name" = "NOMBRE_MPI"))
       }
