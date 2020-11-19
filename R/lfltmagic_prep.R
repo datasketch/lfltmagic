@@ -31,7 +31,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
     frtype_d <- paste0(dic$hdType, collapse = "-")
-    if (sum(grepl("Cat", dic$hdType))>1) color_scale <- "Category"
+    if (sum(grepl("Cat", dic$hdType))>0) color_scale <- "Category"
 
     if (grepl("Pct", frtype_d)) {
       dic$hdType[dic$hdType == "Pct"] <- "Num"
