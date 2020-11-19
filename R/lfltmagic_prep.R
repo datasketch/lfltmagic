@@ -69,12 +69,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       dic <- dic %>% bind_rows(dic_num)
     }
 
-
     var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
     var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
     # category, geocode, geoname formtat
-
 
     if (!identical(var_cats, integer())) {
       var_cats <- dic$id_letters[var_cats]
@@ -139,7 +137,38 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     data <- d
   }
 
+  # define color palette based on data type
+  palette_type <-  opts$theme$palette_type
+  var_cat <- "Cat" %in% dic$hdType
+  if(!is.null(palette_type)){
+    if(!palette_type %in% c("categorical", "sequential", "divergent")){
+      warning("Palette type must be one of 'categorical', 'sequential', or 'divergent'; reverting to default.")
+      palette_type <- NULL
+    }
+    if(!var_cat & palette_type == "categorical"){
+      warning("Palette type might not be suitable for data type input.")
+    }
+  } else {
+    if(var_cat){
+      palette_type <- "categorical"
+    } else {
+      palette_type <- "sequential"
+    }
+  }
 
+  palette_colors <-  opts$theme$palette_colors
+  if(is.null(palette_colors)){
+    if(palette_type == "categorical"){
+      palette_colors <- opts$theme$palette_colors_categorical
+    } else if (palette_type == "sequential"){
+      palette_colors <- opts$theme$palette_colors_sequential
+    } else if (palette_type == "divergent"){
+      palette_colors <- opts$theme$palette_colors_divergent
+    }
+  }
+
+
+  # style titles
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
@@ -159,6 +188,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     data = data,
     b_box = bbox,
     color_scale = color_scale,
+    palette_colors = palette_colors,
     titles = list(title = title,
                   subtitle = subtitle,
                   caption = caption),
