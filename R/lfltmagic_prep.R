@@ -107,7 +107,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       if ("NOMBRE_MPI" %in% names(topoInfo@data)) {
         topoInfo@data <- topoInfo@data %>% rename(c("name" = "NOMBRE_MPI"))
       }
-      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_cat_sample)
+      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_sample_cat)
       topoInfo@data$id_label <- topoInfo@data$id
 
       if(grepl("\\{name\\}", opts$chart$tooltip)) {
@@ -155,7 +155,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-
+print(opts$style)
   list(
     d = topoInfo,
     data = data,
@@ -181,7 +181,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     na_label = opts$preprocess$na_label,
     suffix = opts$style$suffix,
     prefix = opts$style$prefix,
-    format_num = opts$style$format_num_sample,
+    format_num = opts$style$format_sample_num,
     locale = opts$style$locale,
     min_zoom = opts$extra$map_min_zoom
   )
