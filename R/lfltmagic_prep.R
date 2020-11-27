@@ -155,7 +155,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
-print(opts$style)
+
   list(
     d = topoInfo,
     data = data,
