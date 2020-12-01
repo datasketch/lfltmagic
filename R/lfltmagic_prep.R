@@ -104,9 +104,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
       centroides <- centroides[,c("name_alt","lat", "lon")]
 
-      if ("NOMBRE_MPI" %in% names(topoInfo@data)) {
-        topoInfo@data <- topoInfo@data %>% rename(c("name" = "NOMBRE_MPI"))
-      }
+
       topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_sample_cat)
       topoInfo@data$id_label <- topoInfo@data$id
 
