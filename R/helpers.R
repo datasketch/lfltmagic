@@ -1,6 +1,5 @@
 #' Legend by palette type
 lflt_palette <- function(opts) {
-  palette <- opts$palette
   if (opts$color_scale %in% c("Category", "Custom")) {
     color_mapping <- "colorFactor"
     # l <- list(levels = opts$levels,
@@ -14,12 +13,11 @@ lflt_palette <- function(opts) {
     l <- list(bins = opts$n_bins,
               pretty = opts$pretty)
   } else {
-    palette <- opts$sequential
     color_mapping <- "colorNumeric"
     l <- list()
   }
 
-  l$palette <- palette
+  l$palette <- opts$palette
   l$domain <- opts$domain
   l$na.color <- opts$na_color
   do.call(color_mapping, l)
@@ -146,9 +144,9 @@ lflt_basic_choropleth <- function(l) {
 
 
       opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$theme$palette_colors,
-                       sequential = l$theme$palette_colors_sequential,
-                       divergent = l$theme$palette_colors_divergent,
+                       palette = l$palette_colors,
+                       # sequential = l$palette_colors_sequential,
+                       # divergent = l$palette_colors_divergent,
                        na_color = l$theme$na_color,
                        domain = domain,
                        n_bins = l$n_bins,
@@ -213,13 +211,13 @@ lflt_basic_points <- function(l) {
   if (!is.null(l$data)) {
 
     radius <- 0
-    color <- l$theme$palette_colors[1]
+    color <- l$palette_colors[1]
     legend_color <- color
 
     if (is(l$d$d, "numeric")){
       radius <- scales::rescale(l$d$d, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$theme$palette_colors,
+                       palette = l$palette_colors,
                        na_color = l$theme$na_color,
                        domain = l$d@data[["c"]],
                        n_bins = l$n_bins,
@@ -234,7 +232,7 @@ lflt_basic_points <- function(l) {
     } else if (is(l$d$c, "character")){
       radius <- ifelse(!is.na(l$d$c), 5, 0)
       opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$theme$palette_colors,
+                       palette = l$palette_colors,
                        na_color = l$theme$na_color,
                        domain = l$d@data[["c"]],
                        n_bins = l$n_bins,
@@ -311,13 +309,13 @@ lflt_basic_bubbles <- function(l) {
   if (!is.null(l$data)) {
 
     radius <- 0
-    color <- l$theme$palette_colors[1]
+    color <- l$palette_colors[1]
     legend_color <- color
 
     if (is(l$d$c, "numeric")){
       radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$theme$palette_colors,
+                       palette = l$palette_colors,
                        na_color = l$theme$na_color,
                        domain = l$d@data[["b"]],
                        n_bins = l$n_bins,
@@ -332,7 +330,7 @@ lflt_basic_bubbles <- function(l) {
     } else if (is(l$d$b, "character")){
       radius <- ifelse(!is.na(l$d$b), 5, 0)
       opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$theme$palette_colors,
+                       palette = l$palette_colors,
                        na_color = l$theme$na_color,
                        domain = l$d@data[["b"]],
                        n_bins = l$n_bins,

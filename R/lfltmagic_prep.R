@@ -11,6 +11,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   bbox <- topoInfo@bbox
   if (is.null(bbox)) bbox <- topo_bbox(centroides$lon, centroides$lat)
   color_scale <- opts$extra$map_color_scale
+  palette_colors <-  opts$theme$palette_colors
+  palette_type <-  opts$theme$palette_type
 
   if (is.null(data)) {
     topoInfo@data <- topoInfo@data %>%
@@ -23,15 +25,33 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
 
-    if (length(dic$hdType) == 1) {
-      dic$hdType <- pre_ftype[1]
+    if(length(pre_ftype) < length(dic$hdType)){
+      if(!all(pre_ftype == dic$hdType[1:length(pre_ftype)])){
+        warning("Input data types differ from expected data types.")
+        dic$hdType[1:length(pre_ftype)] <- pre_ftype
+      }
+    } else if(length(pre_ftype) > length(dic$hdType)){
+      if(!all(pre_ftype[1:length(dic$hdType)] == dic$hdType)){
+        warning("Input data types differ from expected data types.")
+        dic$hdType <- pre_ftype[1:length(dic$hdType)]
+      }
     } else {
-      dic$hdType[1:length(pre_ftype)] <- pre_ftype
+      if(!all(pre_ftype == dic$hdType)){
+        warning("Input data types differ from expected data types.")
+        dic$hdType <- pre_ftype
+      }
     }
+    #
+    #
+    # if (length(dic$hdType) == 1) {
+    #   dic$hdType <- pre_ftype[1]
+    # } else {
+    #   dic$hdType[1:length(pre_ftype)] <- pre_ftype
+    # }
 
 
     frtype_d <- paste0(dic$hdType, collapse = "-")
-    if (sum(grepl("Cat", dic$hdType))>1) color_scale <- "Category"
+    if (sum(grepl("Cat", dic$hdType))>0) color_scale <- "Category"
 
     if (grepl("Pct", frtype_d)) {
       dic$hdType[dic$hdType == "Pct"] <- "Num"
@@ -69,12 +89,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       dic <- dic %>% bind_rows(dic_num)
     }
 
-
     var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
     var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
     # category, geocode, geoname formtat
-
 
     if (!identical(var_cats, integer())) {
       var_cats <- dic$id_letters[var_cats]
@@ -137,9 +155,38 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
     data <- d
+
+
+  # define color palette based on data type
+  var_cat <- "Cat" %in% dic$hdType
+  if(!is.null(palette_type)){
+    if(!palette_type %in% c("categorical", "sequential", "divergent")){
+      warning("Palette type must be one of 'categorical', 'sequential', or 'divergent'; reverting to default.")
+      palette_type <- NULL
+    }
+    if(!var_cat & palette_type == "categorical" | (var_cat & palette_type %in% c("sequential", "divergent"))){
+      warning("Palette type might not be suitable for data type.")
+    }
+  } else {
+    if(var_cat){
+      palette_type <- "categorical"
+    } else {
+      palette_type <- "sequential"
+    }
   }
 
+  if(is.null(palette_colors)){
+    if(palette_type == "categorical"){
+      palette_colors <- opts$theme$palette_colors_categorical
+    } else if (palette_type == "sequential"){
+      palette_colors <- opts$theme$palette_colors_sequential
+    } else if (palette_type == "divergent"){
+      palette_colors <- opts$theme$palette_colors_divergent
+    }
+  }
+  }
 
+  # style titles
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
@@ -159,6 +206,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     data = data,
     b_box = bbox,
     color_scale = color_scale,
+    palette_colors = palette_colors,
     titles = list(title = title,
                   subtitle = subtitle,
                   caption = caption),
