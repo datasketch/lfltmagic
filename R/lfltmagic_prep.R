@@ -75,6 +75,18 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       dic <- dic %>% bind_rows(dic_num)
     }
 
+    if(frtype_d == "Gln-Glt"){
+      d <- d %>%
+        drop_na(a,b) %>%
+        dplyr::group_by_all() %>%
+        dplyr::summarise(c = n())
+      frtype_d <- paste0(frtype_d, "-Num")
+      nms[3] <- opts$summarize$agg_text %||% "Count"
+      names(nms) <- c("a", "b", "c")
+      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
+      dic <- dic %>% bind_rows(dic_num)
+    }
+
 
     if(frtype_d %in% c("Gcd-Cat", "Gnm-Cat")){
       d <- d %>%
@@ -151,6 +163,9 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
         )
 
+    } else if (grepl("Gln|Glt", frtype_d)) {
+      topoInfo@data <- d
+      topoInfo@data$name <- opts$preprocess$na_label
     }
 
 
