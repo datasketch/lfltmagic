@@ -18,6 +18,7 @@ Depends:
     dsvizopts,
     makeup,
     leaflet.extras,
+    leaflet.esri,
     htmltools,
     rgdal
 License: MIT

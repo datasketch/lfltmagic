@@ -395,11 +395,21 @@ url_logo <- function(logo, background_color) {
 
 #' Background and branding Map
 lflt_background <- function(map, theme) {
-
-  if (is.null(theme$map_tiles)) {
+print(theme$map_provider_tile)
+  if (is.null(theme$map_tiles) & theme$map_provider_tile == "leaflet") {
     lf <- map %>% setMapWidgetStyle(list(background = theme$background_color))
   } else {
-    lf <- map %>%  addProviderTiles(theme$map_tiles)
+     if (theme$map_provider_tile == "leaflet") {
+       lf <- map %>%  addProviderTiles(theme$map_tiles)
+     } else {
+       lf <- map %>% leaflet.esri::addEsriBasemapLayer(esriBasemapLayers[[theme$map_tiles_esri]])
+       if (!is.null(theme$map_extra_layout)) {
+         lf <- map %>%
+           addEsriFeatureLayer(
+           url = theme$map_extra_layout,
+           labelProperty = theme$map_name_layout)
+       }
+     }
   }
   if (theme$branding_include) {
     img <- url_logo(logo = theme$logo, background = theme$background_color)

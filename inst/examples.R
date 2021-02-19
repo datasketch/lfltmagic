@@ -16,6 +16,20 @@ lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_tiles = "OpenStreetMap"
 )
 
+
+lflt_choropleth_GnmNum(map_name = "col_departments",
+                       map_tiles = "OpenStreetMap"
+)
+
+lflt_choropleth_GnmNum(map_name = "col_departments",
+                       map_provider_tile = "esri",
+                       map_tiles_esri = "Streets"
+)
+
+lflt_choropleth_GnmNum(map_name = "col_departments",
+                       background_color = "#FECFED"
+)
+
 lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_tiles = "OpenStreetMap",
                        na_color = "#000000",
