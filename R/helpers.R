@@ -404,7 +404,7 @@ print(theme$map_provider_tile)
      } else {
        lf <- map %>% leaflet.esri::addEsriBasemapLayer(esriBasemapLayers[[theme$map_tiles_esri]])
        if (!is.null(theme$map_extra_layout)) {
-         lf <- map %>%
+         lf <- lf %>%
            addEsriFeatureLayer(
            url = theme$map_extra_layout,
            labelProperty = theme$map_name_layout)
