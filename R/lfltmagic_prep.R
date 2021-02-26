@@ -94,11 +94,17 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         drop_na(a) %>%
         dplyr::group_by_all() %>%
         dplyr::summarise(c = n())
-      frtype_d <- paste0(frtype_d, "-Num")
-      nms[3] <- opts$summarize$agg_text %||% "Count"
-      names(nms) <- c("a", "b", "c")
-      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
-      dic <- dic %>% bind_rows(dic_num)
+
+      if(sum(d$c) > nrow(d)){
+        frtype_d <- paste0(frtype_d, "-Num")
+        nms[3] <- opts$summarize$agg_text %||% "Count"
+        names(nms) <- c("a", "b", "c")
+        dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
+        dic <- dic %>% bind_rows(dic_num)
+      } else {
+        d <- d %>% select(-c)
+      }
+
     }
 
     var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
