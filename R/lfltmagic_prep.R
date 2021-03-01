@@ -41,13 +41,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         dic$hdType <- pre_ftype
       }
     }
-    #
-    #
-    # if (length(dic$hdType) == 1) {
-    #   dic$hdType <- pre_ftype[1]
-    # } else {
-    #   dic$hdType[1:length(pre_ftype)] <- pre_ftype
-    # }
 
 
     frtype_d <- paste0(dic$hdType, collapse = "-")
