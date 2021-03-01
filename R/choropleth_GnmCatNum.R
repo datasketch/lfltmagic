@@ -37,4 +37,16 @@ lflt_choropleth_GnmCatNum <- function(data = NULL, ...) {
 #' @export
 #' @examples
 #' lflt_choropleth_GnmCat(sample_data("Gnm-Cat", nrow = 10))
-lflt_choropleth_GnmCat <- lflt_choropleth_GnmCatNum
+lflt_choropleth_GnmCat <- function(data = NULL, ...) {
+  opts <- dsvizopts::merge_dsviz_options(...)
+
+  l <- lfltmagic_prep(data = data, opts = opts, ftype = "Gnm-Cat")
+
+  lf <- lflt_basic_choropleth(l) %>%
+    lflt_background(l$theme) %>%
+    lflt_bounds(l$b_box) %>%
+    lflt_graticule(l$graticule) %>%
+    lflt_titles(l$titles)
+
+  lf
+}
