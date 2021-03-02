@@ -21,6 +21,12 @@ Depends:
     leaflet.esri,
     htmltools,
     rgdal
+Remotes:
+    datasketch/homodatum,
+    datasketch/geodata,
+    datasketch/dsvizopts,
+    datasketch/makeup,
+    dreamRs/d3.format
 License: MIT
 LazyData: true
 RoxygenNote: 7.1.1
