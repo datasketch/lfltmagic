@@ -2,8 +2,7 @@
 lflt_palette <- function(opts) {
   if (opts$color_scale %in% c("Category", "Custom")) {
     color_mapping <- "colorFactor"
-    # l <- list(levels = opts$levels,
-    #           ordered = opts$ordered)
+    # l <- list(levels = opts$levels, ordered = opts$ordered)
     l <- list()
   } else if (opts$color_scale == "Quantile") {
     color_mapping <- "colorQuantile"
@@ -39,7 +38,7 @@ lflt_tooltip <- function(nms, tooltip) {
       tooltip <- tooltip
     } else {
       l <- purrr::map(1:length(points), function(i){
-        true_points <-  paste0("{",names(nms[match(points[i], nms)]),"_label}")
+        true_points <- paste0("{",names(nms[match(points[i], nms)]),"_label}")
         tooltip <<- gsub(paste0("\\{",points[i], "\\}"), true_points, tooltip)
       })[[length(points)]]}
   }
@@ -71,8 +70,7 @@ lflt_format <- function(d, dic, nms, opts) {
 
 lflt_legend_bubbles <- function(map, colors, labels, sizes,
                                 title, na.label, position, opacity){
-  colorAdditions <- paste0(colors, ";
-                           border-radius: 50%;  width:", sizes, "px; height:", sizes, "px;")
+  colorAdditions <- paste0(colors, ";border-radius: 50%; width:", sizes, "px; height:", sizes, "px;")
   labelAdditions <- paste0("<div style='display: inline-block; height: ",
                            max(sizes), "px; margin-bottom: 5px; line-height: ", max(sizes), "px; font-size: 15px; '>",
                            makeup::makeup_num(labels), "</div>")
@@ -395,26 +393,26 @@ url_logo <- function(logo, background_color) {
 
 #' Background and branding Map
 lflt_background <- function(map, theme) {
-print(theme$map_provider_tile)
+  print(theme$map_provider_tile)
   if (is.null(theme$map_tiles) & theme$map_provider_tile == "leaflet") {
     lf <- map %>% setMapWidgetStyle(list(background = theme$background_color))
   } else {
-     if (theme$map_provider_tile == "leaflet") {
-       lf <- map %>%  addProviderTiles(theme$map_tiles)
-     } else {
-       lf <- map %>% leaflet.esri::addEsriBasemapLayer(esriBasemapLayers[[theme$map_tiles_esri]])
-       if (!is.null(theme$map_extra_layout)) {
-         lf <- lf %>%
-           addEsriFeatureLayer(
-           url = theme$map_extra_layout,
-           labelProperty = theme$map_name_layout)
-       }
-     }
+    if (theme$map_provider_tile == "leaflet") {
+      lf <- map %>% addProviderTiles(theme$map_tiles)
+    } else {
+      lf <- map %>% leaflet.esri::addEsriBasemapLayer(esriBasemapLayers[[theme$map_tiles_esri]])
+      if (!is.null(theme$map_extra_layout)) {
+        lf <- lf %>%
+          addEsriFeatureLayer(
+            url = theme$map_extra_layout,
+            labelProperty = theme$map_name_layout)
+      }
+    }
   }
   if (theme$branding_include) {
     img <- url_logo(logo = theme$logo, background = theme$background_color)
     lf <- lf %>%
-      leafem::addLogo(img,  width = theme$logo_width, height = theme$logo_height, position = "bottomright")
+      leafem::addLogo(img, width = theme$logo_width, height = theme$logo_height, position = "bottomright")
   }
   lf
 }
@@ -479,14 +477,18 @@ geoType <- function(data, map_name) {
 
 # fake data
 #' @export
-fakeData <- function(map_name = NULL, ...) {
+fakeData <- function(map_name = NULL, by = "name", ...) {
   if (is.null(map_name)) return()
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
-
+  centroides <- suppressWarnings(geodataMeta(map_name)$codes)
   nsample <- nrow(centroides)
   if (nsample > 30) nsample <- 30
-  d <- data.frame(name = sample(centroides$name, nsample), sample_value = rnorm(nsample, 33, 333))
+  centroides <- centroides[sample(1:nrow(centroides), nsample),]
+  if (by == "name" & "name_addition" %in% names(centroides)) {
+    d <- data.frame(name = centroides[[by]],
+                    name_addition = centroides[["name_addition"]], sample_value = rnorm(nsample, 33, 333))
+  } else {
+    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = rnorm(nsample, 33, 333))
+  }
   d
 }
 
@@ -506,109 +508,41 @@ fakepoints <- function(map_name = NULL, ...) {
   d
 }
 
-# guess ftypes changed cat by Gnm or Gcd
+#
+#' standar dataset
 #' @export
-guess_ftypes <- function(data, map_name) {
-  #data <- sample_data("Glt-Gln-Num-Cat-Num-Num-Cat")
-  if (is.null(map_name))
-    stop("Please type a map name")
-  if (is.null(data)) return()
-  data <- fringe(data)
-  d <- data$data
-  dic <- homodatum::fringe_dic(data, id_letters = TRUE)
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
-  centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
-  centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
-
-
-
-  l_gcd <- map(names(d), function(i){
-      if (is.numeric(d[[i]])){
-        d[[i]] <- d[[i]]
-      } else {
-        d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
-      }
-      gcd_in <- sum(centroides$id %in%  d[[i]])
-      gcd_in > 0
-  })
-  names(l_gcd) <- names(d)
-  this_gcd <- names(which(l_gcd == TRUE))
-
-  if (identical(this_gcd, character())) {
-    l_gnm <- map(names(d), function(i){
-      if (is.numeric(d[[i]])){
-       d[[i]] <- d[[i]]
-      } else {
-        d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
-      }
-      gnm_in <- sum(centroides$name %in%  d[[i]])
-      gnm_in > 0
-    })
-    names(l_gnm) <- names(d)
-    this_gnm <- names(which(l_gnm == TRUE))
-    if (identical(this_gnm, character())) {
-    dic <- dic
-    } else {
-      dic$hdType[dic$id %in% this_gnm] <- "Gnm"
-    }
-  } else {
-    dic$hdType[dic$id %in% this_gcd] <- "Gcd"
-  }
-
-
-  dic
-
+standar_values <- function(data) {
+  l <- map(colnames(data), function(i) iconv(tolower(data[[i]]), to = "ASCII//TRANSLIT"))
+  names(l) <- names(data)
+  l <- l %>% bind_rows()
+  l
 }
 
-
-#' Test posibble coords
+# find geo code or geo name
 #' @export
+find_geoinfo <- function(data, centroides) {
 
-guess_coords <- function(data, map_name) {
 
-  dic <- guess_ftypes(data, map_name)
-  data <- fringe(data)
-  d <- data$data
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  centroides <- centroides %>% select(-lat, -lon)
+  centroides <- standar_values(centroides)
+  dic_info <- data.frame(names_centroides = c("id", "name", "name_addition", "code_addition"),
+                         ftype = c("Gcd", "Gnm", "Gnm", "Gcd"))
 
-  if ("Num" %in% dic$hdType) {
-    d_num <- d[grep("Num", dic$hdType)]
-    min_lat <- min(centroides$lat) - 10
-    max_lat <- max(centroides$lat) + 10
+  info_data <- paste0("^", map(colnames(centroides),
+                               function (i) {unique(centroides[[i]])
+                               }) %>% unlist(), "$", collapse = "|")
 
-    l_glt <- map(names(d_num), function(i) {
-      min_d <- min(d_num[[i]], na.rm = T)
-      max_d <- max(d_num[[i]], na.rm = T)
-      if (min_d >= min_lat && max_d <= max_lat) {
-        i
-      } else {
-        return()
-      }
-    }) %>% unlist()
+  data <- standar_values(data)
 
-    dic$hdType[dic$id == l_glt[1]] <- "Glt"
 
-    if ("Num" %in% dic$hdType) {
-      d_num <- d[grep("Num", dic$hdType)]
-      min_lon <- min(centroides$lon) - 10
-      max_lon <- max(centroides$lon) + 10
-
-      l_gln <- map(names(d_num), function(i) {
-        min_d <- min(d_num[[i]], na.rm = T)
-        max_d <- max(d_num[[i]], na.rm = T)
-        if (min_d >= min_lon && max_d <= max_lon) {
-          i
-        } else {
-          return()
-        }
-      }) %>% unlist()
-
-      dic$hdType[dic$id == l_gln[1]] <- "Gln"
-    }
-
+  l <- sapply(colnames(data), function(x) {
+    search_info <- !identical(grep(info_data, as.matrix(data[,x])), integer(0)) == TRUE
+  })
+  r <- names(l)[l == TRUE]
+  if (identical(r, character(0))) {
+    return() # if is null is not finding consciousness
+  } else{
+    r # return names of date with geo code o geoname
   }
 
-  dic
 }

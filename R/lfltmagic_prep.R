@@ -2,12 +2,37 @@
 #' @export
 lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm-Num", ...) {
 
+  # map_name <- "col_municipalities"
+  # data <- fakeData("col_municipalities")
+  # opts <- dsvizopts::dsviz_defaults()
+  # opts$extra$map_name <- map_name
+  # by_col = "name"
+  # ftype="Gnm-Num"
+
+
   map_name <- opts$extra$map_name
   label_by <- opts$extra$map_label_by
 
-  topoInfo <- topo_info(map_name)
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+
+  centroides <-  suppressWarnings(geodataMeta(map_name)$codes)
+
+  topoInfo <- suppressWarnings(topo_info(map_name))
+  topoInfo@data <- topoInfo@data %>%
+    select(-name) %>%
+    left_join(centroides, by =  "id") %>%
+    mutate(id = as.character(id))
+
+
+  if ("name_addition" %in% names(centroides) & grepl("Gnm", ftype)) {
+    topoInfo@data$name_alt <- paste0(topoInfo@data$name, " - ", topoInfo@data$name_addition)
+  } else {
+    topoInfo@data$name_alt <- topoInfo@data[[by_col]]
+  }
+
+
+  topoInfo@data$name_alt <- iconv(tolower(topoInfo@data$name_alt), to = "ASCII//TRANSLIT")
+  #tjj <- topoInfo@data
+
   bbox <- topoInfo@bbox
   if (is.null(bbox)) bbox <- topo_bbox(centroides$lon, centroides$lat)
   color_scale <- opts$extra$map_color_scale
@@ -18,12 +43,29 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     topoInfo@data <- topoInfo@data %>%
       mutate(labels = glue::glue(paste0('<strong>{', label_by, '}</strong>')) %>% lapply(htmltools::HTML))
   } else {
-
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
     dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
+
+    if (grepl("Gnm|Gcd", ftype)) {
+      have_geocode <- find_geoinfo(d, centroides)
+      if (is.null(have_geocode)) stop("make sure your data has geographic information")
+      if (grepl("Gnm", ftype) & "name_addition" %in% names(centroides)) {
+        d$a <- paste0(d$a, " - ", d$b)
+        d <- d %>% select(-b)
+        dic <- dic %>%  filter(id_letters != "b")
+        dic$id_letters[dic$id_letters == "c"] <- "b"
+        d <- d %>% rename(c("b" = "c"))
+        nms <- nms[c(1,3)]
+        names(nms) <- c("a", "b")
+      }
+    }
+
+
+
+
 
     if(length(pre_ftype) < length(dic$hdType)){
       if(!all(pre_ftype == dic$hdType[1:length(pre_ftype)])){
@@ -55,7 +97,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
 
-    if(frtype_d %in% c("Gcd", "Gnm")){
+    if(!grepl("Num", frtype_d)){
       d <- d %>%
         mutate(a = na_if(a, "-99")) %>%
         drop_na(a) %>%
@@ -129,9 +171,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
     if (grepl("Gcd|Gnm", frtype_d)) {
-      centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
-
-      centroides <- centroides[,c("name_alt","lat", "lon")]
 
 
       topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_sample_cat)
@@ -143,8 +182,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         names(nms) <- c(nm, "name")
       }
 
-      topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
-      topoInfo@data <- left_join(topoInfo@data, centroides, by = "name_alt")
 
       d <- d %>%
         mutate(name_alt = iconv(tolower(a), to = "ASCII//TRANSLIT"))
@@ -171,33 +208,33 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     data <- d
 
 
-  # define color palette based on data type
-  var_cat <- "Cat" %in% dic$hdType
-  if(!is.null(palette_type)){
-    if(!palette_type %in% c("categorical", "sequential", "divergent")){
-      warning("Palette type must be one of 'categorical', 'sequential', or 'divergent'; reverting to default.")
-      palette_type <- NULL
-    }
-    if(!var_cat & palette_type == "categorical" | (var_cat & palette_type %in% c("sequential", "divergent"))){
-      warning("Palette type might not be suitable for data type.")
-    }
-  } else {
-    if(var_cat){
-      palette_type <- "categorical"
+    # define color palette based on data type
+    var_cat <- "Cat" %in% dic$hdType
+    if(!is.null(palette_type)){
+      if(!palette_type %in% c("categorical", "sequential", "divergent")){
+        warning("Palette type must be one of 'categorical', 'sequential', or 'divergent'; reverting to default.")
+        palette_type <- NULL
+      }
+      if(!var_cat & palette_type == "categorical" | (var_cat & palette_type %in% c("sequential", "divergent"))){
+        warning("Palette type might not be suitable for data type.")
+      }
     } else {
-      palette_type <- "sequential"
+      if(var_cat){
+        palette_type <- "categorical"
+      } else {
+        palette_type <- "sequential"
+      }
     }
-  }
 
-  if(is.null(palette_colors)){
-    if(palette_type == "categorical"){
-      palette_colors <- opts$theme$palette_colors_categorical
-    } else if (palette_type == "sequential"){
-      palette_colors <- opts$theme$palette_colors_sequential
-    } else if (palette_type == "divergent"){
-      palette_colors <- opts$theme$palette_colors_divergent
+    if(is.null(palette_colors)){
+      if(palette_type == "categorical"){
+        palette_colors <- opts$theme$palette_colors_categorical
+      } else if (palette_type == "sequential"){
+        palette_colors <- opts$theme$palette_colors_sequential
+      } else if (palette_type == "divergent"){
+        palette_colors <- opts$theme$palette_colors_divergent
+      }
     }
-  }
   }
 
   # style titles
@@ -245,6 +282,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     locale = opts$style$locale,
     min_zoom = opts$extra$map_min_zoom
   )
+
+
 
 
 }
