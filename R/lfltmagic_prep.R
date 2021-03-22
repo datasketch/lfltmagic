@@ -196,7 +196,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     }
 
     if (ftype == "Gcd-Cat" | ftype == "Gnm-Cat") {
-      d$..domain <- as.numeric( factor(d$b) )
+      d$..domain <- as.numeric(as.factor(d$b))
       d <- d %>% select(a, b, ..domain, everything())
     }
 
@@ -260,7 +260,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       } else {
         palette_type <- "sequential"
       }
+
+      if (ftype == "Gcd-Cat" | ftype == "Gnm-Cat") {
+        palette_type <- "categorical"
+      }
     }
+
 
     if(is.null(palette_colors)){
       if(palette_type == "categorical"){
@@ -271,6 +276,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         palette_colors <- opts$theme$palette_colors_divergent
       }
     }
+
+
    # print(d)
   }
   # style titles

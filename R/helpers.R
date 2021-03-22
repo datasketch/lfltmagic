@@ -566,3 +566,58 @@ find_geoinfo <- function(data, centroides) {
   }
 
 }
+
+
+# guess ftypes changed cat by Gnm or Gcd
+#' @export
+guess_ftypes <- function(data, map_name) {
+  #data <- sample_data("Glt-Gln-Num-Cat-Num-Num-Cat")
+  if (is.null(map_name))
+    stop("Please type a map name")
+  if (is.null(data)) return()
+  data <- fringe(data)
+  d <- data$data
+  dic <- homodatum::fringe_dic(data, id_letters = TRUE)
+  centroides <- suppressWarnings(geodataMeta(map_name)$codes)
+  centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
+  centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
+
+
+
+  l_gcd <- map(names(d), function(i){
+    if (is.numeric(d[[i]])){
+      d[[i]] <- d[[i]]
+    } else {
+      d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
+    }
+    gcd_in <- sum(centroides$id %in%  d[[i]])
+    gcd_in > 0
+  })
+  names(l_gcd) <- names(d)
+  this_gcd <- names(which(l_gcd == TRUE))
+
+  if (identical(this_gcd, character())) {
+    l_gnm <- map(names(d), function(i){
+      if (is.numeric(d[[i]])){
+        d[[i]] <- d[[i]]
+      } else {
+        d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
+      }
+      gnm_in <- sum(centroides$name %in%  d[[i]])
+      gnm_in > 0
+    })
+    names(l_gnm) <- names(d)
+    this_gnm <- names(which(l_gnm == TRUE))
+    if (identical(this_gnm, character())) {
+      dic <- dic
+    } else {
+      dic$hdType[dic$id %in% this_gnm] <- "Gnm"
+    }
+  } else {
+    dic$hdType[dic$id %in% this_gcd] <- "Gcd"
+  }
+
+
+  dic
+
+}
