@@ -575,48 +575,53 @@ guess_ftypes <- function(data, map_name) {
   if (is.null(map_name))
     stop("Please type a map name")
   if (is.null(data)) return()
-  data <- fringe(data)
-  d <- data$data
-  dic <- homodatum::fringe_dic(data, id_letters = TRUE)
+
+  f <- fringe(data)
+  d <- homodatum::fringe_d(f)
+  dic <- homodatum::fringe_dic(f)
+  dic$id <- names(d)
+
   centroides <- suppressWarnings(geodataMeta(map_name)$codes)
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
-  centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
 
-
-
-  l_gcd <- map(names(d), function(i){
-    if (is.numeric(d[[i]])){
-      d[[i]] <- d[[i]]
-    } else {
-      d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
-    }
-    gcd_in <- sum(centroides$id %in%  d[[i]])
-    gcd_in > 0
-  })
-  names(l_gcd) <- names(d)
-  this_gcd <- names(which(l_gcd == TRUE))
-
-  if (identical(this_gcd, character())) {
-    l_gnm <- map(names(d), function(i){
-      if (is.numeric(d[[i]])){
-        d[[i]] <- d[[i]]
-      } else {
-        d[[i]] <- iconv(tolower(d[[i]]), to = "ASCII//TRANSLIT")
-      }
-      gnm_in <- sum(centroides$name %in%  d[[i]])
-      gnm_in > 0
-    })
-    names(l_gnm) <- names(d)
-    this_gnm <- names(which(l_gnm == TRUE))
-    if (identical(this_gnm, character())) {
-      dic <- dic
-    } else {
-      dic$hdType[dic$id %in% this_gnm] <- "Gnm"
-    }
+  if ("name_addition" %in% names(centroides)) {
+    col_names <- c("name", "name_addition")
+    centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
+    centroides$name_addition <- iconv(tolower(centroides$name_addition), to = "ASCII//TRANSLIT")
   } else {
-    dic$hdType[dic$id %in% this_gcd] <- "Gcd"
+    col_names <- c("name")
+    centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
+  }
+  var_geo <- find_geoinfo(as.data.frame(data), centroides)
+  d <- data[var_geo]
+  d <- standar_values(d)
+
+  info_gcd <- paste0("^", centroides$id, "$", collapse = "|")
+  l <- sapply(colnames(d), function(x) {
+    search_info <- !identical(grep(info_gcd, as.matrix(d[,x])), integer(0)) == TRUE
+  })
+  r <- names(l)[l == TRUE]
+
+  if (!identical(r, character(0))) {
+   ld<- map(r, function(i) {
+      dic$hdType[dic$label == i] <<- "Gcd"
+    })
   }
 
+
+  info_gnm <- paste0("^", map(col_names,
+                              function (i) {unique(centroides[[i]])
+                              }) %>% unlist(), "$", collapse = "|")
+  l <- sapply(colnames(d), function(x) {
+    search_info <- !identical(grep(info_gnm, as.matrix(d[,x])), integer(0)) == TRUE
+  })
+  r <- names(l)[l == TRUE]
+
+  if (!identical(r, character(0))) {
+    ld<- map(r, function(i) {
+      dic$hdType[dic$label == i] <<- "Gnm"
+    })
+  }
 
   dic
 
