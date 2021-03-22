@@ -164,3 +164,6 @@ lflt_bubbles_GlnGlt(data,
 lflt_choropleth_GnmCat(data=sample_data("Gnm-Cat"))
 lflt_choropleth_GcdCat(data=sample_data("Gcd-Cat"))
 lflt_choropleth_GcdCatNum(data=sample_data("Gcd-Cat-Num"))
+
+data <- fakeData("madrid_barrios")
+lflt_choropleth_GnmNum(data, map_name = "madrid_barrios")
