@@ -39,4 +39,18 @@ lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 #' @export
 #' @examples
 #' lflt_bubbles_GcdCat(sample_data("Gcd-Cat", nrow = 10))
-lflt_bubbles_GcdCat <- lflt_bubbles_GcdCatNum
+lflt_bubbles_GcdCat <- function(data = NULL, ...) {
+
+  data[[1]] <- as_Gcd(data[[1]])
+  opts <- dsvizopts::merge_dsviz_options(...)
+
+  l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype= "Gcd-Cat")
+
+  lf <- lflt_basic_bubbles(l) %>%
+    lflt_background(l$theme) %>%
+    lflt_bounds(l$b_box) %>%
+    lflt_graticule(l$graticule) %>%
+    lflt_titles(l$titles)
+
+  lf
+}

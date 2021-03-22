@@ -11,7 +11,7 @@
 lflt_choropleth_GnmNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
-
+  if (!is.null(data)) data[[1]] <- as_Gnm(data[[1]])
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
 
   lf <- lflt_basic_choropleth(l) %>%
@@ -34,4 +34,17 @@ lflt_choropleth_GnmNum <- function(data = NULL, ...) {
 #' @export
 #' @examples
 #' lflt_choropleth_Gnm(sampleData("Gnm", nrow = 10))
-lflt_choropleth_Gnm <- lflt_choropleth_GnmNum
+lflt_choropleth_Gnm <- function(data = NULL, ...) {
+
+  opts <- dsvizopts::merge_dsviz_options(...)
+  if (!is.null(data)) data[[1]] <- as_Gnm(data[[1]])
+  l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm")
+
+  lf <- lflt_basic_choropleth(l) %>%
+    lflt_background(l$theme) %>%
+    lflt_bounds(l$b_box) %>%
+    lflt_graticule(l$graticule) %>%
+    lflt_titles(l$titles)
+
+  lf
+}

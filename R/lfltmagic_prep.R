@@ -2,18 +2,8 @@
 #' @export
 lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm-Num", ...) {
 
-  # map_name <- "col_municipalities"
-  # data <- fakeData("col_municipalities")
-  # opts <- dsvizopts::dsviz_defaults()
-  # opts$extra$map_name <- map_name
-  # by_col = "name"
-  # ftype="Gnm-Num"
-
-
   map_name <- opts$extra$map_name
   label_by <- opts$extra$map_label_by
-
-
   centroides <-  suppressWarnings(geodataMeta(map_name)$codes)
 
   topoInfo <- suppressWarnings(topo_info(map_name))
@@ -21,17 +11,15 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     select(-name) %>%
     left_join(centroides, by =  "id") %>%
     mutate(id = as.character(id))
-
-
   if ("name_addition" %in% names(centroides) & grepl("Gnm", ftype)) {
     topoInfo@data$name_alt <- paste0(topoInfo@data$name, " - ", topoInfo@data$name_addition)
   } else {
-    topoInfo@data$name_alt <- topoInfo@data[[by_col]]
+    topoInfo@data$name_alt <- as.character(topoInfo@data[[by_col]])
   }
 
 
   topoInfo@data$name_alt <- iconv(tolower(topoInfo@data$name_alt), to = "ASCII//TRANSLIT")
-  #tjj <- topoInfo@data
+  topoInfo@data <- topoInfo@data %>% filter(id != -99)
 
   bbox <- topoInfo@bbox
   if (is.null(bbox)) bbox <- topo_bbox(centroides$lon, centroides$lat)
@@ -49,130 +37,194 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
 
-    if (grepl("Gnm|Gcd", ftype)) {
+
+
+    # searches the centroids for matches of the name or code belonging to the information geographic of map_name
+    if (grepl("Gcd", ftype)) {
       have_geocode <- find_geoinfo(d, centroides)
       if (is.null(have_geocode)) stop("make sure your data has geographic information")
-      if (grepl("Gnm", ftype) & "name_addition" %in% names(centroides)) {
-        d$a <- paste0(d$a, " - ", d$b)
-        d <- d %>% select(-b)
-        dic <- dic %>%  filter(id_letters != "b")
-        dic$id_letters[dic$id_letters == "c"] <- "b"
-        d <- d %>% rename(c("b" = "c"))
-        nms <- nms[c(1,3)]
-        names(nms) <- c("a", "b")
-      }
     }
 
-
-
-
-
-    if(length(pre_ftype) < length(dic$hdType)){
-      if(!all(pre_ftype == dic$hdType[1:length(pre_ftype)])){
-        warning("Input data types differ from expected data types.")
-        dic$hdType[1:length(pre_ftype)] <- pre_ftype
-      }
-    } else if(length(pre_ftype) > length(dic$hdType)){
-      if(!all(pre_ftype[1:length(dic$hdType)] == dic$hdType)){
-        warning("Input data types differ from expected data types.")
-        dic$hdType <- pre_ftype[1:length(dic$hdType)]
-      }
-    } else {
-      if(!all(pre_ftype == dic$hdType)){
-        warning("Input data types differ from expected data types.")
-        dic$hdType <- pre_ftype
-      }
-    }
-
-
-    frtype_d <- paste0(dic$hdType, collapse = "-")
-    if (sum(grepl("Cat", dic$hdType))>0) color_scale <- "Category"
-
-    if (grepl("Pct", frtype_d)) {
-      dic$hdType[dic$hdType == "Pct"] <- "Num"
-      frtype_d <- gsub("Pct", "Num", frtype_d)
-    }
-
-    if (sum(c("Glt", "Gln", "Gcd", "Gnm") %in% dic$hdType)==0) stop("Make sure you have a geographic variable in your data, it can be name or country codes, or latitude and longitude coordinates. Also make sure the map_name entered is correct.")
-
-
-
-    if(!grepl("Num", frtype_d)){
-      d <- d %>%
-        mutate(a = na_if(a, "-99")) %>%
-        drop_na(a) %>%
-        dplyr::group_by_all() %>%
-        dplyr::summarise(b = n())
-      frtype_d <- paste0(frtype_d, "-Num")
-      nms[2] <- opts$summarize$agg_text %||% "Count"
+    if (grepl("Gnm", ftype) & "name_addition" %in% names(centroides)) {
+      d$a <- paste0(d$a, " - ", d$b)
+      d <- d %>% select(-b)
+      dic <- dic %>%  filter(id_letters != "b")
+      dic$id_letters[dic$id_letters == "c"] <- "b"
+      d <- d %>% rename(c("b" = "c"))
+      nms <- nms[c(1,3)]
       names(nms) <- c("a", "b")
-      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "b")
-      dic <- dic %>% bind_rows(dic_num)
     }
 
-    if(frtype_d == "Gln-Glt"){
-      d <- d %>%
-        drop_na(a,b) %>%
-        dplyr::group_by_all() %>%
-        dplyr::summarise(c = n())
-      frtype_d <- paste0(frtype_d, "-Num")
-      nms[3] <- opts$summarize$agg_text %||% "Count"
-      names(nms) <- c("a", "b", "c")
-      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
-      dic <- dic %>% bind_rows(dic_num)
+    nms[length(nms)+1] <- c("%")
+    names(nms) <- c(names(nms)[-length(nms)], "..percentage")
+    nms[length(nms)+1] <- c("Count")
+    names(nms) <- c(names(nms)[-length(nms)], "..count")
+    dic$id <- names(d)
+
+
+    # separarte only data plot ------------------------------------------------
+
+    ftype_vec <- stringr::str_split(ftype, pattern = "-") %>% unlist()
+    ftype_length <- length(ftype_vec)
+    dd <- d[,1:ftype_length]
+    dic_p <- dic %>% dplyr::filter(id %in% names(dd))
+
+
+    # agregation all numeric variables and collapse categorica variabl --------
+
+
+    var_g <- NULL ## categorical ..groups
+    dic_agg <- NULL
+
+
+    if (any(c("Cat", "Gcd", "Gnm") %in% pre_ftype)) {
+      dic_agg <- dic_p %>% dplyr::filter(hdType %in% c("Cat", "Gcd", "Gnm"))
+      var_g <- unique(dic_agg$id)
     }
 
 
-    if(frtype_d %in% c("Gcd-Cat", "Gnm-Cat")){
-      d <- d %>%
-        mutate(a = na_if(a, "-99")) %>%
-        drop_na(a) %>%
-        dplyr::group_by_all() %>%
-        dplyr::summarise(c = n())
+    # agregation all numeric variables and collapse categorica variabl --------
 
-      if(sum(d$c) > nrow(d)){
-        frtype_d <- paste0(frtype_d, "-Num")
-        nms[3] <- opts$summarize$agg_text %||% "Count"
-        names(nms) <- c("a", "b", "c")
-        dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
-        dic <- dic %>% bind_rows(dic_num)
+    var_nums <- grep("Num", dic$hdType)
+    agg_num <- NULL
+    if (!identical(var_nums, integer())) agg_num <- dic$id[var_nums]
+    func_paste <- function(x) paste(unique(x), collapse = '. ')
+    var_cats <- grep("Cat|Gnm|Gcd", dic$hdType)
+    agg_cats <- NULL
+    if (!identical(var_cats, integer())) agg_cats <- dic$id[var_cats]
+    dd <- NULL
+
+    agg_var <- "..count"
+    has_num_var <- "Num" %in% dic_p$hdType
+
+    if (has_num_var &  sum(grepl("Num",  ftype_vec)) > 1) {
+      agg_var <- opts$postprocess$percentage_col %||% "b"
+    }
+
+
+    if (!is.null(var_g)) {
+      if (length(grep("Cat|Gnm|Gcd", ftype_vec)) == 1) {
+        if (has_num_var & sum(grepl("Num",  ftype_vec)) == 1)  {
+          agg_var <- "b"
+        }
       } else {
-        d <- d %>% select(-c)
+        if (has_num_var) {
+          agg_var <- "c"
+        }
+      }
+    }
+    dic_alt <- dic
+
+    if (agg_var == "..count") {
+      dic_p <- dic_p %>% dplyr::bind_rows(dplyr::bind_rows(data.frame(id = "..count", label = "Count", hdType = "Num") %>%
+                                                             dplyr::mutate_all(as.character)))
+    } else {
+      dic_p <- dic_p
+    }
+
+    if (opts$postprocess$percentage) {
+      dic_p <- dic_p %>% dplyr::filter(id != agg_var)
+      dic_p <- dic_p %>% dplyr::bind_rows(dplyr::bind_rows(data.frame(id = "..percentage", label = "%", hdType = "Num") %>%
+                                                             dplyr::mutate_all(as.character)))
+    }
+
+
+    if (!is.null(var_g)) {
+      dn <- d
+      if (!is.null(agg_num))  dn <- d[,-var_nums]
+
+
+      if (length(var_g) == 1) {
+        dd <- function_agg(df = d, agg = opts$summarize$agg, to_agg = agg_num, a)
+
+        dd <- dsvizopts::preprocessData(dd, drop_na = opts$preprocess$drop_na,
+                                        na_label = opts$preprocess$na_label, na_label_cols = "a")
+
+        dd <- dsvizopts::postprocess(dd, agg_var, sort = opts$postprocess$sort, slice_n = opts$postprocess$slice_n)
+
+        dd$..percentage <- (dd[[agg_var]]/sum(dd[[agg_var]], na.rm = TRUE)) * 100
+        dd$..domain <- dd$b
+        dn <- dn %>%
+          dplyr::group_by(a) %>%
+          dplyr::summarise_all(.funs = func_paste)
+      } else {
+
+        dd <- function_agg(df = d, agg = opts$summarize$agg, to_agg = agg_num, a, b)
+
+        by_col <- opts$postprocess$percentage_col
+        if (is.null(by_col)) {
+          by_col <- "a"
+        } else {
+          by_col <- names(nms[match(by_col, nms)])
+        }
+        agg_var_t <- rlang::sym(agg_var)
+        dd <- dd %>%
+          dplyr::group_by_(by_col) %>%
+          dplyr::mutate(..percentage = (!!agg_var_t/sum(!!agg_var_t, na.rm = TRUE))*100)
+
+        dd <- dd %>% drop_na(a)
+        dd <- dsvizopts::preprocessData(dd, drop_na = opts$preprocess$drop_na,
+                                        na_label = opts$preprocess$na_label, na_label_cols = "b")
+
+
+        dd <- dsvizopts::postprocess(dd, agg_var, sort = opts$postprocess$sort, slice_n = opts$postprocess$slice_n)
+        dd$..domain <- dd$c
+        dn$a[is.na(dn$a)] <- opts$preprocess$na_label
+        dn$b[is.na(dn$b)] <- opts$preprocess$na_label
+
+
+        dn <- dn %>%
+          dplyr::group_by(a, b) %>%
+          dplyr::summarise_each(dplyr::funs(func_paste))
+        dd$b <- as.character(dd$b)
+        dn$b <- as.character(dn$b)
       }
 
+      dic_alt <- dic_alt %>%
+        dplyr::bind_rows(data.frame(id = c("..count", "..percentage"), label = c("Count", "%"), hdType = c("Num", "Num")) %>%
+                           dplyr::mutate_all(as.character))
+
+      d <- dd %>% dplyr::left_join(dn, by = var_g)
     }
 
-    var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
-    var_nums <- grep("Num|Glt|Gln", dic$hdType)
 
-    # category, geocode, geoname formtat
+    ####################################
 
+    if (ftype == "Gcd" | ftype == "Gnm") {
+      d$..domain <- d$..count
+      d <- d %>% select(a, ..domain, everything())
+    }
+
+    if (ftype == "Gcd-Cat" | ftype == "Gnm-Cat") {
+      d$..domain <- d$..count
+      d <- d %>% select(a, b, ..domain, everything())
+    }
+
+    # categoric format
     if (!identical(var_cats, integer())) {
       var_cats <- dic$id_letters[var_cats]
       l_cats <- map(var_cats, function(f_cats){
         d[[paste0(f_cats, "_label")]] <<- makeup_chr(d[[f_cats]], opts$style$format_sample_cat)
       })}
 
-
     # numeric format
 
-    if (!identical(var_nums, integer())) {
-      var_nums <- dic$id_letters[var_nums]
+    var_nums <- grep("Num", dic_alt$hdType)
 
-      l_nums <- map(var_nums, function(f_nums){
-        d[[paste0(f_nums, "_label")]] <<- makeup_num(d[[f_nums]], sample = opts$style$format_sample_num)
+
+    if (!identical(var_nums, integer())) {
+      var_nums <- dic_alt$id[var_nums]
+
+      l_nums <- purrr::map(var_nums, function(f_nums){
+        d[[paste0(f_nums, "_label")]] <<- makeup::makeup_num(d[[f_nums]], sample = opts$style$format_sample_num)
       })}
 
-
-    if (grepl("Gln|Glt", frtype_d)) {
+    if (grepl("Gln|Glt", ftype)) {
       d <- d %>%
         mutate(labels = glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
     }
 
-
-    if (grepl("Gcd|Gnm", frtype_d)) {
-
-
+    if (grepl("Gnm|Gcd", ftype)) {
       topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_sample_cat)
       topoInfo@data$id_label <- topoInfo@data$id
 
@@ -183,31 +235,15 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       }
 
 
-      d <- d %>%
-        mutate(name_alt = iconv(tolower(a), to = "ASCII//TRANSLIT"))
-
-      topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
-
-      topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
-
-
-
+      d$name_alt <- iconv(tolower(d$a), to = "ASCII//TRANSLIT")
+      topoInfo@data <- topoInfo@data %>% left_join(d)
 
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a),
                                glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
                                glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
         )
-
-    } else if (grepl("Gln|Glt", frtype_d)) {
-      topoInfo@data <- d
-      topoInfo@data$name <- opts$preprocess$na_label
     }
-
-
-    data <- d
-
-
     # define color palette based on data type
     var_cat <- "Cat" %in% dic$hdType
     if(!is.null(palette_type)){
@@ -235,8 +271,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         palette_colors <- opts$theme$palette_colors_divergent
       }
     }
+   # print(d)
   }
-
   # style titles
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
@@ -282,7 +318,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     locale = opts$style$locale,
     min_zoom = opts$extra$map_min_zoom
   )
-
 
 
 

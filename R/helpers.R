@@ -1,3 +1,23 @@
+#'
+#' @export
+function_agg <- function (df, agg, to_agg, ...) {
+  group_var <- rlang::enquos(...)
+
+  if (is.null(to_agg)) {
+    dd <- df %>%
+      dplyr::group_by(!!!group_var) %>%
+      dplyr::summarise(..count = dplyr::n())
+  } else {
+    dd <- df %>%
+      dplyr::group_by(!!!group_var) %>%
+      dplyr::summarise(dplyr::across(to_agg, ~ dsvizopts::agg(agg, .x)), ..count = dplyr::n())
+  }
+  dd
+
+}
+
+
+
 #' Legend by palette type
 lflt_palette <- function(opts) {
   if (opts$color_scale %in% c("Category", "Custom")) {
@@ -131,10 +151,10 @@ lflt_basic_choropleth <- function(l) {
                    bringToFront = TRUE))
 
   if (!is.null(l$data)) {
-    if(sum(is.na(l$d@data$b)) == nrow(l$d@data)) {
+    if(sum(is.na(l$d@data[[2]])) == nrow(l$d@data)) {
       lf <- lf
     } else {
-      domain <- l$d@data[["b"]]
+      domain <- l$d@data[["..domain"]]
       if(l$color_scale == "Custom"){
         intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
         domain <- intervals
@@ -156,8 +176,8 @@ lflt_basic_choropleth <- function(l) {
       color_map <- pal(domain)
 
       fill_opacity <- l$theme$topo_fill_opacity
-      if (is(l$d$c, "numeric")){
-        fill_opacity <- scales::rescale(l$d$c, to = c(0.5, 1))
+      if (is(l$d[[3]], "numeric")){
+        fill_opacity <- scales::rescale(l$d[[3]], to = c(0.5, 1))
       }
 
 

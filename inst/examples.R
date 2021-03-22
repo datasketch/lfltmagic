@@ -103,7 +103,7 @@ lflt_choropleth_Gcd(sample_data("Gcd", 3000),
                     topo_fill_opacity = 1,
                     palette_colors = c("#FEAFEA", "#000CCC"))
 
-
+lflt_choropleth_GcdNum(map_name= "col_departments",dataLabels_show = T, data = data.frame(dep = c("05", "05", "27"), id = 1:3))
 lflt_choropleth_Gcd(map_name= "col_departments",dataLabels_show = T, data = data.frame(dep = c("05", "05", "27")))
 
 # Gnm-Num bubbles examples ------------------------------------------------
@@ -160,3 +160,7 @@ lflt_bubbles_GlnGlt(data,
                     palette_colors = "#000000",
                     na_color = "#FEAFEA",
                     topo_fill_opacity = 0.2)
+
+lflt_choropleth_GnmCat(data=sample_data("Gnm-Cat"))
+lflt_choropleth_GcdCat(data=sample_data("Gcd-Cat"))
+lflt_choropleth_GcdCatNum(data=sample_data("Gcd-Cat-Num"))
