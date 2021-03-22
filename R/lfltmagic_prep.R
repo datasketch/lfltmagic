@@ -196,7 +196,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     }
 
     if (ftype == "Gcd-Cat" | ftype == "Gnm-Cat") {
-      d$..domain <- d$..count
+      d$..domain <- as.numeric( factor(d$b) )
       d <- d %>% select(a, b, ..domain, everything())
     }
 
