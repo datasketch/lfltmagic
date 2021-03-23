@@ -35,4 +35,16 @@ lflt_bubbles_GnmNum <- function(data = NULL, ...) {
 #' @export
 #' @examples
 #' lflt_bubbles_Gnm(sampleData("Gnm", nrow = 10))
-lflt_bubbles_Gnm <- lflt_bubbles_GnmNum
+lflt_bubbles_Gnm <- function(data = NULL, ...) {
+
+  opts <- dsvizopts::merge_dsviz_options(...)
+
+  l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm")
+  lf <- lflt_basic_bubbles(l) %>%
+    lflt_background(l$theme) %>%
+    lflt_bounds(l$b_box) %>%
+    lflt_graticule(l$graticule) %>%
+    lflt_titles(l$titles)
+  lf
+}
+

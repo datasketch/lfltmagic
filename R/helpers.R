@@ -603,6 +603,12 @@ guess_ftypes <- function(data, map_name) {
   r <- names(l)[l == TRUE]
 
   if (!identical(r, character(0))) {
+    if(!all(is.na(suppressWarnings(as.numeric(centroides$id))))) {
+      max_gcd <- max(centroides$id)
+      d_gcd <- r %>%
+                 map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
+      r <- r[d_gcd]
+    }
    ld<- map(r, function(i) {
       dic$hdType[dic$label == i] <<- "Gcd"
     })

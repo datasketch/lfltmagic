@@ -268,17 +268,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
     if(is.null(palette_colors)){
-      if(palette_type == "categorical"){
-        palette_colors <- opts$theme$palette_colors_categorical
-      } else if (palette_type == "sequential"){
-        palette_colors <- opts$theme$palette_colors_sequential
-      } else if (palette_type == "divergent"){
-        palette_colors <- opts$theme$palette_colors_divergent
-      }
+        palette_colors <- opts$theme[[paste0("palette_colors_", palette_type)]]
     }
 
 
-   # print(d)
+    print(d)
   }
   # style titles
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
