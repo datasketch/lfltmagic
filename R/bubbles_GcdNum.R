@@ -37,7 +37,6 @@ lflt_bubbles_GcdNum <- function(data = NULL, ...) {
 #' @examples
 #' lflt_bubbles_Gcd(sampleData("Gcd", nrow = 10))
 lflt_bubbles_Gcd <- function(data = NULL, ...) {
-
   data[[1]] <- as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 

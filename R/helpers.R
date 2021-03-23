@@ -330,31 +330,28 @@ lflt_basic_bubbles <- function(l) {
     color <- l$palette_colors[1]
     legend_color <- color
 
-    if (is(l$d$c, "numeric")){
-      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
+    if (is(l$d@data$..domain, "numeric")){
+      radius <- scales::rescale(l$d@data$..domain, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$d@data[["b"]],
+                       domain = l$d@data$..domain,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$d@data[["b"]])
-      legend_color <- "#505050"
-      cuts <- create_legend_cuts(l$d$c)
-    } else if (is(l$d$b, "numeric")){
-      radius <- scales::rescale(l$d$b, to = c(l$min_size, l$max_size))
-      cuts <- create_legend_cuts(l$d$b)
-    } else if (is(l$d$b, "character")){
-      radius <- ifelse(!is.na(l$d$b), 5, 0)
+      color <- pal(l$d@data[["..domain"]])
+      legend_color <- l$palette_colors[1]
+      cuts <- create_legend_cuts(l$d@data$..domain)
+    } else if (is(l$d@data$..domain, "character")){
+      radius <- ifelse(!is.na(l$d@data$..domain), 5, 0)
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$d@data[["b"]],
+                       domain = l$d@data$..domain,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$d@data[["b"]])
+      color <- pal(l$d@data$..domain)
     }
 
     lon <- l$d$lon
@@ -376,8 +373,7 @@ lflt_basic_bubbles <- function(l) {
       )
 
     if (l$theme$legend_show){
-
-      if (is(l$d$b, "numeric") | is(l$d$c, "numeric")){
+      if (is(l$d@data$..domain, "numeric")){
         lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
                                          labels = cuts,
                                          color = legend_color,
@@ -387,8 +383,8 @@ lflt_basic_bubbles <- function(l) {
                                          title = l$legend_title)
       }
 
-      if (is(l$d$b, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = ~b, opacity = 1,
+      if (is(l$d@data$..domain, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~..domain, opacity = 1,
                                position = l$theme$legend_position,
                                na.label = l$na_label,
                                title = l$legend_title,
@@ -413,7 +409,7 @@ url_logo <- function(logo, background_color) {
 
 #' Background and branding Map
 lflt_background <- function(map, theme) {
-  print(theme$map_provider_tile)
+  #print(theme$map_provider_tile)
   if (is.null(theme$map_tiles) & theme$map_provider_tile == "leaflet") {
     lf <- map %>% setMapWidgetStyle(list(background = theme$background_color))
   } else {

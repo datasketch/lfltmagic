@@ -128,7 +128,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                                              dplyr::mutate_all(as.character)))
     }
 
-
+print(var_g)
     if (!is.null(var_g)) {
       dn <- d
       if (!is.null(agg_num))  dn <- d[,-var_nums]
@@ -143,7 +143,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         dd <- dsvizopts::postprocess(dd, agg_var, sort = opts$postprocess$sort, slice_n = opts$postprocess$slice_n)
 
         dd$..percentage <- (dd[[agg_var]]/sum(dd[[agg_var]], na.rm = TRUE)) * 100
-        dd$..domain <- dd$b
+        if (!is.null(agg_num)) {
+          dd$..domain <- dd$b
+        } else {
+          dd$..domain <- dd$..count
+        }
+
         dn <- dn %>%
           dplyr::group_by(a) %>%
           dplyr::summarise_all(.funs = func_paste)
@@ -168,7 +173,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
         dd <- dsvizopts::postprocess(dd, agg_var, sort = opts$postprocess$sort, slice_n = opts$postprocess$slice_n)
-        dd$..domain <- dd$c
+        if (!is.null(agg_num)) {
+          dd$..domain <- dd$c
+        } else {
+          dd$..domain <- dd$..count
+        }
         dn$a[is.na(dn$a)] <- opts$preprocess$na_label
         dn$b[is.na(dn$b)] <- opts$preprocess$na_label
 
@@ -186,7 +195,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
       d <- dd %>% dplyr::left_join(dn, by = var_g)
     }
-
+#print(d)
 
     ####################################
 
@@ -272,7 +281,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     }
 
 
-    print(d)
+  #  print(d)
   }
   # style titles
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
