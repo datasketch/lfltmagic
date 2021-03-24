@@ -194,8 +194,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
       d <- dd %>% dplyr::left_join(dn, by = var_g)
     }
-#print(d)
-
+print(dic_p)
+    default_tooltip <- dic_p$id
     ####################################
 
     if (ftype == "Gcd" | ftype == "Gnm") {
@@ -229,7 +229,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
     if (grepl("Gln|Glt", ftype)) {
       d <- d %>%
-        mutate(labels = glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+        mutate(labels = glue::glue(lflt_tooltip(nms, label_ftype = default_tooltip, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
     }
 
     if (grepl("Gnm|Gcd", ftype)) {
@@ -249,8 +249,9 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       topoInfo@data <- topoInfo@data %>%
         mutate(labels = ifelse(is.na(a),
                                glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
-                               glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
+                               glue::glue(lflt_tooltip(nms, label_ftype = default_tooltip, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
         )
+     # print(topoInfo@data)
     }
     # define color palette based on data type
     var_cat <- "Cat" %in% dic$hdType

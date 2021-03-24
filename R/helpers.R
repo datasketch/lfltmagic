@@ -43,10 +43,13 @@ lflt_palette <- function(opts) {
 }
 
 #' labels
-lflt_tooltip <- function(nms, tooltip) {
+lflt_tooltip <- function(nms,label_ftype, tooltip) {
   if (is.null(nms)) stop("Enter names")
   nms_names <- names(nms)
+
   if (is.null(tooltip) | tooltip == "") {
+    nms <-  nms[names(nms) %in% label_ftype]
+    nms_names <- names(nms)
     l <- map(seq_along(nms), function(i){
       paste0("<span style='font-size:15px;'><strong>", nms[[i]], ":</strong> {", nms_names[i], "_label}</span>")
     }) %>% unlist()
