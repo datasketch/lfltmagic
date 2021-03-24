@@ -12,6 +12,7 @@
 #' lflt_bubbles_GnmNum(sampleData("Gnm-Num", nrow = 10))
 lflt_bubbles_GnmNum <- function(data = NULL, ...) {
 
+  if(!is.null(data)) data[[1]] <- as_Gnm(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
@@ -37,6 +38,7 @@ lflt_bubbles_GnmNum <- function(data = NULL, ...) {
 #' lflt_bubbles_Gnm(sampleData("Gnm", nrow = 10))
 lflt_bubbles_Gnm <- function(data = NULL, ...) {
 
+  if(!is.null(data)) data[[1]] <- as_Gnm(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm")

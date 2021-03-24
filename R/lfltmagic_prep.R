@@ -17,6 +17,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     topoInfo@data$name_alt <- as.character(topoInfo@data[[by_col]])
   }
 
+  print(all(is.na(topoInfo@data$name_alt)))
+  if (all(is.na(topoInfo@data$name_alt))) return()
 
   topoInfo@data$name_alt <- iconv(tolower(topoInfo@data$name_alt), to = "ASCII//TRANSLIT")
   topoInfo@data <- topoInfo@data %>% filter(id != -99)
