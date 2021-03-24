@@ -151,7 +151,7 @@ lflt_basic_choropleth <- function(l) {
                    bringToFront = TRUE))
 
   if (!is.null(l$data)) {
-    if(sum(is.na(l$d@data[[2]])) == nrow(l$d@data)) {
+    if(sum(is.na(l$d@data[["..domain"]])) == nrow(l$d@data)) {
       lf <- lf
     } else {
       domain <- l$d@data[["..domain"]]
@@ -177,7 +177,7 @@ lflt_basic_choropleth <- function(l) {
 
       fill_opacity <- l$theme$topo_fill_opacity
       if (is(l$d[[3]], "numeric")){
-        fill_opacity <- scales::rescale(l$d[[3]], to = c(0.5, 1))
+        fill_opacity <- scales::rescale(l$d[["..domain"]], to = c(0.5, 1))
       }
 
 
@@ -501,9 +501,9 @@ fakeData <- function(map_name = NULL, by = "name", ...) {
   centroides <- centroides[sample(1:nrow(centroides), nsample),]
   if (by == "name" & "name_addition" %in% names(centroides)) {
     d <- data.frame(name = centroides[[by]],
-                    name_addition = centroides[["name_addition"]], sample_value = rnorm(nsample, 33, 333))
+                    name_addition = centroides[["name_addition"]], sample_value = runif(nsample, 33, 333))
   } else {
-    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = rnorm(nsample, 33, 333))
+    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = runif(nsample, 33, 333))
   }
   d
 }

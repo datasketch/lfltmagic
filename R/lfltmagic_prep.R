@@ -5,7 +5,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   map_name <- opts$extra$map_name
   label_by <- opts$extra$map_label_by
   centroides <-  suppressWarnings(geodataMeta(map_name)$codes)
-
+#print(centroides)
   topoInfo <- suppressWarnings(topo_info(map_name))
   topoInfo@data <- topoInfo@data %>%
     select(-name) %>%
@@ -16,9 +16,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   } else {
     topoInfo@data$name_alt <- as.character(topoInfo@data[[by_col]])
   }
-
-  print(all(is.na(topoInfo@data$name_alt)))
-  if (all(is.na(topoInfo@data$name_alt))) return()
 
   topoInfo@data$name_alt <- iconv(tolower(topoInfo@data$name_alt), to = "ASCII//TRANSLIT")
   topoInfo@data <- topoInfo@data %>% filter(id != -99)
@@ -130,7 +127,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                                              dplyr::mutate_all(as.character)))
     }
 
-print(var_g)
+#print(var_g)
     if (!is.null(var_g)) {
       dn <- d
       if (!is.null(agg_num))  dn <- d[,-var_nums]
