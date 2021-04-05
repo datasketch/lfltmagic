@@ -35,7 +35,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     d <- homodatum::fringe_d(f)
     dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
-
+    dic$hdType[dic$hdType == "Pct"] <- "Num"
 
 
     # searches the centroids for matches of the name or code belonging to the information geographic of map_name
@@ -96,7 +96,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     agg_var <- "..count"
     has_num_var <- "Num" %in% dic_p$hdType
 
-    if (has_num_var &  sum(grepl("Num",  ftype_vec)) > 1) {
+    if (has_num_var &  sum(grepl("Num",  ftype_vec)) >= 1) {
       agg_var <- opts$postprocess$percentage_col %||% "b"
     }
 
@@ -154,7 +154,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       } else {
 
         dd <- function_agg(df = d, agg = opts$summarize$agg, to_agg = agg_num, a, b)
-
+        print(dd)
         by_col <- opts$postprocess$percentage_col
         if (is.null(by_col)) {
           by_col <- "a"
