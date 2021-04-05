@@ -115,7 +115,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     dic_alt <- dic
 
     if (agg_var == "..count") {
-      dic_p <- dic_p %>% dplyr::bind_rows(dplyr::bind_rows(data.frame(id = "..count", label = "Count", hdType = "Num") %>%
+      dic_p <- dic_p %>% dplyr::bind_rows(dplyr::bind_rows(data.frame(id = "..count", label = "Count", hdType = "Num", id_letters = "..count") %>%
                                                              dplyr::mutate_all(as.character)))
     } else {
       dic_p <- dic_p
@@ -123,7 +123,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
     if (opts$postprocess$percentage) {
       dic_p <- dic_p %>% dplyr::filter(id != agg_var)
-      dic_p <- dic_p %>% dplyr::bind_rows(dplyr::bind_rows(data.frame(id = "..percentage", label = "%", hdType = "Num") %>%
+      dic_p <- dic_p %>% dplyr::bind_rows(dplyr::bind_rows(data.frame(id = "..percentage", label = "%", hdType = "Num", id_letters = "..percentage") %>%
                                                              dplyr::mutate_all(as.character)))
     }
 
