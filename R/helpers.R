@@ -157,7 +157,7 @@ lflt_basic_choropleth <- function(l) {
     if(sum(is.na(l$d@data[["..domain"]])) == nrow(l$d@data)) {
       lf <- lf
     } else {
-      domain <- l$d@data[["..domain"]]
+      domain <- l$d@data[["..domain"]]#l$d@data %>% drop_na(..domain) %>% .$..domain
       if(l$color_scale == "Custom"){
         intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
         domain <- intervals
