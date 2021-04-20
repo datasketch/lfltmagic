@@ -37,7 +37,7 @@
 #' info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
 #' data %>%
 #'  lflt_bubbles_GcdCatNum(tooltip = info_tool)
-#'
+
 lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 
   data[[1]] <- as_Gcd(data[[1]])

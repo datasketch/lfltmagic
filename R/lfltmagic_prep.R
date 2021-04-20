@@ -12,14 +12,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   topoInfo <- suppressWarnings(topo_info(map_name))
 
   topoInfo <- topoInfo %>%
-                left_join(centroides_join, by =  "id") %>%
+                dplyr::left_join(centroides_join, by =  "id") %>%
                  mutate(id = as.character(id))
 
   topoInfo_names <- names(topoInfo)
 
 
 
-  if (!identical(aditional_name, character())) {
+  if (grepl("Gnm", ftype) & !identical(aditional_name, character())) {
     topoInfo$name_alt <- paste0(topoInfo$name, " - ", topoInfo[[aditional_name]])
   } else {
     topoInfo$name_alt <- as.character(topoInfo[[by_col]])
@@ -249,7 +249,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         names(nms) <- c(nm, "name")
       }
       d$name_alt <- iconv(tolower(d$a), to = "ASCII//TRANSLIT")
-      topoInfo <- topoInfo %>% left_join(d, by = "name_alt")
+
+      topoInfo <- topoInfo %>% dplyr::left_join(d, by = "name_alt")
 
       topoInfo <- topoInfo %>%
         mutate(labels = ifelse(is.na(a),

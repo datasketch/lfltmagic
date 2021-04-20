@@ -19,7 +19,7 @@ lflt_choropleth_GcdCatNum <- function(data = NULL, ...) {
 
   lf <- lflt_basic_choropleth(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
 
@@ -49,7 +49,7 @@ lflt_choropleth_GcdCat <- function(data = NULL, ...) {
 
   lf <- lflt_basic_choropleth(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
 
