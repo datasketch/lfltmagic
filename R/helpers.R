@@ -139,79 +139,75 @@ lflt_basic_choropleth <- function(l) {
 
   color_map <- l$theme$na_color
 
-  lf <- leaflet(l$d,
+  lm <- leaflet(l$d,
                 option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addPolygons( weight = l$theme$border_weight,
-                 fillOpacity = l$theme$topo_fill_opacity,
-                 opacity = 1,
-                 label = ~labels,
-                 color = l$border_color,
-                 fillColor = color_map,
-                 highlight = highlightOptions(
-                   color= 'white',
-                   opacity = 0.8,
-                   weight= 3,
-                   bringToFront = TRUE))
-
-  if (!is.null(l$data)) {
-    if(sum(is.na(l$d@data[["..domain"]])) == nrow(l$d@data)) {
-      lf <- lf
-    } else {
-      domain <- l$d@data[["..domain"]]#l$d@data %>% drop_na(..domain) %>% .$..domain
-      if(l$color_scale == "Custom"){
-        intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
-        domain <- intervals
-      }
+    addTopoJSON(l$geoInfo,
+                weight = l$theme$border_weight,
+                fillOpacity = l$theme$topo_fill_opacity,
+                opacity = 1,
+                color = l$border_color,
+                fillColor = color_map)
+  print("..domain" %in% names(l$d))
+  if ("..domain" %in% names(l$d)) {
+    domain <- l$d[["..domain"]]#l$d@data %>% drop_na(..domain) %>% .$..domain
+    if(l$color_scale == "Custom"){
+      intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
+      domain <- intervals
+    }
 
 
-      opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$palette_colors,
-                       # sequential = l$palette_colors_sequential,
-                       # divergent = l$palette_colors_divergent,
-                       na_color = l$theme$na_color,
-                       domain = domain,
-                       n_bins = l$n_bins,
-                       n_quantile = l$n_quantile,
-                       pretty = l$bins_pretty)
+    opts_pal <- list(color_scale = l$color_scale,
+                     palette = l$palette_colors,
+                     # sequential = l$palette_colors_sequential,
+                     # divergent = l$palette_colors_divergent,
+                     na_color = l$theme$na_color,
+                     domain = domain,
+                     n_bins = l$n_bins,
+                     n_quantile = l$n_quantile,
+                     pretty = l$bins_pretty)
 
-      pal <- lflt_palette(opts_pal)
+    pal <- lflt_palette(opts_pal)
 
-      color_map <- pal(domain)
+    color_map <- pal(domain)
 
-      fill_opacity <- l$theme$topo_fill_opacity
-      if (is(l$d[[3]], "numeric")){
-        fill_opacity <- scales::rescale(l$d[["..domain"]], to = c(0.5, 1))
-      }
+    fill_opacity <- l$theme$topo_fill_opacity
+    if (is(l$d[[3]], "numeric")){
+      fill_opacity <- scales::rescale(l$d[["..domain"]], to = c(0.5, 1))
+    }
 
 
-      lf <- leaflet(l$d,
-                    option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-        addPolygons( weight = l$theme$border_weight,
-                     fillOpacity = fill_opacity,
-                     opacity = 1,
-                     color = l$border_color,
-                     fillColor = color_map,
-                     layerId = ~a,
-                     label = ~labels,
-                     highlight = highlightOptions(
-                       color= 'white',
-                       opacity = 0.8,
-                       weight= 3,
-                       bringToFront = TRUE)
-        )
-      if (!is.null(l$data) & l$theme$legend_show) {
+    lf <- lm %>%
+      addPolygons( weight = l$theme$border_weight,
+                   fillOpacity = fill_opacity,
+                   opacity = 1,
+                   color = l$border_color,
+                   fillColor = color_map,
+                   layerId = ~a,
+                   label = ~labels,
+                   highlight = highlightOptions(
+                     color= 'white',
+                     opacity = 0.8,
+                     weight= 3,
+                     bringToFront = TRUE)
+      )
+    if ( l$theme$legend_show) {
 
-        lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
-                               position = l$theme$legend_position,
-                               na.label = l$na_label,
-                               title = l$legend_title,
-                               labFormat = lflt_legend_format(
-                                 sample =l$format_num, locale = l$locale,
-                                 prefix = l$prefix, suffix = l$suffix,
-                                 between = paste0(l$suffix, " - ", l$prefix),
-                               ))
-      }
-    }}
+      lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
+                             position = l$theme$legend_position,
+                             na.label = l$na_label,
+                             title = l$legend_title,
+                             labFormat = lflt_legend_format(
+                               sample =l$format_num, locale = l$locale,
+                               prefix = l$prefix, suffix = l$suffix,
+                               between = paste0(l$suffix, " - ", l$prefix),
+                             ))
+    }
+  } else {
+    lf <- lm %>%
+      addPolygons(weight = 0.5,
+                  label = ~labels,
+                  fillColor = color_map)
+  }
   lf
 }
 
@@ -499,12 +495,14 @@ geoType <- function(data, map_name) {
 fakeData <- function(map_name = NULL, by = "name", ...) {
   if (is.null(map_name)) return()
   centroides <- suppressWarnings(geodataMeta(map_name)$codes)
+  names_centroides <- names(centroides)
+  diff_names <- setdiff(names_centroides, c("id", "name", "lat", "lon"))
   nsample <- nrow(centroides)
   if (nsample > 30) nsample <- 30
   centroides <- centroides[sample(1:nrow(centroides), nsample),]
-  if (by == "name" & "name_addition" %in% names(centroides)) {
+  if (by == "name" & !(identical(diff_names, character()))) {
     d <- data.frame(name = centroides[[by]],
-                    name_addition = centroides[["name_addition"]], sample_value = runif(nsample, 33, 333))
+                    name_addition = centroides[[diff_names]], sample_value = runif(nsample, 33, 333))
   } else {
     d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = runif(nsample, 33, 333))
   }
@@ -605,10 +603,10 @@ guess_ftypes <- function(data, map_name) {
     if(!all(is.na(suppressWarnings(as.numeric(centroides$id))))) {
       max_gcd <- max(centroides$id)
       d_gcd <- r %>%
-                 map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
+        map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
       r <- r[d_gcd]
     }
-   ld<- map(r, function(i) {
+    ld<- map(r, function(i) {
       dic$hdType[dic$label == i] <<- "Gcd"
     })
   }

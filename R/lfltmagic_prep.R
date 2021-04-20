@@ -1,35 +1,42 @@
 
 #' @export
 lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm-Num", ...) {
-
   map_name <- opts$extra$map_name
   label_by <- opts$extra$map_label_by
-  centroides <-  suppressWarnings(geodataMeta(map_name)$codes)
-#print(centroides)
+  path_rds_centroides <- geodata::geodataRdsPath(mapName = map_name)
+  topoData <- read_rds(gsub("-centroides", "", path_rds_centroides))
+  centroides <- read_rds(suppressWarnings(path_rds_centroides))
+  nms_centroides <- names(centroides)
+  aditional_name <- setdiff(nms_centroides, c("id", "name", "lat", "lon"))
+  centroides_join <- centroides[c("id", "lat", "lon")]
   topoInfo <- suppressWarnings(topo_info(map_name))
-  topoInfo@data <- topoInfo@data %>%
-    select(-name) %>%
-    left_join(centroides, by =  "id") %>%
-    mutate(id = as.character(id))
-  if ("name_addition" %in% names(centroides) & grepl("Gnm", ftype)) {
-    topoInfo@data$name_alt <- paste0(topoInfo@data$name, " - ", topoInfo@data$name_addition)
+
+  topoInfo <- topoInfo %>%
+                left_join(centroides_join, by =  "id") %>%
+                 mutate(id = as.character(id))
+
+  topoInfo_names <- names(topoInfo)
+
+
+
+  if (!identical(aditional_name, character())) {
+    topoInfo$name_alt <- paste0(topoInfo$name, " - ", topoInfo[[aditional_name]])
   } else {
-    topoInfo@data$name_alt <- as.character(topoInfo@data[[by_col]])
+    topoInfo$name_alt <- as.character(topoInfo[[by_col]])
   }
 
-  topoInfo@data$name_alt <- iconv(tolower(topoInfo@data$name_alt), to = "ASCII//TRANSLIT")
-  topoInfo@data <- topoInfo@data %>% filter(id != -99)
+  topoInfo$name_alt <- iconv(tolower(topoInfo$name_alt), to = "ASCII//TRANSLIT")
 
-  bbox <- topoInfo@bbox
-  if (is.null(bbox)) bbox <- topo_bbox(centroides$lon, centroides$lat)
+  bbox <- st_bbox(topoInfo)
   color_scale <- opts$extra$map_color_scale
   palette_colors <-  opts$theme$palette_colors
   palette_type <-  opts$theme$palette_type
 
   if (is.null(data)) {
-    topoInfo@data <- topoInfo@data %>%
+    topoInfo <- topoInfo %>%
       mutate(labels = glue::glue(paste0('<strong>{', label_by, '}</strong>')) %>% lapply(htmltools::HTML))
   } else {
+    data <- data %>% drop_na()
     f <- homodatum::fringe(data)
     nms <- homodatum::fringe_labels(f)
     d <- homodatum::fringe_d(f)
@@ -37,14 +44,13 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
     dic$hdType[dic$hdType == "Pct"] <- "Num"
 
-
     # searches the centroids for matches of the name or code belonging to the information geographic of map_name
     if (grepl("Gcd", ftype)) {
       have_geocode <- find_geoinfo(d, centroides)
       if (is.null(have_geocode)) stop("make sure your data has geographic information")
     }
 
-    if (grepl("Gnm", ftype) & "name_addition" %in% names(centroides)) {
+    if (grepl("Gnm", ftype) & (!identical(aditional_name, character()))) {
       d$a <- paste0(d$a, " - ", d$b)
       d <- d %>% select(-b)
       dic <- dic %>%  filter(id_letters != "b")
@@ -53,6 +59,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       nms <- nms[c(1,3)]
       names(nms) <- c("a", "b")
     }
+
 
     nms[length(nms)+1] <- c("%")
     names(nms) <- c(names(nms)[-length(nms)], "..percentage")
@@ -127,7 +134,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                                              dplyr::mutate_all(as.character)))
     }
 
-#print(var_g)
+    #print(var_g)
     if (!is.null(var_g)) {
       dn <- d
       if (!is.null(agg_num))  dn <- d[,-var_nums]
@@ -194,7 +201,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
       d <- dd %>% dplyr::left_join(dn, by = var_g)
     }
-print(dic_p)
+    print(dic_p)
     default_tooltip <- dic_p$id
     ####################################
 
@@ -233,25 +240,23 @@ print(dic_p)
     }
 
     if (grepl("Gnm|Gcd", ftype)) {
-      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_sample_cat)
-      topoInfo@data$id_label <- topoInfo@data$id
+      topoInfo$name_label <- makeup::makeup_chr(topoInfo$name, opts$style$format_sample_cat)
+      topoInfo$id_label <- topoInfo$id
 
       if(grepl("\\{name\\}", opts$chart$tooltip)) {
         nm <- names(nms)
         nms <- c(nms, "name")
         names(nms) <- c(nm, "name")
       }
-
-
       d$name_alt <- iconv(tolower(d$a), to = "ASCII//TRANSLIT")
-      topoInfo@data <- topoInfo@data %>% left_join(d)
+      topoInfo <- topoInfo %>% left_join(d, by = "name_alt")
 
-      topoInfo@data <- topoInfo@data %>%
+      topoInfo <- topoInfo %>%
         mutate(labels = ifelse(is.na(a),
                                glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
                                glue::glue(lflt_tooltip(nms, label_ftype = default_tooltip, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
         )
-     # print(topoInfo@data)
+      # print(topoInfo)
     }
     # define color palette based on data type
     var_cat <- "Cat" %in% dic$hdType
@@ -277,13 +282,14 @@ print(dic_p)
 
 
     if(is.null(palette_colors)){
-        palette_colors <- opts$theme[[paste0("palette_colors_", palette_type)]]
+      palette_colors <- opts$theme[[paste0("palette_colors_", palette_type)]]
     }
 
 
-  #  print(d)
   }
-  # style titles
+
+
+
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
@@ -300,7 +306,7 @@ print(dic_p)
 
   list(
     d = topoInfo,
-    data = data,
+    geoInfo = topoData,
     b_box = bbox,
     color_scale = color_scale,
     palette_colors = palette_colors,
@@ -328,7 +334,6 @@ print(dic_p)
     locale = opts$style$locale,
     min_zoom = opts$extra$map_min_zoom
   )
-
 
 
 }

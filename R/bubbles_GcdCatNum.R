@@ -1,15 +1,43 @@
-
-#' Leaflet bubbles by categorical variable
+#' Bubbles chart Gcd Cat Num
 #'
-#' Leaflet bubbles by categorical variable
-#'
-#' @name lflt_bubbles_GcdCatNum
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gcd-Cat-Num
+#' @description
+#' `lflt_bubbles_GcdCatNum()` Create a Leaflet  Bubbles map based on a particular data type.
+#' In this case, you can load data with only three columns, where the firts it's a **geocode column**,
+#' the second is a **categorical column** and the third must be  a **numeric class column**, you should be sure that
+#' three firts columns they meet this condition
 #' @export
+#' @inheritParams hgch_bubbles_GcdCatNum
+#' @family Gcd-Cat-Num plots
+#' @section Ftype:
+#' Gcd-Cat-Num
 #' @examples
-#' lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", nrow = 10))
+#' data <- sample_data("Gcd-Cat-Num", n = 30)
+#' lflt_bubbles_GcdCatNum(data)
+#'
+#' # Activate data labels
+#' lflt_bubbles_GcdCatNum(data,
+#'                        dataLabels_show = TRUE)
+#'
+#' # if you want to calculate the average instead of the sum, you can use agg inside a function
+#' lflt_bubbles_GcdCatNum(data,
+#'                        agg = "mean",
+#'                        dataLabels_show = TRUE)
+#'
+#' # data with more of one column
+#' data <- sample_data("Gcd-Cat-Num-Dat-Yea-Cat", n = 30)
+#' lflt_bubbles_GcdCatNum(data)
+#'
+#' # Change variable to color and pallete type
+#' lflt_bubbles_GcdCatNum(data,
+#'                        color_by = names(data)[2],
+#'                        palette_type = "sequential")
+#'
+#' # Change tooltip info and add additional information contained in your data
+#' names_data <- names(data)
+#' info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
+#' data %>%
+#'  lflt_bubbles_GcdCatNum(tooltip = info_tool)
+#'
 lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 
   data[[1]] <- as_Gcd(data[[1]])
