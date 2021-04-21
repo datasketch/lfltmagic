@@ -6,7 +6,6 @@
 #' the second is a **categorical column** and the third must be  a **numeric class column**, you should be sure that
 #' three firts columns they meet this condition
 #' @export
-#' @inheritParams hgch_bubbles_GcdCatNum
 #' @family Gcd-Cat-Num plots
 #' @section Ftype:
 #' Gcd-Cat-Num
@@ -47,7 +46,7 @@ lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
 
@@ -76,7 +75,7 @@ lflt_bubbles_GcdCat <- function(data = NULL, ...) {
 
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
 

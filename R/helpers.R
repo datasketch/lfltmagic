@@ -149,7 +149,7 @@ lflt_basic_choropleth <- function(l) {
                 fillColor = color_map)
   print("..domain" %in% names(l$d))
   if ("..domain" %in% names(l$d)) {
-    domain <- l$d[["..domain"]]#l$d@data %>% drop_na(..domain) %>% .$..domain
+    domain <- l$d[["..domain"]]#l$d %>% drop_na(..domain) %>% .$..domain
     if(l$color_scale == "Custom"){
       intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
       domain <- intervals
@@ -211,63 +211,62 @@ lflt_basic_choropleth <- function(l) {
   lf
 }
 
-
-#' Basic layer points
-lflt_basic_points <- function(l) {
+#' Basic layer bubbles
+lflt_basic_bubbles <- function(l) {
 
   color_map <- l$theme$na_color
+
   lf <- leaflet(l$d,
                 option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addPolygons( weight = l$theme$border_weight,
-                 fillOpacity = l$theme$topo_fill_opacity,
-                 opacity = 1,
-                 label = ~labels,
-                 color = l$border_color,
-                 fillColor = color_map)
-
-  if (!is.null(l$data)) {
+    addTopoJSON(l$geoInfo,
+                weight = l$theme$border_weight,
+                fillOpacity = l$theme$topo_fill_opacity,
+                opacity = 1,
+                color = color_map) %>%
+    addPolygons(weight = 0.5,
+                label = ~labels,
+                color = color_map)
+print("..domain" %in% names(l$d))
+  if ("..domain" %in% names(l$d)) {
 
     radius <- 0
     color <- l$palette_colors[1]
     legend_color <- color
 
-    if (is(l$d$d, "numeric")){
-      radius <- scales::rescale(l$d$d, to = c(l$min_size, l$max_size))
+    if (is(l$d$..domain, "numeric")){
+      radius <- scales::rescale(l$d$..domain, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$d@data[["c"]],
+                       domain = l$d$..domain,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$d@data[["c"]])
-      legend_color <- "#505050"
-      cuts <- create_legend_cuts(l$d$d)
-    } else if (is(l$d$c, "numeric")){
-      radius <- scales::rescale(l$d$c, to = c(l$min_size, l$max_size))
-      cuts <- create_legend_cuts(l$d$c)
-    } else if (is(l$d$c, "character")){
-      radius <- ifelse(!is.na(l$d$c), 5, 0)
+      color <- pal(l$d[["..domain"]])
+      legend_color <- l$palette_colors[1]
+      cuts <- create_legend_cuts(l$d$..domain)
+    } else if (is(l$d$..domain, "character")){
+      radius <- ifelse(!is.na(l$d$..domain), 5, 0)
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$d@data[["c"]],
+                       domain = l$d$..domain,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$d@data[["c"]])
+      color <- pal(l$d$..domain)
     }
 
-    lf <- leaflet(l$d,
-                  option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-      addPolygons( weight = l$theme$border_weight,
-                   fillOpacity = l$theme$topo_fill_opacity,
-                   opacity = 1,
-                   color = l$border_color,
-                   fillColor = color_map) %>%
+    lon <- as.numeric(l$d$lon)
+    lat <- as.numeric(l$d$lat)
+
+    lon[is.na(radius)] <- NA
+    lat[is.na(radius)] <- NA
+
+    lf <- lf %>%
       addCircleMarkers(
-        lng = ~a,
-        lat = ~b,
+        lng = lon,
+        lat = lat,
         radius = radius,
         color = color,
         stroke = l$map_stroke,
@@ -276,10 +275,8 @@ lflt_basic_points <- function(l) {
         layerId = ~a
       )
 
-
     if (l$theme$legend_show){
-
-      if (is(l$d$c, "numeric") | is(l$d$d, "numeric")){
+      if (is(l$d$..domain, "numeric")){
         lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
                                          labels = cuts,
                                          color = legend_color,
@@ -289,8 +286,95 @@ lflt_basic_points <- function(l) {
                                          title = l$legend_title)
       }
 
-      if (is(l$d$c, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = ~c, opacity = 1,
+      if (is(l$d$..domain, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~..domain, opacity = 1,
+                               position = l$theme$legend_position,
+                               na.label = l$na_label,
+                               title = l$legend_title,
+                               labFormat = lflt_legend_format(
+                                 sample =l$format_num, locale = l$locale,
+                                 prefix = l$prefix, suffix = l$suffix,
+                                 between = paste0(l$suffix, " - ", l$prefix),
+                               ))
+      }
+    }}
+
+  lf
+}
+
+
+#' Basic layer points
+lflt_basic_points <- function(l) {
+
+  color_map <- l$theme$na_color
+  lf <-  leaflet(l$d,
+                 option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
+    addTopoJSON(l$geoInfo,
+                weight = l$theme$border_weight,
+                fillOpacity = l$theme$topo_fill_opacity,
+                opacity = 1,
+                color = color_map) %>%
+    addPolygons(weight = 0.5,
+                label = ~labels,
+                color = color_map)
+
+  if ("..domain" %in% names(l$data)) {
+
+    radius <- 0
+    color <- l$palette_colors[1]
+    legend_color <- color
+
+    if (is(l$data$..domain, "numeric")){
+      radius <- scales::rescale(l$data$..domain, to = c(l$min_size, l$max_size))
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$data$..domain,
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$data[["..domain"]])
+      legend_color <- "#505050"
+      cuts <- create_legend_cuts(l$data$..domain)
+    } else { #if (is(l$data$..domain, "character")){
+      radius <- ifelse(!is.na(l$data$..domain), 5, 0)
+      opts_pal <- list(color_scale = l$color_scale,
+                       palette = l$palette_colors,
+                       na_color = l$theme$na_color,
+                       domain = l$data$..domain,
+                       n_bins = l$n_bins,
+                       n_quantile = l$n_quantile)
+      pal <- lflt_palette(opts_pal)
+      color <- pal(l$data[["..domain"]])
+    }
+
+    lf <- lf %>%
+      addCircleMarkers(
+        lng = l$data$a,
+        lat = l$data$b,
+        radius = radius,
+        color = color,
+        stroke = l$map_stroke,
+        fillOpacity = l$bubble_opacity,
+        label = l$data$labels,
+        layerId = l$data$a
+      )
+
+
+    if (l$theme$legend_show){
+
+      if (is(l$data$..domain, "numeric")){
+        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
+                                         labels = cuts,
+                                         color = legend_color,
+                                         opacity = 1,
+                                         position = l$theme$legend_position,
+                                         na.label = l$na_label,
+                                         title = l$legend_title)
+      }
+
+      if (is(l$data$..domain, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~..domain, opacity = 1,
                                position = l$theme$legend_position,
                                na.label = l$na_label,
                                title = l$legend_title,
@@ -310,93 +394,6 @@ lflt_basic_points <- function(l) {
 
 
 
-#' Basic layer bubbles
-lflt_basic_bubbles <- function(l) {
-
-  color_map <- l$theme$na_color
-
-  lf <- leaflet(l$d,
-                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addPolygons( weight = l$theme$border_weight,
-                 fillOpacity = l$theme$topo_fill_opacity,
-                 opacity = 1,
-                 label = ~name,
-                 color = l$border_color,
-                 fillColor = color_map)
-  if (!is.null(l$data)) {
-
-    radius <- 0
-    color <- l$palette_colors[1]
-    legend_color <- color
-
-    if (is(l$d@data$..domain, "numeric")){
-      radius <- scales::rescale(l$d@data$..domain, to = c(l$min_size, l$max_size))
-      opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$palette_colors,
-                       na_color = l$theme$na_color,
-                       domain = l$d@data$..domain,
-                       n_bins = l$n_bins,
-                       n_quantile = l$n_quantile)
-      pal <- lflt_palette(opts_pal)
-      color <- pal(l$d@data[["..domain"]])
-      legend_color <- l$palette_colors[1]
-      cuts <- create_legend_cuts(l$d@data$..domain)
-    } else if (is(l$d@data$..domain, "character")){
-      radius <- ifelse(!is.na(l$d@data$..domain), 5, 0)
-      opts_pal <- list(color_scale = l$color_scale,
-                       palette = l$palette_colors,
-                       na_color = l$theme$na_color,
-                       domain = l$d@data$..domain,
-                       n_bins = l$n_bins,
-                       n_quantile = l$n_quantile)
-      pal <- lflt_palette(opts_pal)
-      color <- pal(l$d@data$..domain)
-    }
-
-    lon <- l$d$lon
-    lat <- l$d$lat
-
-    lon[is.na(radius)]=NA
-    lat[is.na(radius)]=NA
-
-    lf <- lf %>%
-      addCircleMarkers(
-        lng = lon,
-        lat = lat,
-        radius = radius,
-        color = color,
-        stroke = l$map_stroke,
-        fillOpacity = l$bubble_opacity,
-        label = ~labels,
-        layerId = ~a
-      )
-
-    if (l$theme$legend_show){
-      if (is(l$d@data$..domain, "numeric")){
-        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
-                                         labels = cuts,
-                                         color = legend_color,
-                                         opacity = 1,
-                                         position = l$theme$legend_position,
-                                         na.label = l$na_label,
-                                         title = l$legend_title)
-      }
-
-      if (is(l$d@data$..domain, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = ~..domain, opacity = 1,
-                               position = l$theme$legend_position,
-                               na.label = l$na_label,
-                               title = l$legend_title,
-                               labFormat = lflt_legend_format(
-                                 sample =l$format_num, locale = l$locale,
-                                 prefix = l$prefix, suffix = l$suffix,
-                                 between = paste0(l$suffix, " - ", l$prefix),
-                               ))
-      }
-    }}
-
-  lf
-}
 
 
 url_logo <- function(logo, background_color) {

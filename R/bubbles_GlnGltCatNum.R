@@ -16,7 +16,7 @@ lflt_bubbles_GlnGltCatNum <- function(data = NULL, ...) {
 
   lf <- lflt_basic_points(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
   lf
@@ -33,4 +33,16 @@ lflt_bubbles_GlnGltCatNum <- function(data = NULL, ...) {
 #' @export
 #' @examples
 #' lflt_bubbles_GlnGltCat(sample_data("Gln-Glt-Cat", nrow = 10))
-lflt_bubbles_GlnGltCat <- lflt_bubbles_GlnGltCatNum
+lflt_bubbles_GlnGltCat <-  function(data = NULL, ...) {
+
+  opts <- dsvizopts::merge_dsviz_options(...)
+  l <- lfltmagic_prep(data = data, opts = opts, ftype= "Gln-Glt-Cat")
+
+  lf <- lflt_basic_points(l) %>%
+    lflt_background(l$theme) %>%
+    #lflt_bounds(l$b_box) %>%
+    lflt_graticule(l$graticule) %>%
+    lflt_titles(l$titles)
+  lf
+}
+

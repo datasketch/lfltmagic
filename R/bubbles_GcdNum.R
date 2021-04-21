@@ -18,7 +18,7 @@ lflt_bubbles_GcdNum <- function(data = NULL, ...) {
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype="Gcd-Num")
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
   lf
@@ -43,7 +43,7 @@ lflt_bubbles_Gcd <- function(data = NULL, ...) {
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype="Gcd")
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
   lf

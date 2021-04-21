@@ -18,7 +18,7 @@ lflt_bubbles_GnmNum <- function(data = NULL, ...) {
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
   lf <- lflt_basic_bubbles(l) %>%
           lflt_background(l$theme) %>%
-            lflt_bounds(l$b_box) %>%
+            #lflt_bounds(l$b_box) %>%
               lflt_graticule(l$graticule) %>%
                 lflt_titles(l$titles)
   lf
@@ -44,7 +44,7 @@ lflt_bubbles_Gnm <- function(data = NULL, ...) {
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm")
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    lflt_bounds(l$b_box) %>%
+    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
   lf
