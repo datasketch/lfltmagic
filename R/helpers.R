@@ -577,11 +577,13 @@ guess_ftypes <- function(data, map_name) {
 
   centroides <- suppressWarnings(geodataMeta(map_name)$codes)
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
+  dif_names <- setdiff(names(centroides), c("id", "name", "lat", "lon"))
 
-  if ("name_addition" %in% names(centroides)) {
-    col_names <- c("name", "name_addition")
+
+  if (!identical(dif_names, character())) {
+    col_names <- c("name", dif_names)
     centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
-    centroides$name_addition <- iconv(tolower(centroides$name_addition), to = "ASCII//TRANSLIT")
+    centroides[[dif_names]] <- iconv(tolower(centroides[[dif_names]]), to = "ASCII//TRANSLIT")
   } else {
     col_names <- c("name")
     centroides$name <- iconv(tolower(centroides$name), to = "ASCII//TRANSLIT")
