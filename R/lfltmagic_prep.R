@@ -33,6 +33,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   palette_colors <-  opts$theme$palette_colors
   palette_type <-  opts$theme$palette_type
 
+  d <- NULL
+
   if (is.null(data)) {
     topoInfo <- topoInfo %>%
       mutate(labels = glue::glue(paste0('<strong>{', label_by, '}</strong>')) %>% lapply(htmltools::HTML))
@@ -311,7 +313,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
   list(
-    d = topoInfo,
+    topoInfo = topoInfo,
     data = d,
     geoInfo = topoData,
     #b_box = bbox,
