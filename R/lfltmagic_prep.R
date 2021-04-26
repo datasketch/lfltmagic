@@ -28,7 +28,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
   topoInfo$name_alt <- iconv(tolower(topoInfo$name_alt), to = "ASCII//TRANSLIT")
 
-  #bbox <- st_bbox(topoInfo)
+  bbox <- st_bbox(topoInfo)
   color_scale <- opts$extra$map_color_scale
   palette_colors <-  opts$theme$palette_colors
   palette_type <-  opts$theme$palette_type
@@ -316,7 +316,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     topoInfo = topoInfo,
     data = d,
     geoInfo = topoData,
-    #b_box = bbox,
+    b_box = bbox,
     color_scale = color_scale,
     palette_colors = palette_colors,
     titles = list(title = title,
