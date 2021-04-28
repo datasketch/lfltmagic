@@ -46,7 +46,6 @@ lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
 
@@ -59,9 +58,9 @@ lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 #'
 #' @description
 #' `lflt_bubbles_GcdCat()` Create a Leaflet bubbles map based on a particular data type.
-#' In this case, you can load data with only three columns, where the firts it's a
+#' In this case, you can load data with only two columns, where the firts it's a
 #'  **geocode column**, and second is a **categorical column**,
-#' or be sure that three firts columns they meet this condition
+#' or make sure that the firts two columns of you data meet this condition
 #' @export
 #' @inheritParams lflt_bubbles_GcdCatNum
 #' @section Ftype:
@@ -97,7 +96,6 @@ lflt_bubbles_GcdCat <- function(data = NULL, ...) {
 
   lf <- lflt_basic_bubbles(l) %>%
     lflt_background(l$theme) %>%
-    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
 

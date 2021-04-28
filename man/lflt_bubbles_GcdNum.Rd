@@ -2,23 +2,31 @@
 % Please edit documentation in R/bubbles_GcdNum.R
 \name{lflt_bubbles_GcdNum}
 \alias{lflt_bubbles_GcdNum}
-\title{Leaflet bubbless by numerical variable}
+\title{Bubbles chart Gcd Num}
 \usage{
 lflt_bubbles_GcdNum(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbless by numerical variable
+\code{lflt_bubbles_GcdNum()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with only two columns, where the firts it's a \strong{geocode column},
+and the second is a \strong{numeric class column}, or make sure that the first two columns of
+your data meet this condition
 }
-\section{ctypes}{
- Gcd-Num
+\section{Ftype}{
+
+Gcd-Num
 }
 
 \examples{
-lflt_bubbles_GcdNum(sampleData("Gcd-Num", nrow = 10))
+data <- sample_data("Gcd-Num", n = 30)
+lflt_bubbles_GcdNum(data)
+
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_bubbles_GcdNum(data,
+                       agg = "mean")
+
+
+
 }
+\concept{Gcd-Num plots}
