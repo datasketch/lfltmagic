@@ -45,7 +45,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     dic <- fringe_dic(f, id_letters = T)
     pre_ftype <- strsplit(ftype, "-") %>% unlist()
     dic$hdType[dic$hdType == "Pct"] <- "Num"
-
+    default_tooltip <- names(d)
     # searches the centroids for matches of the name or code belonging to the information geographic of map_name
     if (grepl("Gcd", ftype)) {
       have_geocode <- find_geoinfo(d, centroides)
@@ -141,8 +141,11 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       dn <- d
       if (!is.null(agg_num))  dn <- d[,-var_nums]
 
+      n_cats <- length(var_g)
 
-      if (length(var_g) == 1) {
+      if (grepl("Gln-Glt-Cat", ftype)) n_cats <- 3
+
+      if (n_cats == 1) {
         dd <- function_agg(df = d, agg = opts$summarize$agg, to_agg = agg_num, a)
 
         dd <- dsvizopts::preprocessData(dd, drop_na = opts$preprocess$drop_na,
@@ -151,19 +154,13 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         dd <- dsvizopts::postprocess(dd, agg_var, sort = opts$postprocess$sort, slice_n = opts$postprocess$slice_n)
 
         dd$..percentage <- (dd[[agg_var]]/sum(dd[[agg_var]], na.rm = TRUE)) * 100
-        if (!is.null(agg_num)) {
-          dd$..domain <- dd$b
-        } else {
-          dd$..domain <- dd$..count
-        }
-
         dn <- dn %>%
           dplyr::group_by(a) %>%
           dplyr::summarise_all(.funs = func_paste)
-      } else {
+      } else if (n_cats == 2) {
 
         dd <- function_agg(df = d, agg = opts$summarize$agg, to_agg = agg_num, a, b)
-        print(dd)
+
         by_col <- opts$postprocess$percentage_col
         if (is.null(by_col)) {
           by_col <- "a"
@@ -181,11 +178,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
         dd <- dsvizopts::postprocess(dd, agg_var, sort = opts$postprocess$sort, slice_n = opts$postprocess$slice_n)
-        if (!is.null(agg_num)) {
-          dd$..domain <- dd$c
-        } else {
-          dd$..domain <- dd$..count
-        }
+
         dn$a[is.na(dn$a)] <- opts$preprocess$na_label
         dn$b[is.na(dn$b)] <- opts$preprocess$na_label
 
@@ -195,6 +188,23 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
           dplyr::summarise_each(dplyr::funs(func_paste))
         dd$b <- as.character(dd$b)
         dn$b <- as.character(dn$b)
+      } else {
+        var_g <- c("a", "b", "c")
+        dd <- function_agg(df = d, agg = opts$summarize$agg, to_agg = agg_num, a, b, c)
+
+        by_col <- "c"
+
+        agg_var_t <- rlang::sym(agg_var)
+        dd <- dd %>%
+          dplyr::group_by_(by_col) %>%
+          dplyr::mutate(..percentage = (!!agg_var_t/sum(!!agg_var_t, na.rm = TRUE))*100)
+
+      }
+
+      if (!is.null(agg_num)) {
+        dd$..domain <- dd[[agg_num]]
+      } else {
+        dd$..domain <- dd$..count
       }
 
       dic_alt <- dic_alt %>%
@@ -204,7 +214,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       d <- dd %>% dplyr::left_join(dn, by = var_g)
     }
     print(dic_p)
-    default_tooltip <- dic_p$id
+    #default_tooltip <- dic_p$id
     ####################################
 
     if (ftype == "Gcd" | ftype == "Gnm") {
@@ -238,12 +248,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
     if (grepl("Gln|Glt", ftype)) {
       topoInfo$labels <- topoInfo[[label_by]]
-      default_tooltip <- names(d)
+      #default_tooltip <- names(d)
       d$..domain <- 1
 
       if (grepl("Num|Cat", ftype)) {
         d$..domain <- d$c
-        default_tooltip <- names(d)
+        #default_tooltip <- names(d)
       }
 
 

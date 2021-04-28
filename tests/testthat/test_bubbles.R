@@ -73,5 +73,38 @@ test_that("Bubbles Gcd", {
   # Bubbles Glt Gln Num
   data <- sample_data("Gln-Glt-Num", n = 30)
   lflt_bubbles_GlnGltNum(data)
+
+
+  data <- sample_data("Gln-Glt-Cat", n = 30)
+  lflt_bubbles_GlnGltCat(data)
+
+
+  # data with more of one column
+  data <- sample_data("Gln-Glt-Cat-Dat-Yea-Cat", n = 30)
+  lflt_bubbles_GlnGltCat(data)
+
+  # Change variable to color and pallete type
+  lflt_bubbles_GlnGltCat(data,
+                         color_by = names(data)[3],
+                         palette_type = "sequential")
+
+  # Bubbles Gln Glt Cat Num
+  data <- sample_data("Gln-Glt-Cat-Num", n = 30)
+  lflt_bubbles_GlnGltCatNum(data)
+
+
+  lflt_bubbles_GlnGltCatNum(data,
+                         agg = "mean",
+                         color_by = names(data)[4],
+                         palette_type = "sequential")
+
+
+  data <- sample_data("Gln-Glt-Cat-Num-Dat-Yea-Cat", n = 30)
+  lflt_bubbles_GlnGltCatNum(data)
+
+
+  lflt_bubbles_GlnGltCatNum(data,
+                         color_by = names(data)[3],
+                         palette_type = "sequential")
 })
 

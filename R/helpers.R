@@ -338,10 +338,10 @@ lflt_basic_points <- function(l) {
       cuts <- create_legend_cuts(l$data$..domain)
     } else { #if (is(l$data$..domain, "character")){
       radius <- ifelse(!is.na(l$data$..domain), 5, 0)
-      opts_pal <- list(color_scale = l$color_scale,
+      opts_pal <- list(color_scale = "Custom",
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$data$..domain,
+                       domain = unique(l$data$..domain),
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
@@ -374,7 +374,7 @@ lflt_basic_points <- function(l) {
       }
 
       if (is(l$data$..domain, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = ~..domain, opacity = 1,
+        lf <- lf %>% addLegend(pal = pal, values = l$data$..domain, opacity = 1,
                                position = l$theme$legend_position,
                                na.label = l$na_label,
                                title = l$legend_title,
