@@ -7,9 +7,9 @@
 lflt_bubbles_GcdCatNum(data = NULL, ...)
 }
 \description{
-`lflt_bubbles_GcdCatNum()` Create a Leaflet  Bubbles map based on a particular data type.
-In this case, you can load data with only three columns, where the firts it's a **geocode column**,
-the second is a **categorical column** and the third must be  a **numeric class column**, you should be sure that
+\code{lflt_bubbles_GcdCatNum()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with only three columns, where the firts it's a \strong{geocode column},
+the second is a \strong{categorical column} and the third must be  a \strong{numeric class column}, you should be sure that
 three firts columns they meet this condition
 }
 \section{Ftype}{

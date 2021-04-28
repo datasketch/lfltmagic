@@ -7,12 +7,10 @@ Description: A wrapper for highcharter
 Depends:
     R (>= 3.0.0),
     tools,
-    homodatum,
     readr,
     tidyr,
     dplyr,
     purrr,
-    geodata,
     leaflet,
     d3.format,
     dsvizopts,
@@ -21,12 +19,17 @@ Depends:
     leaflet.esri,
     htmltools,
     rgdal
+VignetteBuilder: 
+    knitr
 Remotes:
     datasketch/homodatum,
     datasketch/geodata,
-    datasketch/dsvizopts,
     datasketch/makeup,
+    datasketch/paletero,
+    datasketch/dsvizopts,
     dreamRs/d3.format
-License: MIT
-LazyData: true
+License: MIT + file LICENSE
+LazyData: no
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Encoding: UTF-8
