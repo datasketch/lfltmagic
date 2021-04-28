@@ -66,5 +66,12 @@ test_that("Bubbles Gcd", {
   lflt_bubbles_GcdCatNum(data = df)
 
 
+  # Bubbles Glt Gln
+  data <- sample_data("Gln-Glt", n = 30)
+  lflt_bubbles_GlnGlt(data)
+
+  # Bubbles Glt Gln Num
+  data <- sample_data("Gln-Glt-Num", n = 30)
+  lflt_bubbles_GlnGltNum(data)
 })
 

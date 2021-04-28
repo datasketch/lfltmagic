@@ -1,14 +1,17 @@
-
-#' Leaflet bubbles by numerical variable
+#' #' Bubbles chart Gln Glt Num
 #'
-#'
-#' @name lflt_bubbles_GlnGltNum
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gnm-Num
+#' @description
+#' `lflt_bubbles_GlnGlt()` Create a Leaflet bubbles map based on a particular data type.
+#' In this case, you can load data with only three columns, where the firts column contains **longitudes points**,
+#' the second **latitudes points** and the third must be a **numeric class column**,
+#'  or be sure that three firts columns they meet this condition.
 #' @export
+#' @family Gln-Glt-Num plots
+#' @section Ftype:
+#' Gln-Glt-Num
 #' @examples
-#' lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num", nrow = 10))
+#' data <- sample_data("Gln-Glt-Num", n = 30)
+#' lflt_bubbles_GlnGltNum(data)
 lflt_bubbles_GlnGltNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
@@ -23,16 +26,29 @@ lflt_bubbles_GlnGltNum <- function(data = NULL, ...) {
 }
 
 
-#' Leaflet bubbles with constant radius
+#' Bubbles chart Gln Glt
 #'
+#' @description
+#' `lflt_bubbles_GlnGlt()` Create a Leaflet bubbles map based on a particular data type.
+#' In this case, you can load data with only two columns, where the firts column contains **longitudes points**,
+#' and the second **latitudes points**, or make sure that the first two columns of
+#' your data meet this condition
 #'
-#' @name lflt_bubbles_GlnGlt
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gln-Glt
 #' @export
+#' @inheritParams lflt_bubbles_GlnGlt
+#' @section Ftype:
+#' Gln-Glt
 #' @examples
-#' lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+#' data <- sample_data("Gln-Glt", n = 30)
+#' lflt_bubbles_GlnGlt(data)
+#'
+#'
+#' # if you want to calculate the average instead of the sum, you can use agg inside a function
+#' lflt_bubbles_GlnGlt(data,
+#'                        agg = "mean")
+#'
+#'
+#'
 lflt_bubbles_GlnGlt <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
@@ -40,7 +56,6 @@ lflt_bubbles_GlnGlt <- function(data = NULL, ...) {
 
   lf <- lflt_basic_points(l) %>%
     lflt_background(l$theme) %>%
-    #lflt_bounds(l$b_box) %>%
     lflt_graticule(l$graticule) %>%
     lflt_titles(l$titles)
   lf

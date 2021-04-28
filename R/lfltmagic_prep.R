@@ -28,7 +28,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
   topoInfo$name_alt <- iconv(tolower(topoInfo$name_alt), to = "ASCII//TRANSLIT")
 
-  bbox <- st_bbox(topoInfo)
   color_scale <- opts$extra$map_color_scale
   palette_colors <-  opts$theme$palette_colors
   palette_type <-  opts$theme$palette_type
@@ -239,8 +238,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
     if (grepl("Gln|Glt", ftype)) {
       topoInfo$labels <- topoInfo[[label_by]]
+      default_tooltip <- names(d)
       d$..domain <- 1
-      if (grepl("Num|Cat", ftype)) d$..domain <- d$c
+
+      if (grepl("Num|Cat", ftype)) {
+        d$..domain <- d$c
+        default_tooltip <- names(d)
+      }
+
 
       d <- d %>%
         mutate(labels = glue::glue(lflt_tooltip(nms, label_ftype = default_tooltip, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
@@ -316,7 +321,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     topoInfo = topoInfo,
     data = d,
     geoInfo = topoData,
-    b_box = bbox,
     color_scale = color_scale,
     palette_colors = palette_colors,
     titles = list(title = title,

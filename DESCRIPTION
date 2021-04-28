@@ -7,6 +7,9 @@ Description: A wrapper for highcharter
 Depends:
     R (>= 3.0.0),
     tools,
+    homodatum,
+    yaml,
+    geodata,
     readr,
     tidyr,
     dplyr,
