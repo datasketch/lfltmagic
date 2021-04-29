@@ -14,8 +14,9 @@ test_that("Choropleth", {
 
   # choropleth Gnm Cat Num
   data <- sample_data("Gnm-Cat-Num", n = 30)
-  lflt_choropleth_GnmCatNum(data)
-
+  lflt_choropleth_GnmCatNum(data,
+                            color_by = names(data)[2],
+                            palette_type = "sequential")
   # choropleth Gnm Cat
   data <- sample_data("Gnm-Cat", n = 30)
   lflt_choropleth_GnmCat(data)
