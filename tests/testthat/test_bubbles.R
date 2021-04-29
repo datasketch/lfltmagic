@@ -40,6 +40,14 @@ test_that("Bubbles", {
 
 test_that("Bubbles Gcd", {
 
+  # Bubbles Gnm
+  data <- sample_data("Gnm", n = 30)
+  lflt_bubbles_Gnm(data)
+
+  # Bubbles Gnm Num
+  data <- sample_data("Gnm-Num", n = 30)
+  lflt_bubbles_GnmNum(data)
+
 
   # Bubbles Gnm Cat Num
   data <- sample_data("Gnm-Cat-Num", n = 30)
