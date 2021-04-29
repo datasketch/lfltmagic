@@ -2,23 +2,41 @@
 % Please edit documentation in R/choropleth_GnmCatNum.R
 \name{lflt_choropleth_GnmCat}
 \alias{lflt_choropleth_GnmCat}
-\title{Leaflet choropleths by categorical variable}
+\title{Leaflet choropleth by categorical variable}
 \usage{
 lflt_choropleth_GnmCat(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet choropleths by categorical variable
+\code{lflt_choropleth_GnmCat()} Create a Leaflet choropleth map based on a particular data type.
+In this case, you can load data with only two columns, where the firts it's a
+\strong{geoname column}, and second is a \strong{categorical column},
+or make sure that the firts two columns of you data meet this condition
 }
-\section{ctypes}{
- Gnm-Cat
+\section{Ftype}{
+
+Gnm-Cat
 }
 
 \examples{
-lflt_choropleth_GnmCat(sample_data("Gnm-Cat", nrow = 10))
+data <- sample_data("Gnm-Cat", n = 30)
+lflt_choropleth_GnmCat(data)
+
+# Activate data labels
+lflt_choropleth_GnmCat(data,
+                       dataLabels_show = TRUE)
+
+# data with more of one column
+data <- sample_data("Gnm-Cat-Dat-Yea-Cat", n = 30)
+lflt_choropleth_GnmCat(data)
+
+# Change variable to color and pallete type
+lflt_choropleth_GnmCat(data,
+                       color_by = names(data)[2],
+                       palette_type = "sequential")
+
+# Change tooltip info and add additional information contained in your data
+names_data <- names(data)
+info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
+data \%>\%
+ lflt_choropleth_GnmCat(tooltip = info_tool)
 }

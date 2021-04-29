@@ -1,6 +1,12 @@
 context("lflt magic prep")
 
 
+test_that("lfltmagic has a valid class after valid data input", {
+  data(mpg, package = "ggplot2")
+  lm <- lflt_choropleth_GnmNum(data)
+  expect_true(all(class(lm) %in% c("leaflet","htmlwidget")))
+})
+
 test_that("Choropleth", {
 
   # choropleth Gnm
@@ -9,7 +15,7 @@ test_that("Choropleth", {
 
   # choropleth Gnm Num
   data <- sample_data("Gnm-Num", n = 30)
-  lflt_choropleth_GnmNum(data)
+  lf <- lflt_choropleth_GnmNum(data)
 
 
   # choropleth Gnm Cat Num

@@ -2,23 +2,42 @@
 % Please edit documentation in R/bubbles_GlnGltCatNum.R
 \name{lflt_bubbles_GlnGltCatNum}
 \alias{lflt_bubbles_GlnGltCatNum}
-\title{Leaflet bubbles by categorical variable}
+\title{Bubbles chart Gln Glt Cat Num}
 \usage{
 lflt_bubbles_GlnGltCatNum(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbles by categorical variable
+\code{lflt_bubbles_GlnGltCatNum()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with four columns, where the firts column contains \strong{longitudes points},
+the second \strong{latitudes points}, the third is a \strong{categorical column} and the fourth must be a \strong{numeric class column},
+or you must be sure that the first four columns of your data meet these rule.
 }
-\section{ctypes}{
- Gln-Glt-Cat-Num
+\section{Ftype}{
+
+Gln-Glt-Cat-Num
 }
 
 \examples{
-lflt_bubbles_GlnGltCatNum(sample_data("Gln-Glt-Cat-Num", nrow = 10))
+data <- sample_data("Gln-Glt-Cat-Num", n = 30)
+lflt_bubbles_GlnGltCatNum(data)
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_bubbles_GlnGltCatNum(data,
+                       agg = "mean")
+
+# data with more of one column
+data <- sample_data("Gln-Glt-Cat-Num-Dat-Yea-Cat", n = 30)
+lflt_bubbles_GlnGltCatNum(data)
+
+# Change variable to color and pallete type
+lflt_bubbles_GlnGltCatNum(data,
+                       color_by = names(data)[3],
+                       palette_type = "sequential")
+
+# Change tooltip info and add additional information contained in your data
+names_data <- names(data)
+info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
+data \%>\%
+ lflt_bubbles_GlnGltCatNum(tooltip = info_tool)
 }
+\concept{Gln-Glt-Cat-Num plots}

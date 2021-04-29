@@ -2,23 +2,41 @@
 % Please edit documentation in R/bubbles_GlnGltCatNum.R
 \name{lflt_bubbles_GlnGltCat}
 \alias{lflt_bubbles_GlnGltCat}
-\title{Leaflet bubbles by categorical variable}
+\title{Bubbles chart Gln Glt Cat}
 \usage{
 lflt_bubbles_GlnGltCat(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbles by categorical variable
+\code{lflt_bubbles_GlnGltCat()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with four columns, where the firts column contains \strong{longitudes points},
+the second \strong{latitudes points} and the third is a \strong{categorical column},
+or you must be sure that the first four columns of your data meet these rule.
 }
-\section{ctypes}{
- Gln-Glt-Cat
+\section{Ftype}{
+
+Gln-Glt-Cat
 }
 
 \examples{
-lflt_bubbles_GlnGltCat(sample_data("Gln-Glt-Cat", nrow = 10))
+data <- sample_data("Gln-Glt-Cat", n = 30)
+lflt_bubbles_GlnGltCat(data)
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_bubbles_GlnGltCat(data,
+                       agg = "mean")
+
+# data with more of one column
+data <- sample_data("Gln-Glt-Cat-Dat-Yea-Cat", n = 30)
+lflt_bubbles_GlnGltCat(data)
+
+# Change variable to color and pallete type
+lflt_bubbles_GlnGltCat(data,
+                       color_by = names(data)[3],
+                       palette_type = "sequential")
+
+# Change tooltip info and add additional information contained in your data
+names_data <- names(data)
+info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
+data \%>\%
+ lflt_bubbles_GlnGltCat(tooltip = info_tool)
 }

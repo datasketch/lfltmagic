@@ -6,19 +6,37 @@
 \usage{
 lflt_bubbles_GnmCat(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbles by categorical variable
+\code{lflt_bubbles_GnmCat()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with only two columns, where the firts it's a
+\strong{geoname column}, and second is a \strong{categorical column},
+or make sure that the firts two columns of you data meet this condition
 }
-\section{ctypes}{
- Gnm-Cat
+\section{Ftype}{
+
+Gnm-Cat
 }
 
 \examples{
-lflt_bubbles_GnmCat(sample_data("Gnm-Cat", nrow = 10))
+data <- sample_data("Gnm-Cat", n = 30)
+lflt_bubbles_GnmCat(data)
+
+# Activate data labels
+lflt_bubbles_GnmCat(data,
+                       dataLabels_show = TRUE)
+
+# data with more of one column
+data <- sample_data("Gnm-Cat-Dat-Yea-Cat", n = 30)
+lflt_bubbles_GnmCat(data)
+
+# Change variable to color and pallete type
+lflt_bubbles_GnmCat(data,
+                       color_by = names(data)[2],
+                       palette_type = "sequential")
+
+# Change tooltip info and add additional information contained in your data
+names_data <- names(data)
+info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
+data \%>\%
+ lflt_bubbles_GnmCat(tooltip = info_tool)
 }

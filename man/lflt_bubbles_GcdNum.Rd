@@ -29,4 +29,8 @@ lflt_bubbles_GcdNum(data,
 
 
 }
+\seealso{
+Other Gcd-Num plots: 
+\code{\link{lflt_choropleth_GcdNum}()}
+}
 \concept{Gcd-Num plots}

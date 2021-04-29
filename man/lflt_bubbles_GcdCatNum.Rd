@@ -45,4 +45,8 @@ info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", na
 data \%>\%
  lflt_bubbles_GcdCatNum(tooltip = info_tool)
 }
+\seealso{
+Other Gcd-Cat-Num plots: 
+\code{\link{lflt_choropleth_GcdCatNum}()}
+}
 \concept{Gcd-Cat-Num plots}
