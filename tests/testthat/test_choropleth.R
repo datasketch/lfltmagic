@@ -32,7 +32,7 @@ test_that("Choropleth", {
   lflt_choropleth_GcdNum(data)
 
   # choropleth Gcd Cat
-  data <- sample_data("Gcd-Cat", n = 30, addNA = F)
+  data <- sample_data("Gcd-Cat", n = 100, addNA = F)
   lflt_choropleth_GcdCat(data)
   lflt_choropleth_GcdCat(data,
                       color_by = names(data)[2],

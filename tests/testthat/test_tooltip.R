@@ -1,25 +1,33 @@
-context("helpers")
+context("lflt magic prep")
 
-test_that("Tooltips", {
+test_that("Tooltip", {
 
-  data <- sample_data("Gcd")
-  names(data) <- "Countries"
+  data <- sample_data("Gcd-Cat-Num-Num-Cat-Gnm")
+  names(data) <- gsub("[][()*`|]", "", names(data))
   f <- homodatum::fringe(data)
   nms <- homodatum::fringe_labels(f)
-  t_t <- lflt_tooltip(nms = nms, tooltip = "test {Countries}")
-  expect_equal(t_t,  "test {a_label}")
+  lf <- c("a", "c", "d")
+  l_tooltip <- lflt_tooltip(nms,
+                            label_ftype = lf,
+                            tooltip = "")
 
+  nms_filter <-  nms[names(nms) %in% lf]
+  nms_names <- names(nms_filter)
+  l <- map(seq_along(nms_filter), function(i){
+    paste0("<span style='font-size:15px;'><strong>", nms_filter[[i]], ":</strong> {", nms_names[i], "_label}</span>")
+  }) %>% unlist()
+  tooltip <- paste0(l, collapse = "<br/>")
+  expect_identical(l_tooltip, tooltip)
 
-  data <- sample_data("Glt-Gln-Cat-Num-Num-Num")
-  names(data) <- c("Lat", "Long", "Categories", "Values_uno", "Values_two", "Values_trhee")
-  f <- homodatum::fringe(data)
-  nms <- homodatum::fringe_labels(f)
-  t_t <- lflt_tooltip(nms = nms, tooltip = "La Categoria {Categories} tiene {Values_uno} y {Values_trhee} mariposas")
-  expect_equal(t_t,  "La Categoria {c_label} tiene {d_label} y {f_label} mariposas")
-
-  t_t <- lflt_tooltip(nms = nms, tooltip = "Hola")
-  expect_equal(t_t,  "Hola")
-
-
+ tooltip_eg <- paste0(names(data)[6], ": {", names(data)[6], "}", "<br/>",
+                      names(data)[3], ": {", names(data)[3], "}", "<br/>",
+                      "tooltip test")
+  l_tooltip <- lflt_tooltip(nms,
+                            label_ftype = names(nms),
+                            tooltip = tooltip_eg)
+  tooltip_eg <- gsub(paste0("\\{",names(data)[6], "\\}"), paste0("{",letters[6], "_label}"), tooltip_eg)
+  tooltip_eg <- gsub(paste0("\\{",names(data)[3], "\\}"), paste0("{",letters[3], "_label}"), tooltip_eg)
+  expect_identical(l_tooltip, tooltip_eg)
 
 })
+

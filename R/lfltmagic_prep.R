@@ -273,7 +273,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       d$name_alt <- iconv(tolower(d$a), to = "ASCII//TRANSLIT")
 
       topoInfo <- topoInfo %>% dplyr::left_join(d, by = "name_alt")
-
       topoInfo <- topoInfo %>%
         mutate(labels = ifelse(is.na(a),
                                glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
