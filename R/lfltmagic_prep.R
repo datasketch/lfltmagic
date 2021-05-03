@@ -270,6 +270,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
         nms <- c(nms, "name")
         names(nms) <- c(nm, "name")
       }
+
       d$name_alt <- iconv(tolower(d$a), to = "ASCII//TRANSLIT")
 
       topoInfo <- topoInfo %>% dplyr::left_join(d, by = "name_alt")

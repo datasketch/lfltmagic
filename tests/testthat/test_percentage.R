@@ -7,7 +7,7 @@ test_that("Percentage", {
                                    rep("LSO", 37)))
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, by_col = "id", ftype = "Gcd")
-  expect_equal(sum(l$d@data$..percentage, na.rm = TRUE), 100)
+  expect_equal(sum(l$data$..percentage, na.rm = TRUE), 100)
 
 
   data <- data.frame(Ciudad = c(rep("Cauca", 15),
@@ -25,13 +25,13 @@ test_that("Percentage", {
   dd <- data %>% group_by(Ciudad, Cosa) %>% summarise(total = n())
   d_test <- dd %>% ungroup() %>% group_by(Ciudad) %>% mutate(p = total/sum(total) * 100)
   l <- lfltmagic_prep(data, opts, by_col = "name", ftype = "Gnm-Cat")
-  expect_equal(l$d@data %>% drop_na(..percentage) %>% .$..percentage, d_test$p)
+  expect_equal(l$data %>% drop_na(..percentage) %>% .$..percentage, d_test$p)
 
 
   d_test <- dd %>% ungroup() %>% group_by(Cosa) %>% mutate(p = total/sum(total) * 100)
   opts$postprocess$percentage_col <- names(data)[2]
   l <- lfltmagic_prep(data, opts, by_col = "name", ftype = "Gnm-Cat")
-  expect_equal(l$d@data %>% drop_na(..percentage) %>% .$..percentage, d_test$p)
+  expect_equal(l$data %>% drop_na(..percentage) %>% .$..percentage, d_test$p)
 
 
 
@@ -44,7 +44,7 @@ test_that("Percentage", {
   opts <- dsvizopts::dsviz_defaults()
   opts$extra$map_name <- "col_departments"
   l <- lfltmagic_prep(data, opts, by_col = "name", ftype = "Gnm-Num")
-  expect_equal(sum(l$d@data$..percentage, na.rm = TRUE), 100)
+  expect_equal(sum(l$data$..percentage, na.rm = TRUE), 100)
 
   data <- data.frame(Ciudad = c(rep("Cauca", 15),
                                 rep("chocó", 11),
@@ -61,7 +61,7 @@ test_that("Percentage", {
   l <- lfltmagic_prep(data, opts, by_col = "name", ftype = "Gnm-Cat-Num")
   dd <- data %>% group_by(Ciudad, Cosa) %>% summarise(Valor = sum(Valor))
   d_test <- dd %>% ungroup() %>% group_by(Ciudad) %>% mutate(p = Valor/sum(Valor) * 100)
-  expect_equal(l$d@data %>% drop_na(..percentage) %>% .$..percentage, d_test$p)
+  expect_equal(l$data %>% drop_na(..percentage) %>% .$..percentage, d_test$p)
 
 })
 

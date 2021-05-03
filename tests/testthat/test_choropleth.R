@@ -19,7 +19,7 @@ test_that("Choropleth", {
 
 
   # choropleth Gnm Cat Num
-  data <- sample_data("Gnm-Cat-Num", n = 30)
+  data <- sample_data("Gnm-Cat-Num-Cat-Dat", n = 30)
   lflt_choropleth_GnmCatNum(data,
                             color_by = names(data)[2],
                             palette_type = "sequential")
@@ -48,7 +48,7 @@ test_that("Choropleth", {
   lflt_choropleth_GcdCatNum()
 
   df <- sample_data("Gcd-Cat-Num")
-  lflt_choropleth_GcdCatNum(data = df)
+  lflt_choropleth_GcdCatNum(data = df, tooltip = "{Count}")
 
 
 

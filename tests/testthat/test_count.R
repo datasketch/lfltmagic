@@ -9,7 +9,7 @@ test_that("Count", {
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, by_col = "id", ftype = "Gcd")
 
-  expect_equal(sum(l$d@data$..count, na.rm = TRUE), nrow(data))
+  expect_equal(sum(l$data$..count, na.rm = TRUE), nrow(data))
 
 
 
@@ -28,7 +28,7 @@ test_that("Count", {
   opts$extra$map_name <- "col_departments"
   l <- lfltmagic_prep(data, opts, by_col = "name", ftype = "Gnm-Cat")
 
-  expect_equal(sum(l$d@data$..count, na.rm = T), nrow(data))
+  expect_equal(sum(l$data$..count, na.rm = T), nrow(data))
 
 
 
