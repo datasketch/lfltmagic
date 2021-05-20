@@ -1,21 +1,3 @@
-#'
-#' @export
-function_agg <- function (df, agg, to_agg, ...) {
-  group_var <- rlang::enquos(...)
-
-  if (is.null(to_agg)) {
-    dd <- df %>%
-      dplyr::group_by(!!!group_var) %>%
-      dplyr::summarise(..count = dplyr::n())
-  } else {
-    dd <- df %>%
-      dplyr::group_by(!!!group_var) %>%
-      dplyr::summarise(dplyr::across(to_agg, ~ dsvizopts::agg(agg, .x)), ..count = dplyr::n())
-  }
-  dd
-
-}
-
 
 
 #' Legend by palette type
@@ -156,9 +138,9 @@ lflt_basic_choropleth <- function(l) {
                 opacity = 1,
                 color = l$border_color,
                 fillColor = color_map)
-  print("..domain" %in% names(l$topoInfo))
-  if ("..domain" %in% names(l$topoInfo)) {
-    domain <- l$topoInfo[["..domain"]]#l$d %>% drop_na(..domain) %>% .$..domain
+  print("value" %in% names(l$topoInfo))
+  if ("value" %in% names(l$topoInfo)) {
+    domain <- l$topoInfo[["value"]]#l$d %>% drop_na(value) %>% .$value
     if(l$color_scale == "Custom"){
       intervals <- calculate_custom_intervals(cutoff_points = l$cutoff_points, domain = domain)
       domain <- intervals
@@ -181,7 +163,7 @@ lflt_basic_choropleth <- function(l) {
 
     fill_opacity <- l$theme$topo_fill_opacity
     if (is(l$topoInfo[[3]], "numeric")){
-      fill_opacity <- scales::rescale(l$topoInfo[["..domain"]], to = c(0.5, 1))
+      fill_opacity <- scales::rescale(l$topoInfo[["value"]], to = c(0.5, 1))
     }
 
 
@@ -236,34 +218,34 @@ lflt_basic_bubbles <- function(l) {
                 label = ~labels,
                 color = color_map)
 
-  if ("..domain" %in% names(l$topoInfo)) {
+  if ("value" %in% names(l$topoInfo)) {
 
     radius <- 0
     color <- l$palette_colors[1]
     legend_color <- color
 
-    if (is(l$topoInfo$..domain, "numeric")){
-      radius <- scales::rescale(l$topoInfo$..domain, to = c(l$min_size, l$max_size))
+    if (is(l$topoInfo$value, "numeric")){
+      radius <- scales::rescale(l$topoInfo$value, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$topoInfo$..domain,
+                       domain = l$topoInfo$value,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$topoInfo[["..domain"]])
+      color <- pal(l$topoInfo[["value"]])
       legend_color <- l$palette_colors[1]
-      cuts <- create_legend_cuts(l$topoInfo$..domain)
-    } else if (is(l$topoInfo$..domain, "character")){
-      radius <- ifelse(!is.na(l$topoInfo$..domain), 5, 0)
+      cuts <- create_legend_cuts(l$topoInfo$value)
+    } else if (is(l$topoInfo$value, "character")){
+      radius <- ifelse(!is.na(l$topoInfo$value), 5, 0)
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$topoInfo$..domain,
+                       domain = l$topoInfo$value,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$topoInfo$..domain)
+      color <- pal(l$topoInfo$value)
     }
 
     lon <- as.numeric(l$topoInfo$lon)
@@ -285,7 +267,7 @@ lflt_basic_bubbles <- function(l) {
       )
 
     if (l$theme$legend_show){
-      if (is(l$topoInfo$..domain, "numeric")){
+      if (is(l$topoInfo$value, "numeric")){
         lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
                                          labels = cuts,
                                          color = legend_color,
@@ -295,8 +277,8 @@ lflt_basic_bubbles <- function(l) {
                                          title = l$legend_title)
       }
 
-      if (is(l$topoInfo$..domain, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = ~..domain, opacity = 1,
+      if (is(l$topoInfo$value, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = ~value, opacity = 1,
                                position = l$theme$legend_position,
                                na.label = l$na_label,
                                title = l$legend_title,
@@ -327,34 +309,34 @@ lflt_basic_points <- function(l) {
                 label = ~labels,
                 color = color_map)
 
-  if ("..domain" %in% names(l$data)) {
+  if ("value" %in% names(l$data)) {
 
     radius <- 0
     color <- l$palette_colors[1]
     legend_color <- color
 
-    if (is(l$data$..domain, "numeric")){
-      radius <- scales::rescale(l$data$..domain, to = c(l$min_size, l$max_size))
+    if (is(l$data$value, "numeric")){
+      radius <- scales::rescale(l$data$value, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$data$..domain,
+                       domain = l$data$value,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$data[["..domain"]])
+      color <- pal(l$data[["value"]])
       legend_color <- "#505050"
-      cuts <- create_legend_cuts(l$data$..domain)
-    } else { #if (is(l$data$..domain, "character")){
-      radius <- ifelse(!is.na(l$data$..domain), 5, 0)
+      cuts <- create_legend_cuts(l$data$value)
+    } else { #if (is(l$data$value, "character")){
+      radius <- ifelse(!is.na(l$data$value), 5, 0)
       opts_pal <- list(color_scale = "Custom",
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = unique(l$data$..domain),
+                       domain = unique(l$data$value),
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$data[["..domain"]])
+      color <- pal(l$data[["value"]])
     }
 
     lf <- lf %>%
@@ -372,7 +354,7 @@ lflt_basic_points <- function(l) {
 
     if (l$theme$legend_show){
 
-      if (is(l$data$..domain, "numeric")){
+      if (is(l$data$value, "numeric")){
         lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
                                          labels = cuts,
                                          color = legend_color,
@@ -382,8 +364,8 @@ lflt_basic_points <- function(l) {
                                          title = l$legend_title)
       }
 
-      if (is(l$data$..domain, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = l$data$..domain, opacity = 1,
+      if (is(l$data$value, "character")) {
+        lf <- lf %>% addLegend(pal = pal, values = l$data$value, opacity = 1,
                                position = l$theme$legend_position,
                                na.label = l$na_label,
                                title = l$legend_title,
