@@ -3,8 +3,9 @@ context("lflt magic prep")
 test_that("Bubbles", {
 
   data <- data.frame(Countries = c(rep("COL", 33),
-                                   rep("BGD", 11),
+                                   rep("ARG", 41),
                                    rep("LSO", 37)))
+  data[[1]] <- as_Gcd(data[[1]])
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, by_col = "id", ftype = "Gcd")
   lfltmagic:::lflt_basic_bubbles(l)

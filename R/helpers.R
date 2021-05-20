@@ -1,5 +1,6 @@
 
 
+
 #' Legend by palette type
 lflt_palette <- function(opts) {
   if (opts$color_scale %in% c("Category", "Custom")) {
@@ -24,41 +25,49 @@ lflt_palette <- function(opts) {
   do.call(color_mapping, l)
 }
 
-#' labels
-lflt_tooltip <- function(nms,label_ftype, tooltip) {
+
+lflt_tooltip <- function(nms, label_ftype = NULL, tooltip) {
   if (is.null(nms)) stop("Enter names")
   nms <- nms
+
+  if(grepl("\\{name\\}", tooltip)) {
+    nm <- names(nms)
+    nms <- c(nms, "name")
+    names(nms) <- c(nm, "name")
+  }
+
   nms <- gsub("[][!()*`|]", "",nms)
   nms <- gsub("[\r\n]", " ", nms)
   label_ftype_clean <- gsub("[][!()*`|{}]", "", label_ftype)
   label_ftype_clean <- gsub("[\r\n]", " ", label_ftype_clean)
   nms_names <- names(nms)
 
-  if (is.null(tooltip)) tooltip <- ""
-  if (tooltip == "") {
-    nms <-  nms[names(nms) %in% label_ftype]
-    nms_names <- names(nms)
-    l <- map(seq_along(nms), function(i){
-      paste0("<span style='font-size:15px;'><strong>", nms[[i]], ":</strong> {", nms_names[i], "_label}</span>")
-    }) %>% unlist()
-    tooltip <- paste0(l, collapse = "<br/>")
+  if (tooltip == "") tooltip <- NULL
+  if (is.null(tooltip)) {
+    tooltip  <- paste0(purrr::map(seq_along(label_ftype), function(i) {
+      paste0(label_ftype[i], ": {", label_ftype_clean[i], "}")
+    }) %>% unlist(), collapse = "<br/>")
   } else {
-    tt <- gsub("[][()*`|]", "", tooltip)#gsub("[][!#$()*,.:;<=>@^`|~.", "", tooltip)
+    tooltip <- gsub("[][()*`|]", "", tooltip)#gsub("[][!#$()*,.:;<=>@^`|~.", "", tooltip)
+  }
+  print(tooltip)
   points <- gsub("\\{|\\}", "",
-                 stringr::str_extract_all(tt, "\\{.*?\\}")[[1]])
+                 stringr::str_extract_all(tooltip, "\\{.*?\\}")[[1]])
+
+  if(!all(points %in% label_ftype_clean)) stop("all variables within braces must be contained in the loaded data")
+
   if (identical(points, character())) {
     tooltip <- tooltip
   } else {
-    tooltip <- tt
     l <- purrr::map(seq_along(points), function(i){
 
       true_points <-  paste0("{",names(nms[match(points[i], nms)]),"_label}")
       tooltip <<- gsub(paste0("\\{",points[i], "\\}"), true_points, tooltip)
-    })}
-}
+    })[[length(points)]]
+  }
+
   tooltip
 }
-
 #' Format
 lflt_format <- function(d, dic, nms, opts) {
 

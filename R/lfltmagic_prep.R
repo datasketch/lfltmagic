@@ -22,16 +22,75 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                           dic = list_d$dic,
                                           formats = list(sample_num = opts$style$format_sample_num,
                                                          sample_cat = opts$style$format_sample_cat))
+
+    if (grepl("Gnm|Gcd", ftype)) {
+      data_format$name_alt <- iconv(tolower(data_format$a), to = "ASCII//TRANSLIT")
+      topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
+    } else {
+      topoInfo <- data_format
+    }
+
     # add info tooltip in data
-    data_format <- data_format %>%
+    topoInfo <- topoInfo %>%
       dplyr::mutate(labels = ifelse(is.na(a),
-                                    glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
+                                    glue::glue(paste0("<span style='font-size:13px;'><strong>{", opts$extra$map_label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
                                     glue::glue(
                                       lflt_tooltip(nms = list_d$nms,
                                                    label_ftype = list_d$nms_tooltip,
                                                    tooltip = opts$chart$tooltip)) %>%
                                       lapply(htmltools::HTML))
       )
+
+
   }
+
+
+  title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
+                                ';color:', opts$theme$title_color,
+                                ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
+  subtitle <- tags$div(HTML(paste0("<p style='margin-top:0px;font-family:", opts$theme$text_family,
+                                   ';color:', opts$theme$subtitle_color,
+                                   ';font-size:', opts$theme$subtitle_size,"px;'>", opts$title$subtitle %||% "","</p>")))
+  caption <- tags$div(HTML(paste0("<p style='font-family:", opts$theme$text_family,
+                                  ';color:', opts$theme$caption_color,
+                                  ';font-size:', opts$theme$caption_size,"px;'>", opts$title$caption %||% "","</p>")))
+  legend_title <- HTML(paste0("<p style='font-family:", opts$theme$text_family,
+                              ';color:', opts$theme$legend_color,
+                              ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
+
+  color_scale <- opts$extra$map_color_scale
+  palette_type <-  opts$theme$palette_type %||% "sequential"
+  palette_colors <-  opts$theme$palette_colors %||% opts$theme[[paste0("palette_colors_", palette_type)]]
+
+
+  list(
+    topoInfo = topoInfo,
+    geoInfo = topoData,
+    color_scale = color_scale,
+    palette_colors = palette_colors,
+    titles = list(title = title,
+                  subtitle = subtitle,
+                  caption = caption),
+    legend_title = legend_title,
+    border_color = opts$theme$border_color,
+    theme = opts$theme,
+    min_size = opts$extra$map_min_size,
+    max_size = opts$extra$map_max_size,
+    bubble_opacity = opts$extra$bubble_opacity,
+    map_stroke = opts$extra$map_stroke,
+    graticule = list(map_graticule = opts$extra$map_graticule,
+                     map_graticule_color = opts$theme$grid_color,
+                     map_graticule_interval = opts$extra$map_graticule_interval,
+                     map_graticule_weight = opts$theme$grid_size),
+    n_quantile = opts$extra$map_quantile,
+    n_bins = opts$extra$map_bins,
+    cutoff_points = opts$extra$map_cutoff_points,
+    na_label = opts$preprocess$na_label,
+    suffix = opts$style$suffix,
+    prefix = opts$style$prefix,
+    format_num = opts$style$format_sample_num,
+    locale = opts$style$locale,
+    min_zoom = opts$extra$map_min_zoom
+  )
 
 }
