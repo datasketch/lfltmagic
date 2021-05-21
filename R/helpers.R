@@ -1,27 +1,27 @@
 
-
-
 #' Legend by palette type
 lflt_palette <- function(opts) {
+
+  l <- list(
+    palette = opts$palette,
+    domain = opts$domain,
+    na.color = opts$na_color
+  )
+
   if (opts$color_scale %in% c("Category", "Custom")) {
     color_mapping <- "colorFactor"
-    # l <- list(levels = opts$levels, ordered = opts$ordered)
-    l <- list()
   } else if (opts$color_scale == "Quantile") {
     color_mapping <- "colorQuantile"
-    l <- list(n = opts$n_quantile)
+    l <- modifyList(l, list(n = opts$n_quantile))
   } else if (opts$color_scale == 'Bins') {
     color_mapping <- "colorBin"
-    l <- list(bins = opts$n_bins,
-              pretty = opts$pretty)
+    l <- modifyList(l, list(bins = opts$n_bins,
+              pretty = opts$pretty))
   } else {
     color_mapping <- "colorNumeric"
-    l <- list()
   }
 
-  l$palette <- opts$palette
-  l$domain <- opts$domain
-  l$na.color <- opts$na_color
+
   do.call(color_mapping, l)
 }
 

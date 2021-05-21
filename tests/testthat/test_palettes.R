@@ -3,12 +3,13 @@ context("lflt_palette")
 test_that("Palette colors", {
 
   data <-  data.frame(Countries = c(rep("IDN", 5), rep("RUS", 11), rep("SRB", 23), rep("NER", 37)))
+  data$Countries <- as_Gcd(data$Countries)
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, ftype = "Gcd", by_col = "id")
   opt_ptt <- list(color_scale = l$color_scale,
                   palette = l$palette_colors,
                   na_color = l$theme$na_color,
-                  domain = l$d@data$..domain,
+                  domain = as.numeric(l$topoInfo$value),
                   n_bins = l$n_bins,
                   n_quantile = l$n_quantile,
                   pretty = l$bins_pretty)
@@ -23,7 +24,7 @@ test_that("Palette colors", {
   opt_ptt <- list(color_scale = l$color_scale,
                   palette = l$palette_colors,
                   na_color = l$theme$na_color,
-                  domain = l$d@data$..domain,
+                  domain = l$topoInfo$value,
                   n_bins = l$n_bins,
                   n_quantile = l$n_quantile,
                   pretty = l$bins_pretty)
