@@ -25,7 +25,7 @@ lflt_palette <- function(opts) {
   do.call(color_mapping, l)
 }
 
-
+#' @export
 lflt_tooltip <- function(nms, label_ftype = NULL, tooltip) {
   if (is.null(nms)) stop("Enter names")
   nms <- nms
@@ -54,7 +54,7 @@ lflt_tooltip <- function(nms, label_ftype = NULL, tooltip) {
   points <- gsub("\\{|\\}", "",
                  stringr::str_extract_all(tooltip, "\\{.*?\\}")[[1]])
 
-  if(!all(points %in% label_ftype_clean)) stop("all variables within braces must be contained in the loaded data")
+  if(!all(points %in% nms)) stop("all variables within braces must be contained in the loaded data")
 
   if (identical(points, character())) {
     tooltip <- tooltip

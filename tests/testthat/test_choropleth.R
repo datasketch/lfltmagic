@@ -48,6 +48,7 @@ test_that("Choropleth", {
   lflt_choropleth_GcdCatNum()
 
   df <- sample_data("Gcd-Cat-Num")
+  lflt_choropleth_GcdCatNum(data = df)
   lflt_choropleth_GcdCatNum(data = df, tooltip = "{Count}")
 
 
