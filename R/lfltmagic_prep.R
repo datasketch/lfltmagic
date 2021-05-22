@@ -9,7 +9,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   topoData <- shape$rdsInfo
   topoInfo <- shape$topoInfo
 
-
   # data preparation by type
   if (!is.null(data)) {
     list_d <- dsvizopts::data_map_prep(data = data,
@@ -22,7 +21,9 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     data_format <- dsvizopts::format_prep(data = list_d$data,
                                           dic = list_d$dic,
                                           formats = list(sample_num = opts$style$format_sample_num,
-                                                         sample_cat = opts$style$format_sample_cat))
+                                                         sample_cat = opts$style$format_sample_cat,
+                                                         prefix = opts$style$prefix,
+                                                         suffix = opts$style$suffix))
 
     if (grepl("Gnm|Gcd", ftype)) {
       data_format$name_alt <- iconv(tolower(data_format$a), to = "ASCII//TRANSLIT")

@@ -28,7 +28,6 @@ lflt_palette <- function(opts) {
 #' @export
 lflt_tooltip <- function(nms, label_ftype = NULL, tooltip) {
   if (is.null(nms)) stop("Enter names")
-  nms <- nms
 
   if(grepl("\\{name\\}", tooltip)) {
     nm <- names(nms)
@@ -50,7 +49,7 @@ lflt_tooltip <- function(nms, label_ftype = NULL, tooltip) {
   } else {
     tooltip <- gsub("[][()*`|]", "", tooltip)#gsub("[][!#$()*,.:;<=>@^`|~.", "", tooltip)
   }
-  print(tooltip)
+
   points <- gsub("\\{|\\}", "",
                  stringr::str_extract_all(tooltip, "\\{.*?\\}")[[1]])
 
@@ -67,27 +66,6 @@ lflt_tooltip <- function(nms, label_ftype = NULL, tooltip) {
   }
 
   tooltip
-}
-#' Format
-lflt_format <- function(d, dic, nms, opts) {
-
-  var_nums <- dic$id[dic$hdType %in% c("Num", "Gln", "Glt")]
-  l_num <- map(var_nums, function(v) {
-    d[[paste0(v, "_label")]] <<- ifelse(is.na(d[[v]]), NA,
-                                        paste0(opts$prefix,
-                                               makeup::makeup_num(v = d[[v]],
-                                                                  opts$format_num_sample#,
-                                                                  #locale = opts$locale
-                                               ),
-                                               opts$suffix))
-  })
-  var_cats <- dic$id[dic$hdType %in% c("Cat", "Gnm", "Gcd")]
-  l_cat <- map(var_cats, function(v) {
-    d[[paste0(v, "_label")]] <<- ifelse(is.na(d[[v]]), NA,
-                                        makeup::makeup_chr(v = d[[v]],
-                                                           opts$format_cat_sample))
-  })
-  d
 }
 
 
