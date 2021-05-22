@@ -19,6 +19,7 @@ test_that("Palette colors", {
 
   data <- sample_data("Gcd-Cat")
   opts <- dsvizopts::dsviz_defaults()
+  opts$style$color_by <- names(data)[2]
   opts$extra$map_color_scale <- "Category"
   l <- lfltmagic_prep(data, opts, ftype = "Gcd-Cat", by_col = "id")
   opt_ptt <- list(color_scale = l$color_scale,
