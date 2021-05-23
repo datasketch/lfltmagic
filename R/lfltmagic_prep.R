@@ -25,15 +25,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                                          prefix = opts$style$prefix,
                                                          suffix = opts$style$suffix))
 
-    if (grepl("Gnm|Gcd", ftype)) {
-      data_format$name_alt <- iconv(tolower(data_format$a), to = "ASCII//TRANSLIT")
-      topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
-    } else {
-      topoInfo <- data_format
-    }
-
     # add info tooltip in data
-    topoInfo <- topoInfo %>%
+    data_format <- data_format %>%
       dplyr::mutate(labels = ifelse(is.na(a),
                                     glue::glue(paste0("<span style='font-size:13px;'><strong>{", opts$extra$map_label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
                                     glue::glue(
@@ -42,6 +35,12 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                                    tooltip = opts$chart$tooltip)) %>%
                                       lapply(htmltools::HTML))
       )
+    if (grepl("Gnm|Gcd", ftype)) {
+      data_format$name_alt <- iconv(tolower(data_format$a), to = "ASCII//TRANSLIT")
+      topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
+    } else {
+      topoInfo <- list(topoInfo = topoInfo, data = data_format)
+    }
 
 
   }

@@ -73,7 +73,7 @@ lflt_legend_bubbles <- function(map, colors, labels, sizes,
                                 title, na.label, position, opacity){
   colorAdditions <- paste0(colors, ";border-radius: 50%; width:", sizes, "px; height:", sizes, "px;")
   labelAdditions <- paste0("<div style='display: inline-block; height: ",
-                           max(sizes), "px; margin-bottom: 5px; line-height: ", max(sizes), "px; font-size: 15px; '>",
+                           max(sizes), "px; margin-bottom: 3px; line-height: ", max(sizes), "px; font-size: 13px; '>",
                            makeup::makeup_num(labels), "</div>")
 
   return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
@@ -162,6 +162,7 @@ lflt_basic_choropleth <- function(l) {
                    fillColor = color_map,
                    layerId = ~a,
                    label = ~labels,
+                   labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
                    highlight = highlightOptions(
                      color= 'white',
                      opacity = 0.8,
@@ -250,6 +251,7 @@ lflt_basic_bubbles <- function(l) {
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
+        labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
         layerId = ~a
       )
 
@@ -285,7 +287,7 @@ lflt_basic_bubbles <- function(l) {
 lflt_basic_points <- function(l) {
 
   color_map <- l$theme$na_color
-  lf <-  leaflet(l$topoInfo,
+  lf <-  leaflet(l$topoInfo$topoInfo,
                  option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
     addTopoJSON(l$geoInfo,
                 weight = l$theme$border_weight,
@@ -293,49 +295,49 @@ lflt_basic_points <- function(l) {
                 opacity = 1,
                 color = color_map) %>%
     addPolygons(weight = 0.5,
-                label = ~labels,
+                label = ~name,
                 color = color_map)
 
-  if ("value" %in% names(l$data)) {
+  if ("value" %in% names(l$topoInfo$data)) {
 
     radius <- 0
     color <- l$palette_colors[1]
     legend_color <- color
 
     if (is(l$data$value, "numeric")){
-      radius <- scales::rescale(l$data$value, to = c(l$min_size, l$max_size))
+      radius <- scales::rescale(l$topoInfo$data$value, to = c(l$min_size, l$max_size))
       opts_pal <- list(color_scale = l$color_scale,
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = l$data$value,
+                       domain = l$topoInfo$data$value,
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$data[["value"]])
+      color <- pal(l$topoInfo$data[["value"]])
       legend_color <- "#505050"
-      cuts <- create_legend_cuts(l$data$value)
+      cuts <- create_legend_cuts(l$topoInfo$data$value)
     } else { #if (is(l$data$value, "character")){
-      radius <- ifelse(!is.na(l$data$value), 5, 0)
+      radius <- ifelse(!is.na(l$topoInfo$data$value), 5, 0)
       opts_pal <- list(color_scale = "Custom",
                        palette = l$palette_colors,
                        na_color = l$theme$na_color,
-                       domain = unique(l$data$value),
+                       domain = unique(l$topoInfo$data$value),
                        n_bins = l$n_bins,
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
-      color <- pal(l$data[["value"]])
+      color <- pal(l$topoInfo$data[["value"]])
     }
 
     lf <- lf %>%
       addCircleMarkers(
-        lng = l$data$a,
-        lat = l$data$b,
+        lng = l$topoInfo$data$a,
+        lat = l$topoInfo$data$b,
         radius = radius,
         color = color,
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
-        label = l$data$labels,
-        layerId = l$data$a
+        label = l$topoInfo$data$labels,
+        layerId = l$topoInfo$data$a
       )
 
 
