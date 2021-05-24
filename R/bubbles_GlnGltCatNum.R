@@ -35,6 +35,11 @@
 
 lflt_bubbles_GlnGltCatNum <- function(data = NULL, ...) {
 
+  if(!is.null(data)) {
+    data[[1]] <- as_Gln(data[[1]])
+    data[[2]] <- as_Glt(data[[2]])
+  }
+
   opts <- dsvizopts::merge_dsviz_options(...)
   l <- lfltmagic_prep(data = data, opts = opts, ftype= "Gln-Glt-Cat-Num")
 
@@ -81,6 +86,11 @@ lflt_bubbles_GlnGltCatNum <- function(data = NULL, ...) {
 #' data %>%
 #'  lflt_bubbles_GlnGltCat(tooltip = info_tool)
 lflt_bubbles_GlnGltCat <-  function(data = NULL, ...) {
+
+  if(!is.null(data)) {
+    data[[1]] <- as_Gln(data[[1]])
+    data[[2]] <- as_Glt(data[[2]])
+  }
 
   opts <- dsvizopts::merge_dsviz_options(...)
   l <- lfltmagic_prep(data = data, opts = opts, ftype= "Gln-Glt-Cat")

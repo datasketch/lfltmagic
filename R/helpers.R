@@ -143,7 +143,7 @@ lflt_base_map <- function(topoinfo, opts, ...) {
                 color =  opts$border_color,
                 fillColor = opts$color_map,
                 fillOpacity = opts$topo_fill_opacity,
-                 opacity = 1)
+                opacity = 1)
   lf
 }
 
@@ -226,7 +226,7 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
 
   if (is.null(map)) stop("There is no map")
   if (map_legend_bubble){
-    lf <- map %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(opts$min_size, opts$max_size)),
+    lf <- map %>% lflt_legend_bubbles(sizes = 2*scales::rescale(opts$cuts, to = c(opts$min_size, opts$max_size)),
                                       labels = opts$cuts,
                                       color = opts$legend_color,
                                       opacity = 1,
@@ -252,8 +252,7 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
 lflt_basic_bubbles <- function(l) {
 
   color_map <- l$theme$na_color
-  print(color_map)
-  print(l$border_color)
+
   # base map
   lf <- lflt_base_map(l$topoInfo,
                       opts = list(
@@ -313,11 +312,12 @@ lflt_basic_bubbles <- function(l) {
         labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
         layerId = ~a
       )
-
+print(unique(color))
     if (l$theme$legend_show){
       lf <- legend_format(map = lf, opts = list(min_size = l$min_size,
                                                 max_size = l$max_size,
                                                 cuts = cuts,
+                                                legend_color = unique(color)[1],
                                                 legend_position = l$theme$legend_position,
                                                 na_label = l$na_label,
                                                 legend_title = l$legend_title,
@@ -369,7 +369,7 @@ lflt_basic_points <- function(l) {
       pal <- lflt_palette(opts_pal)
       color <- pal(l$topoInfo$data[["value"]])
       #legend_color <- "#505050"
-      cuts <- create_legend_cuts(l$topoInfo$data$value)
+      cuts <- suppressWarnings(create_legend_cuts(l$topoInfo$data$value))
     } else { #if (is(l$data$value, "character")){
       radius <- ifelse(!is.na(l$topoInfo$data$value), 5, 0)
       opts_pal <- list(color_scale = "Custom",
@@ -395,22 +395,24 @@ lflt_basic_points <- function(l) {
       )
 
 
-
     if (l$theme$legend_show){
-      lf <- legend_format(map = lf, opts = list(min_size = l$min_size,
-                                                max_size = l$max_size,
-                                                cuts = cuts,
-                                                legend_position = l$theme$legend_position,
-                                                na_label = l$na_label,
-                                                legend_title = l$legend_title,
-                                                pal = pal,
-                                                legend_position = l$theme$legend_position,
-                                                na_label = l$na_label,
-                                                legend_title = l$legend_title,
-                                                format_num = l$format_num,
-                                                locale = l$locale,
-                                                prefix = l$prefix,
-                                                suffix = l$suffix))
+      lf <- legend_format(map = lf,
+                          map_legend_bubble = ifelse(is(l$topoInfo$data$value, "character"), FALSE, TRUE),
+                          opts = list(min_size = l$min_size,
+                                      max_size = l$max_size,
+                                      cuts = cuts,
+                                      legend_color = unique(color)[1],
+                                      legend_position = l$theme$legend_position,
+                                      na_label = l$na_label,
+                                      legend_title = l$legend_title,
+                                      pal = pal,
+                                      legend_position = l$theme$legend_position,
+                                      na_label = l$na_label,
+                                      legend_title = l$legend_title,
+                                      format_num = l$format_num,
+                                      locale = l$locale,
+                                      prefix = l$prefix,
+                                      suffix = l$suffix))
     }
   }
 
