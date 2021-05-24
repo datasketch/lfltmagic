@@ -5,10 +5,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   shape <- dsvizopts::shape_info(map_name = opts$extra$map_name,
                                  ftype = ftype,
                                  by_col = by_col,
-                                 addRds = TRUE)
-  topoData <- shape$rdsInfo
+                                 addRds = FALSE)
+  #topoData <- shape$rdsInfo
   topoInfo <- shape$topoInfo
-
+  topoInfo$labels <- topoInfo[[by_col]]
   # data preparation by type
   if (!is.null(data)) {
     list_d <- dsvizopts::data_map_prep(data = data,
@@ -61,7 +61,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
   list(
     topoInfo = topoInfo,
-    geoInfo = topoData,
+    #geoInfo = topoData,
     color_scale = color_scale,
     palette_colors = palette_colors,
     titles = list(title = title,

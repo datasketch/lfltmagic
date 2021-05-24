@@ -127,20 +127,41 @@ lflt_legend_format <- function (prefix = "",
   }
 }
 
+
+lflt_base_map <- function(topoinfo, opts, ...) {
+
+  lf <- leaflet(topoinfo,
+                option = leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
+    # addTopoJSON(geoinfo,
+    #             weight = opts$border_weight,
+    #             fillOpacity = opts$topo_fill_opacity,
+    #             opacity = 1,
+    #             color = opts$border_color,
+    #             fillColor = opts$color_map) %>%
+    addPolygons(weight = opts$border_weight,
+                label = ~labels,
+                color =  opts$border_color,
+                fillColor = opts$color_map,
+                fillOpacity = opts$topo_fill_opacity,
+                 opacity = 1)
+  lf
+}
+
 #' Basic layer choroplets
 lflt_basic_choropleth <- function(l) {
 
   color_map <- l$theme$na_color
 
-  lm <- leaflet(l$topoInfo,
-                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addTopoJSON(l$geoInfo,
-                weight = l$theme$border_weight,
-                fillOpacity = l$theme$topo_fill_opacity,
-                opacity = 1,
-                color = l$border_color,
-                fillColor = color_map)
-  print("value" %in% names(l$topoInfo))
+  lf <- lflt_base_map(l$topoInfo,
+                      opts = list(
+                        map_zoom = l$theme$map_zoom,
+                        min_zoom = l$min_zoom,
+                        border_weight = l$theme$border_weight,
+                        topo_fill_opacity = l$theme$topo_fill_opacity,
+                        border_color = l$border_color,
+                        color_map = color_map
+                      ))
+  #print("value" %in% names(l$topoInfo))
   if ("value" %in% names(l$topoInfo)) {
     domain <- l$topoInfo[["value"]]#l$d %>% drop_na(value) %>% .$value
     if(l$color_scale == "Custom"){
@@ -164,12 +185,12 @@ lflt_basic_choropleth <- function(l) {
     color_map <- pal(domain)
 
     fill_opacity <- l$theme$topo_fill_opacity
-    if (is(l$topoInfo[[3]], "numeric")){
+    if (is(l$topoInfo[["value"]], "numeric")){
       fill_opacity <- scales::rescale(l$topoInfo[["value"]], to = c(0.5, 1))
     }
 
 
-    lf <- lm %>%
+    lf <- lf %>%
       addPolygons( weight = l$theme$border_weight,
                    fillOpacity = fill_opacity,
                    opacity = 1,
@@ -177,12 +198,12 @@ lflt_basic_choropleth <- function(l) {
                    fillColor = color_map,
                    layerId = ~a,
                    label = ~labels,
-                   labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
-                   highlight = highlightOptions(
-                     color= 'white',
-                     opacity = 0.8,
-                     weight= 3,
-                     bringToFront = TRUE)
+                   labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto")#,
+                   # highlight = highlightOptions(
+                   #   color= 'white',
+                   #   opacity = 0.8,
+                   #   weight= 3,
+                   #   bringToFront = TRUE)
       )
     if ( l$theme$legend_show) {
 
@@ -196,11 +217,6 @@ lflt_basic_choropleth <- function(l) {
                                between = paste0(l$suffix, " - ", l$prefix),
                              ))
     }
-  } else {
-    lf <- lm %>%
-      addPolygons(weight = 0.5,
-                  label = ~labels,
-                  fillColor = color_map)
   }
   lf
 }
@@ -236,17 +252,18 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
 lflt_basic_bubbles <- function(l) {
 
   color_map <- l$theme$na_color
-
-  lf <- leaflet(l$topoInfo,
-                option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addTopoJSON(l$geoInfo,
-                weight = l$theme$border_weight,
-                fillOpacity = l$theme$topo_fill_opacity,
-                opacity = 1,
-                color = color_map) %>%
-    addPolygons(weight = 0.5,
-                label = ~labels,
-                color = color_map)
+  print(color_map)
+  print(l$border_color)
+  # base map
+  lf <- lflt_base_map(l$topoInfo,
+                      opts = list(
+                        map_zoom = l$theme$map_zoom,
+                        min_zoom = l$min_zoom,
+                        border_weight = l$theme$border_weight,
+                        topo_fill_opacity = l$theme$topo_fill_opacity,
+                        border_color = l$border_color,
+                        color_map = color_map
+                      ))
 
   if ("value" %in% names(l$topoInfo)) {
 
@@ -323,17 +340,18 @@ lflt_basic_bubbles <- function(l) {
 lflt_basic_points <- function(l) {
 
   color_map <- l$theme$na_color
-  lf <-  leaflet(l$topoInfo$topoInfo,
-                 option = leafletOptions(zoomControl= l$theme$map_zoom, minZoom = l$min_zoom, maxZoom = 18)) %>%
-    addTopoJSON(l$geoInfo,
-                weight = l$theme$border_weight,
-                fillOpacity = l$theme$topo_fill_opacity,
-                opacity = 1,
-                color = color_map) %>%
-    addPolygons(weight = 0.5,
-                label = ~name,
-                color = color_map)
+  # base map
+  lf <- lflt_base_map(l$topoInfo$topoInfo %||% l$topoInfo,
+                      opts = list(
+                        map_zoom = l$theme$map_zoom,
+                        min_zoom = l$min_zoom,
+                        border_weight = l$theme$border_weight,
+                        topo_fill_opacity = l$theme$topo_fill_opacity,
+                        border_color = l$border_color,
+                        color_map = color_map
+                      ))
 
+  if (is.null(l$topoInfo$topoInfo)) return(lf)
   if ("value" %in% names(l$topoInfo$data)) {
 
     radius <- 0
@@ -350,7 +368,7 @@ lflt_basic_points <- function(l) {
                        n_quantile = l$n_quantile)
       pal <- lflt_palette(opts_pal)
       color <- pal(l$topoInfo$data[["value"]])
-      legend_color <- "#505050"
+      #legend_color <- "#505050"
       cuts <- create_legend_cuts(l$topoInfo$data$value)
     } else { #if (is(l$data$value, "character")){
       radius <- ifelse(!is.na(l$topoInfo$data$value), 5, 0)
@@ -377,29 +395,22 @@ lflt_basic_points <- function(l) {
       )
 
 
+
     if (l$theme$legend_show){
-
-      if (is(l$topoInfo$data$value, "numeric")){
-        lf <- lf %>% lflt_legend_bubbles(sizes = 2*scales::rescale(cuts, to = c(l$min_size, l$max_size)),
-                                         labels = cuts,
-                                         color = legend_color,
-                                         opacity = 1,
-                                         position = l$theme$legend_position,
-                                         na.label = l$na_label,
-                                         title = l$legend_title)
-      }
-
-      if (is(l$data$value, "character")) {
-        lf <- lf %>% addLegend(pal = pal, values = l$data$value, opacity = 1,
-                               position = l$theme$legend_position,
-                               na.label = l$na_label,
-                               title = l$legend_title,
-                               labFormat = lflt_legend_format(
-                                 sample =l$format_num, locale = l$locale,
-                                 prefix = l$prefix, suffix = l$suffix,
-                                 between = paste0(l$suffix, " - ", l$prefix),
-                               ))
-      }
+      lf <- legend_format(map = lf, opts = list(min_size = l$min_size,
+                                                max_size = l$max_size,
+                                                cuts = cuts,
+                                                legend_position = l$theme$legend_position,
+                                                na_label = l$na_label,
+                                                legend_title = l$legend_title,
+                                                pal = pal,
+                                                legend_position = l$theme$legend_position,
+                                                na_label = l$na_label,
+                                                legend_title = l$legend_title,
+                                                format_num = l$format_num,
+                                                locale = l$locale,
+                                                prefix = l$prefix,
+                                                suffix = l$suffix))
     }
   }
 
