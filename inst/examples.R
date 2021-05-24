@@ -3,6 +3,59 @@ library(lfltmagic)
 # devtools::document()
 # devtools::install()
 
+
+# quick examples
+data <- NULL
+opts <- dsvizopts::dsviz_default_opts()
+lflt_bubbles_Gcd()
+lflt_bubbles_Gcd(sample_data("Gcd", addNA = F))
+lflt_bubbles_GcdNum()
+lflt_bubbles_GcdCat()
+lflt_bubbles_GcdCatNum()
+lflt_bubbles_Gnm()
+lflt_bubbles_GnmCat()
+lflt_bubbles_GnmCatNum()
+lflt_bubbles_GnmNum()
+lflt_bubbles_GlnGlt()
+lflt_bubbles_GlnGltCat()
+lflt_bubbles_GlnGltCatNum()
+lflt_bubbles_GlnGltNum()
+lflt_choropleth_Gcd()
+lflt_choropleth_Gcd(sample_data("Gcd"))
+lflt_choropleth_GcdCat()
+lflt_choropleth_GcdCatNum()
+lflt_choropleth_GcdNum()
+lflt_choropleth_Gnm()
+lflt_choropleth_GnmCat()
+lflt_choropleth_GnmCatNum()
+lflt_choropleth_GnmNum()
+
+
+
+lflt_bubbles_Gcd(sample_data("Gcd", addNA = F))
+lflt_bubbles_GcdNum(sample_data("Gcd-Num", addNA = F))
+lflt_bubbles_GcdCat(sample_data("Gcd-Cat", addNA = F))
+lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", addNA = F))
+lflt_bubbles_Gnm(sample_data("Gnm", addNA = F))
+lflt_bubbles_GnmCat(sample_data("Gnm-Cat", addNA = F))
+lflt_bubbles_GnmCatNum(sample_data("Gnm-Cat-Num", addNA = F))
+lflt_bubbles_GnmNum(sample_data("Gnm-Num", addNA = F))
+lflt_bubbles_GlnGlt(sample_data("Gln-Glt", addNA = F))
+lflt_bubbles_GlnGltCat(sample_data("Gln-Glt-Cat", addNA = F))
+data <- sample_data("Gln-Glt-Cat-Num", addNA = F)
+# lflt_bubbles_GlnGltCatNum(sample_data("Gln-Glt-Cat-Num", addNA = F))
+# lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num", addNA = F))
+lflt_choropleth_Gcd(sample_data("Gcd", addNA = F))
+lflt_choropleth_GcdCat(sample_data("Gcd-Cat", addNA = F))
+lflt_choropleth_GcdCatNum(sample_data("Gcd-Cat-Num", addNA = F))
+lflt_choropleth_GcdNum(sample_data("Gcd-Num", addNA = F))
+lflt_choropleth_Gnm(sample_data("Gnm", addNA = F))
+lflt_choropleth_GnmCat(sample_data("Gnm-Cat", addNA = F))
+lflt_choropleth_GnmCatNum(sample_data("Gnm-Cat-Num", addNA = F))
+lflt_choropleth_GnmNum(sample_data("Gnm-Num", addNA = F))
+
+
+
 # Gnm-Num examples --------------------------------------------------------
 
 lflt_choropleth_GnmNum()
