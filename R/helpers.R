@@ -526,9 +526,11 @@ fakeData <- function(map_name = NULL, by = "name", ...) {
   centroides <- centroides[sample(1:nrow(centroides), nsample),]
   if (by == "name" & !(identical(diff_names, character()))) {
     d <- data.frame(name = centroides[[by]],
-                    name_addition = centroides[[diff_names]], sample_value = runif(nsample, 33, 333))
+                    name_addition = centroides[[diff_names]], sample_value = runif(nsample, 33, 333),
+                    stringsAsFactors = FALSE)
   } else {
-    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = runif(nsample, 33, 333))
+    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = runif(nsample, 33, 333),
+                    stringsAsFactors = FALSE)
   }
   d
 }
@@ -545,7 +547,8 @@ fakepoints <- function(map_name = NULL, ...) {
   if (nsample > 30) nsample <- 30
   d <- data.frame(lon = sample(centroides$lon, nsample),
                   lat = sample(centroides$lat, nsample),
-                  dim_sample = abs(rnorm(nsample, 33, 333)))
+                  dim_sample = abs(rnorm(nsample, 33, 333)),
+                  stringsAsFactors = FALSE)
   d
 }
 
@@ -567,7 +570,7 @@ find_geoinfo <- function(data, centroides) {
   centroides <- centroides %>% select(-lat, -lon)
   centroides <- standar_values(centroides)
   dic_info <- data.frame(names_centroides = c("id", "name", "name_addition", "code_addition"),
-                         ftype = c("Gcd", "Gnm", "Gnm", "Gcd"))
+                         ftype = c("Gcd", "Gnm", "Gnm", "Gcd"), stringsAsFactors = FALSE)
 
   info_data <- paste0("^", map(colnames(centroides),
                                function (i) {unique(centroides[[i]])
