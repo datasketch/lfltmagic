@@ -4,7 +4,7 @@ test_that("Count", {
 
   data <- data.frame(Countries = c(rep("COL", 33),
                                    rep("BGD", 11),
-                                   rep("LSO", 37)))
+                                   rep("LSO", 37)), stringsAsFactors = FALSE)
   data <- data %>% filter(Countries != "-99")
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, by_col = "id", ftype = "Gcd")
@@ -21,7 +21,8 @@ test_that("Count", {
                       Cosa = c(rep("Río", 7), rep("Montaña", 8),
                                rep("Mar", 5), rep("Montaña", 6),
                                rep("Volcanes", 13), rep("Río", 18),
-                               rep("Montaña", 65), rep("Río", 8))
+                               rep("Montaña", 65), rep("Río", 8)),
+                     stringsAsFactors = FALSE
                      )
 
   opts <- dsvizopts::dsviz_defaults()

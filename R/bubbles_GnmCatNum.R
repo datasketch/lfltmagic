@@ -36,6 +36,12 @@
 #' data %>%
 #'  lflt_bubbles_GnmCatNum(tooltip = info_tool)
 lflt_bubbles_GnmCatNum <- function(data = NULL, ...) {
+
+
+  if(!is.null(data)) {
+    data[[1]] <- homodatum::as_Gnm(data[[1]])
+  }
+
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype = "Gnm-Cat-Num")
@@ -84,6 +90,10 @@ lflt_bubbles_GnmCatNum <- function(data = NULL, ...) {
 #' data %>%
 #'  lflt_bubbles_GnmCat(tooltip = info_tool)
 lflt_bubbles_GnmCat <-  function(data = NULL, ...) {
+  if(!is.null(data)) {
+    data[[1]] <- homodatum::as_Gnm(data[[1]])
+    data[[2]] <- homodatum::as_Cat(data[[2]])
+  }
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype = "Gnm-Cat")

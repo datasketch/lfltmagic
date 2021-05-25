@@ -24,7 +24,7 @@
 #'
 lflt_bubbles_GcdNum <- function(data = NULL, ...) {
 
-  if(!is.null(data)) data[[1]] <- as_Gcd(data[[1]])
+  if(!is.null(data)) data[[1]] <- homodatum::as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype="Gcd-Num")
@@ -59,7 +59,7 @@ lflt_bubbles_GcdNum <- function(data = NULL, ...) {
 #'                        agg = "mean")
 #'
 lflt_bubbles_Gcd <- function(data = NULL, ...) {
-  if(!is.null(data)) data[[1]] <- as_Gcd(data[[1]])
+  if(!is.null(data)) data[[1]] <- homodatum::as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype="Gcd")

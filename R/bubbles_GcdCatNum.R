@@ -39,7 +39,7 @@
 
 lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 
-  data[[1]] <- as_Gcd(data[[1]])
+  data[[1]] <- homodatum::as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype= "Gcd-Cat-Num")
@@ -89,7 +89,7 @@ lflt_bubbles_GcdCatNum <- function(data = NULL, ...) {
 #'  lflt_bubbles_GcdCat(tooltip = info_tool)
 lflt_bubbles_GcdCat <- function(data = NULL, ...) {
 
-  data[[1]] <- as_Gcd(data[[1]])
+  data[[1]] <- homodatum::as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype= "Gcd-Cat")

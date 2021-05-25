@@ -23,7 +23,7 @@
 #'
 lflt_bubbles_GnmNum <- function(data = NULL, ...) {
 
-  if(!is.null(data)) data[[1]] <- as_Gnm(data[[1]])
+  if(!is.null(data)) data[[1]] <- homodatum::as_Gnm(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")

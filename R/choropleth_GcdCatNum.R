@@ -39,7 +39,7 @@
 #'  lflt_choropleth_GcdCatNum(tooltip = info_tool)
 lflt_choropleth_GcdCatNum <- function(data = NULL, ...) {
 
-  data[[1]] <- as_Gcd(data[[1]])
+  data[[1]] <-  homodatum::as_Gcd(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype = "Gcd-Cat-Num")
@@ -89,8 +89,10 @@ lflt_choropleth_GcdCatNum <- function(data = NULL, ...) {
 #'  lflt_choropleth_GcdCat(tooltip = info_tool)
 lflt_choropleth_GcdCat <- function(data = NULL, ...) {
 
-  data[[1]] <- as_Gcd(data[[1]])
-  data[[2]] <- as_Cat(data[[2]])
+  if (!is.null(data)) {
+  data[[1]] <-  homodatum::as_Gcd(data[[1]])
+  data[[2]] <-  homodatum::as_Cat(data[[2]])
+  }
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, by_col = "id", ftype = "Gcd-Cat")
