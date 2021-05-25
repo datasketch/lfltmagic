@@ -2,7 +2,8 @@ context("lflt_palette")
 
 test_that("Palette colors", {
 
-  data <-  data.frame(Countries = c(rep("IDN", 5), rep("RUS", 11), rep("SRB", 23), rep("NER", 37)))
+  data <-  data.frame(Countries = c(rep("IDN", 5), rep("RUS", 11), rep("SRB", 23), rep("NER", 37)),
+                      stringsAsFactors = FALSE)
   data$Countries <- as_Gcd(data$Countries)
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, ftype = "Gcd", by_col = "id")

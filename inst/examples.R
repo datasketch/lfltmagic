@@ -101,7 +101,7 @@ lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
 lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
                        map_graticule = TRUE)
 
-data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), pepito = runif(4, 1, 1000))
+data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), pepito = runif(4, 1, 1000), stringsAsFactors = FALSE)
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
                        palette_colors = c("#FEAFEA", "#000CCC"),
                        map_color_scale = "Bins", prefix = "$")
@@ -130,7 +130,8 @@ lflt_choropleth_GnmNum(data,
                        subtitle = "Un subtitulo", map_zoom = F)
 
 lflt_choropleth_Gnm(sample_data('Gnm', 300))
-lflt_choropleth_Gnm(data.frame("d" = c("antioquia", "chocó", "chocó", "cauca")), map_name = "col_departments")
+lflt_choropleth_Gnm(data.frame("d" = c("antioquia", "chocó", "chocó", "cauca"), stringsAsFactors = FALSE),
+                    map_name = "col_departments")
 
 # Gcd Num examples  -------------------------------------------------------
 
@@ -141,7 +142,7 @@ availableMaps <- setdiff(availableGeodata(), map_changes)
 
 lflt_choropleth_GcdNum(map_name = "bra_states" )
 data <- data.frame(State = c("BR.PA", "BR.RS", "BR.RS", "BR.TO", "BR.MT", "BR.MA", "BR.ES"),
-                   `Fake population` = runif(7, 20000, 600000))
+                   `Fake population` = runif(7, 20000, 600000), stringsAsFactors = FALSE)
 lflt_choropleth_GcdNum(data, map_name = "bra_states")
 lflt_choropleth_GcdNum(data, map_name = "bra_states",
                        palette_colors = c("#FEAFEA", "#000CCC"),
@@ -164,7 +165,8 @@ lflt_bubbles_GnmNum(sample_data("Gnm-Num", 100),
                     palette_colors = 'orange',
                     background_color = "#000",
                     topo_fill_opacity = 0.2)
-data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000))
+data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000),
+                   stringsAsFactors = FALSE)
 guess_ftypes(data = data, map_name = "col_pacifico")
 lflt_bubbles_GnmNum(data,
                     map_name = "col_pacifico",
@@ -206,7 +208,7 @@ lflt_bubbles_GlnGltNum(data,
 lflt_bubbles_GlnGlt(sample_data("Gln-Glt"))
 lflt_bubbles_GlnGlt(sample_data("Gln-Glt"), map_radius = 10)
 
-data <- data.frame(Lon = runif(35, -75, -70) , Lat = runif(35, -3.5, 6))
+data <- data.frame(Lon = runif(35, -75, -70) , Lat = runif(35, -3.5, 6), stringsAsFactors = FALSE)
 lflt_bubbles_GlnGlt(data,
                     map_name = "col_departments",
                     tooltip = "Coord 1: {Lon} <br/> Coord 2: {Lat}",

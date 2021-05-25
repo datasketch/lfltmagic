@@ -2,7 +2,7 @@ context("lflt magic prep")
 
 test_that("Categories Format", {
 
-  data <-  data.frame(c(rep("IDN", 5), rep("RUS", 11), rep("SRB", 23), rep("NER", 37)))
+  data <-  data.frame(c(rep("IDN", 5), rep("RUS", 11), rep("SRB", 23), rep("NER", 37)), stringsAsFactors = FALSE)
   names(data) <- "Countries"
   data$Countries <- as_Gcd(data$Countries)
   data <- data %>% filter(Countries != "-99")

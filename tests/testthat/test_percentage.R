@@ -4,7 +4,7 @@ test_that("Percentage", {
 
   data <- data.frame(Countries = c(rep("COL", 33),
                                    rep("BGD", 11),
-                                   rep("LSO", 37)))
+                                   rep("LSO", 37)), stringsAsFactors = FALSE)
   opts <- dsvizopts::dsviz_defaults()
   l <- lfltmagic_prep(data, opts, by_col = "id", ftype = "Gcd")
   expect_equal(sum(l$data$..percentage, na.rm = TRUE), 100)
@@ -17,7 +17,8 @@ test_that("Percentage", {
                      Cosa = c(rep("Río", 7), rep("Montaña", 8),
                               rep("Mar", 5), rep("Montaña", 6),
                               rep("Volcanes", 13), rep("Río", 18),
-                              rep("Montaña", 65), rep("Río", 8))
+                              rep("Montaña", 65), rep("Río", 8)),
+                     stringsAsFactors = FALSE
   )
 
   opts <- dsvizopts::dsviz_defaults()
@@ -39,7 +40,7 @@ test_that("Percentage", {
                                 rep("chocó", 11),
                                 rep("nariño", 31),
                                 rep("Santander", 73)),
-                     Cosa = runif(130)
+                     Cosa = runif(130), stringsAsFactors = FALSE
   )
   opts <- dsvizopts::dsviz_defaults()
   opts$extra$map_name <- "col_departments"
@@ -54,7 +55,7 @@ test_that("Percentage", {
                               rep("Mar", 5), rep("Montaña", 6),
                               rep("Volcanes", 13), rep("Río", 18),
                               rep("Montaña", 65), rep("Río", 8)),
-                     Valor = runif(130, 100, 10000)
+                     Valor = runif(130, 100, 10000), stringsAsFactors = FALSE
   )
   opts <- dsvizopts::dsviz_defaults()
   opts$extra$map_name <- "col_departments"
