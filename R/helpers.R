@@ -458,13 +458,13 @@ geoType <- function(data, map_name) {
   nms <- homodatum::fringe_labels(f)
   d <- homodatum::fringe_d(f)
 
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  lfmap <- geodata::geodataMeta(map_name)
+  centroides <- dsvizopts::data_centroid(lfmap$geoname, lfmap$basename)
   vs <- NULL
-  values <- intersect(d[["a"]], centroides[["id"]])
+  values <- dplyr::intersect(d[["a"]], centroides[["id"]])
 
   if (identical(values, character(0))||identical(values, numeric(0))) {
-    values <- intersect(d[["a"]], centroides[["name"]])
+    values <- dplyr::intersect(d[["a"]], centroides[["name"]])
     if(!identical(values, character())) vs <- "Gnm"
   } else {
     vs <- "Gcd"
@@ -477,7 +477,7 @@ geoType <- function(data, map_name) {
 #' @export
 fakeData <- function(map_name = NULL, by = "name", ...) {
   if (is.null(map_name)) return()
-  centroides <- suppressWarnings(geodataMeta(map_name)$codes)
+  centroides <- suppressWarnings(geodata::geodataMeta(map_name)$codes)
   names_centroides <- names(centroides)
   diff_names <- setdiff(names_centroides, c("id", "name", "lat", "lon"))
   nsample <- nrow(centroides)
@@ -485,10 +485,10 @@ fakeData <- function(map_name = NULL, by = "name", ...) {
   centroides <- centroides[sample(1:nrow(centroides), nsample),]
   if (by == "name" & !(identical(diff_names, character()))) {
     d <- data.frame(name = centroides[[by]],
-                    name_addition = centroides[[diff_names]], sample_value = runif(nsample, 33, 333),
+                    name_addition = centroides[[diff_names]], sample_value = stats::runif(nsample, 33, 333),
                     stringsAsFactors = FALSE)
   } else {
-    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = runif(nsample, 33, 333),
+    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = stats::runif(nsample, 33, 333),
                     stringsAsFactors = FALSE)
   }
   d
@@ -499,8 +499,8 @@ fakeData <- function(map_name = NULL, by = "name", ...) {
 #' @export
 fakepoints <- function(map_name = NULL, ...) {
   if (is.null(map_name)) return()
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  lfmap <- geodata::geodataMeta(map_name)
+  centroides <- dsvizopts::data_centroid(lfmap$geoname, lfmap$basename)
 
   nsample <- nrow(centroides)
   if (nsample > 30) nsample <- 30
@@ -515,9 +515,9 @@ fakepoints <- function(map_name = NULL, ...) {
 #' standar dataset
 #' @export
 standar_values <- function(data) {
-  l <- map(colnames(data), function(i) iconv(tolower(data[[i]]), to = "ASCII//TRANSLIT"))
+  l <- purrr::map(colnames(data), function(i) iconv(tolower(data[[i]]), to = "ASCII//TRANSLIT"))
   names(l) <- names(data)
-  l <- l %>% bind_rows()
+  l <- l %>% dplyr::bind_rows()
   l
 }
 
@@ -531,7 +531,7 @@ find_geoinfo <- function(data, centroides) {
   dic_info <- data.frame(names_centroides = c("id", "name", "name_addition", "code_addition"),
                          ftype = c("Gcd", "Gnm", "Gnm", "Gcd"), stringsAsFactors = FALSE)
 
-  info_data <- paste0("^", map(colnames(centroides),
+  info_data <- paste0("^", purrr::map(colnames(centroides),
                                function (i) {unique(centroides[[i]])
                                }) %>% unlist(), "$", collapse = "|")
 
@@ -559,12 +559,12 @@ guess_ftypes <- function(data, map_name) {
     stop("Please type a map name")
   if (is.null(data)) return()
 
-  f <- fringe(data)
+  f <- homodatum::fringe(data)
   d <- homodatum::fringe_d(f)
   dic <- homodatum::fringe_dic(f)
   dic$id <- names(d)
 
-  centroides <- suppressWarnings(geodataMeta(map_name)$codes)
+  centroides <- suppressWarnings(geodata::geodataMeta(map_name)$codes)
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
   dif_names <- setdiff(names(centroides), c("id", "name", "lat", "lon"))
 
@@ -591,16 +591,16 @@ guess_ftypes <- function(data, map_name) {
     if(!all(is.na(suppressWarnings(as.numeric(centroides$id))))) {
       max_gcd <- max(centroides$id)
       d_gcd <- r %>%
-        map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
+        purrr::map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
       r <- r[d_gcd]
     }
-    ld<- map(r, function(i) {
+    ld<- purrr::map(r, function(i) {
       dic$hdType[dic$label == i] <<- "Gcd"
     })
   }
 
 
-  info_gnm <- paste0("^", map(col_names,
+  info_gnm <- paste0("^", purrr::map(col_names,
                               function (i) {unique(centroides[[i]])
                               }) %>% unlist(), "$", collapse = "|")
   l <- sapply(colnames(d), function(x) {
@@ -609,7 +609,7 @@ guess_ftypes <- function(data, map_name) {
   r <- names(l)[l == TRUE]
 
   if (!identical(r, character(0))) {
-    ld<- map(r, function(i) {
+    ld<- purrr::map(r, function(i) {
       dic$hdType[dic$label == i] <<- "Gnm"
     })
   }
