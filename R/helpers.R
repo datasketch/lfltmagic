@@ -523,7 +523,7 @@ standar_values <- function(data) {
 find_geoinfo <- function(data, centroides) {
 
 
-  centroides <- centroides %>% select(-lat, -lon)
+  centroides <- centroides %>% dplyr::select(-lat, -lon)
   centroides <- standar_values(centroides)
   dic_info <- data.frame(names_centroides = c("id", "name", "name_addition", "code_addition"),
                          ftype = c("Gcd", "Gnm", "Gnm", "Gcd"), stringsAsFactors = FALSE)
