@@ -22,7 +22,8 @@ Depends:
     leaflet.extras,
     leaflet.esri,
     htmltools,
-    rgdal
+    rgdal,
+    leafem
 VignetteBuilder: 
     knitr
 Remotes:
