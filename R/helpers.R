@@ -20,8 +20,10 @@ lflt_palette <- function(opts) {
     color_mapping <- "colorNumeric"
   }
 
+  # Add leaflet namespace
+  color_mapping <- paste0("leaflet::",color_mapping)
 
-  do.call(color_mapping, l)
+  do.call(getfun(color_mapping), l)
 }
 
 
