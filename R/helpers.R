@@ -384,7 +384,7 @@ lflt_basic_points <- function(l) {
 
 url_logo <- function(logo, background_color) {
   if (grepl("http", logo)) logo_url <- logo
-  logo_path <- local_logo_path(logo, background_color)
+  logo_path <- dsvizopts::local_logo_path(logo, background_color)
   logo_url <- knitr::image_uri(f = logo_path)
   logo_url
 }
