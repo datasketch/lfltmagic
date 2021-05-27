@@ -1,4 +1,3 @@
-
 #' Legend by palette type
 lflt_palette <- function(opts) {
 
@@ -24,8 +23,6 @@ lflt_palette <- function(opts) {
 
   do.call(color_mapping, l)
 }
-
-
 
 
 agg_tooltip <- function(data, label_by, nms, label_ftype, tooltip) {
