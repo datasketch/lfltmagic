@@ -1,3 +1,5 @@
+#' @importFrom dplyr %>%
+
 #' Create cutoff points for legends for bubbles maps
 create_legend_cuts <- function(x, number=seq(1:10)) {
   x_min <- min(x, na.rm = T)
