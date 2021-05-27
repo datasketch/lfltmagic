@@ -528,15 +528,19 @@ find_geoinfo <- function(data, centroides) {
   dic_info <- data.frame(names_centroides = c("id", "name", "name_addition", "code_addition"),
                          ftype = c("Gcd", "Gnm", "Gnm", "Gcd"), stringsAsFactors = FALSE)
 
-  info_data <- paste0("^", purrr::map(colnames(centroides),
-                               function (i) {unique(centroides[[i]])
-                               }) %>% unlist(), "$", collapse = "|")
+  # info_data <- paste0("^", purrr::map(colnames(centroides),
+  #                              function (i) {unique(centroides[[i]])
+  #                              }) %>% unlist(), "$", collapse = "|")
+
+  info_data <- paste0(purrr::map(colnames(centroides),
+                                 function (i) {unique(centroides[[i]])
+                                 }) %>% unlist(), collapse = "|")
 
   data <- standar_values(data)
 
 
   l <- sapply(colnames(data), function(x) {
-    search_info <- !identical(grep(info_data, as.matrix(data[,x])), integer(0)) == TRUE
+    search_info <- !identical(grep(info_data, as.matrix(as.character(data[,x]))), integer(0)) == TRUE
   })
   r <- names(l)[l == TRUE]
   if (identical(r, character(0))) {
