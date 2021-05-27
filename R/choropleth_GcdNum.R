@@ -24,8 +24,8 @@
 lflt_choropleth_GcdNum <- function(data = NULL, ...) {
 
   if (!is.null(data)) {
-    data[[1]] <- as_Gcd(data[[1]])
-    data[[2]] <- as_Num(data[[2]])
+    data[[1]] <- homodatum::as_Gcd(data[[1]])
+    data[[2]] <- homodatum::as_Num(data[[2]])
   }
   opts <- dsvizopts::merge_dsviz_options(...)
 
