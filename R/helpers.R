@@ -434,15 +434,15 @@ lflt_graticule <- function(map, graticule) {
 lflt_titles <- function(map, titles) {
 
   map %>%
-    addControl(titles$caption,
-               position = "bottomleft",
-               className="map-caption") %>%
-    addControl(titles$title,
-               position = "topleft",
-               className="map-title") %>%
-    addControl(titles$subtitle,
-               position = "topleft",
-               className="map-subtitle")
+    leaflet::addControl(titles$caption,
+                        position = "bottomleft",
+                        className="map-caption") %>%
+    leaflet::addControl(titles$title,
+                        position = "topleft",
+                        className="map-title") %>%
+    leaflet::addControl(titles$subtitle,
+                        position = "topleft",
+                        className="map-subtitle")
 
 }
 
