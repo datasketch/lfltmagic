@@ -2,23 +2,30 @@
 % Please edit documentation in R/bubbles_GlnGlt.R
 \name{lflt_bubbles_GlnGlt}
 \alias{lflt_bubbles_GlnGlt}
-\title{Leaflet bubbles with constant radius}
+\title{Bubbles chart Gln Glt}
 \usage{
 lflt_bubbles_GlnGlt(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbles with constant radius
+\code{lflt_bubbles_GlnGlt()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with only two columns, where the firts column contains \strong{longitudes points},
+and the second \strong{latitudes points}, or make sure that the first two columns of
+your data meet this condition
 }
-\section{ctypes}{
- Gln-Glt
+\section{Ftype}{
+
+Gln-Glt
 }
 
 \examples{
-lflt_bubbles_GlnGlt(sampleData("Gln-Glt", nrow = 10))
+data <- sample_data("Gln-Glt", n = 30)
+lflt_bubbles_GlnGlt(data)
+
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_bubbles_GlnGlt(data,
+                       agg = "mean")
+
+
+
 }

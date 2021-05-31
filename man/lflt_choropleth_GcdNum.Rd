@@ -2,23 +2,34 @@
 % Please edit documentation in R/choropleth_GcdNum.R
 \name{lflt_choropleth_GcdNum}
 \alias{lflt_choropleth_GcdNum}
-\title{Leaflet choropleths by numerical variable}
+\title{choropleth chart Gcd Num}
 \usage{
 lflt_choropleth_GcdNum(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet choropleths by numerical variable
+\code{lflt_choropleth_GcdNum()} Create a Leaflet choropleth map based on a particular data type.
+In this case, you can load data with only two columns, where the firts it's a \strong{geocode column},
+and the second is a \strong{numeric class column}, or make sure that the first two columns of
+your data meet this condition
 }
-\section{ctypes}{
- Gcd-Num
+\section{Ftype}{
+
+Gcd-Num
 }
 
 \examples{
-lflt_choropleth_GcdNum(sampleData("Gcd-Num", nrow = 10))
+data <- sample_data("Gcd-Num", n = 30)
+lflt_choropleth_GcdNum(data)
+
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_choropleth_GcdNum(data,
+                       agg = "mean")
+
+
 }
+\seealso{
+Other Gcd-Num plots: 
+\code{\link{lflt_bubbles_GcdNum}()}
+}
+\concept{Gcd-Num plots}

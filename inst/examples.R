@@ -3,6 +3,59 @@ library(lfltmagic)
 # devtools::document()
 # devtools::install()
 
+
+# quick examples
+data <- NULL
+opts <- dsvizopts::dsviz_default_opts()
+lflt_bubbles_Gcd()
+lflt_bubbles_Gcd(sample_data("Gcd", addNA = F))
+lflt_bubbles_GcdNum()
+lflt_bubbles_GcdCat()
+lflt_bubbles_GcdCatNum()
+lflt_bubbles_Gnm()
+lflt_bubbles_GnmCat()
+lflt_bubbles_GnmCatNum()
+lflt_bubbles_GnmNum()
+lflt_bubbles_GlnGlt()
+lflt_bubbles_GlnGltCat()
+lflt_bubbles_GlnGltCatNum()
+lflt_bubbles_GlnGltNum()
+lflt_choropleth_Gcd()
+lflt_choropleth_Gcd(sample_data("Gcd"))
+lflt_choropleth_GcdCat()
+lflt_choropleth_GcdCatNum()
+lflt_choropleth_GcdNum()
+lflt_choropleth_Gnm()
+lflt_choropleth_GnmCat()
+lflt_choropleth_GnmCatNum()
+lflt_choropleth_GnmNum()
+
+
+
+lflt_bubbles_Gcd(sample_data("Gcd", addNA = F))
+lflt_bubbles_GcdNum(sample_data("Gcd-Num", addNA = F))
+lflt_bubbles_GcdCat(sample_data("Gcd-Cat", addNA = F))
+lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", addNA = F))
+lflt_bubbles_Gnm(sample_data("Gnm", addNA = F))
+lflt_bubbles_GnmCat(sample_data("Gnm-Cat", addNA = F))
+lflt_bubbles_GnmCatNum(sample_data("Gnm-Cat-Num", addNA = F))
+lflt_bubbles_GnmNum(sample_data("Gnm-Num", addNA = F))
+lflt_bubbles_GlnGlt(sample_data("Gln-Glt", addNA = F))
+lflt_bubbles_GlnGltCat(sample_data("Gln-Glt-Cat", addNA = F))
+data <- sample_data("Gln-Glt-Cat-Num", addNA = F)
+# lflt_bubbles_GlnGltCatNum(sample_data("Gln-Glt-Cat-Num", addNA = F))
+# lflt_bubbles_GlnGltNum(sample_data("Gln-Glt-Num", addNA = F))
+lflt_choropleth_Gcd(sample_data("Gcd", addNA = F))
+lflt_choropleth_GcdCat(sample_data("Gcd-Cat", addNA = F))
+lflt_choropleth_GcdCatNum(sample_data("Gcd-Cat-Num", addNA = F))
+lflt_choropleth_GcdNum(sample_data("Gcd-Num", addNA = F))
+lflt_choropleth_Gnm(sample_data("Gnm", addNA = F))
+lflt_choropleth_GnmCat(sample_data("Gnm-Cat", addNA = F))
+lflt_choropleth_GnmCatNum(sample_data("Gnm-Cat-Num", addNA = F))
+lflt_choropleth_GnmNum(sample_data("Gnm-Num", addNA = F))
+
+
+
 # Gnm-Num examples --------------------------------------------------------
 
 lflt_choropleth_GnmNum()
@@ -48,7 +101,7 @@ lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
 lflt_choropleth_GnmNum(data = sample_data("Gnm-Num", 100),
                        map_graticule = TRUE)
 
-data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), pepito = runif(4, 1, 1000))
+data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), pepito = runif(4, 1, 1000), stringsAsFactors = FALSE)
 lflt_choropleth_GnmNum(data, map_name = "col_pacifico",
                        palette_colors = c("#FEAFEA", "#000CCC"),
                        map_color_scale = "Bins", prefix = "$")
@@ -77,7 +130,8 @@ lflt_choropleth_GnmNum(data,
                        subtitle = "Un subtitulo", map_zoom = F)
 
 lflt_choropleth_Gnm(sample_data('Gnm', 300))
-lflt_choropleth_Gnm(data.frame("d" = c("antioquia", "chocó", "chocó", "cauca")), map_name = "col_departments")
+lflt_choropleth_Gnm(data.frame("d" = c("antioquia", "chocó", "chocó", "cauca"), stringsAsFactors = FALSE),
+                    map_name = "col_departments")
 
 # Gcd Num examples  -------------------------------------------------------
 
@@ -88,7 +142,7 @@ availableMaps <- setdiff(availableGeodata(), map_changes)
 
 lflt_choropleth_GcdNum(map_name = "bra_states" )
 data <- data.frame(State = c("BR.PA", "BR.RS", "BR.RS", "BR.TO", "BR.MT", "BR.MA", "BR.ES"),
-                   `Fake population` = runif(7, 20000, 600000))
+                   `Fake population` = runif(7, 20000, 600000), stringsAsFactors = FALSE)
 lflt_choropleth_GcdNum(data, map_name = "bra_states")
 lflt_choropleth_GcdNum(data, map_name = "bra_states",
                        palette_colors = c("#FEAFEA", "#000CCC"),
@@ -103,7 +157,7 @@ lflt_choropleth_Gcd(sample_data("Gcd", 3000),
                     topo_fill_opacity = 1,
                     palette_colors = c("#FEAFEA", "#000CCC"))
 
-
+lflt_choropleth_GcdNum(map_name= "col_departments",dataLabels_show = T, data = data.frame(dep = c("05", "05", "27"), id = 1:3))
 lflt_choropleth_Gcd(map_name= "col_departments",dataLabels_show = T, data = data.frame(dep = c("05", "05", "27")))
 
 # Gnm-Num bubbles examples ------------------------------------------------
@@ -111,7 +165,8 @@ lflt_bubbles_GnmNum(sample_data("Gnm-Num", 100),
                     palette_colors = 'orange',
                     background_color = "#000",
                     topo_fill_opacity = 0.2)
-data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000))
+data <- data.frame(Ciudad = c("Cauca", "chocó", "nariño", "nariño"), Val = runif(4, 1, 1000),
+                   stringsAsFactors = FALSE)
 guess_ftypes(data = data, map_name = "col_pacifico")
 lflt_bubbles_GnmNum(data,
                     map_name = "col_pacifico",
@@ -153,10 +208,17 @@ lflt_bubbles_GlnGltNum(data,
 lflt_bubbles_GlnGlt(sample_data("Gln-Glt"))
 lflt_bubbles_GlnGlt(sample_data("Gln-Glt"), map_radius = 10)
 
-data <- data.frame(Lon = runif(35, -75, -70) , Lat = runif(35, -3.5, 6))
+data <- data.frame(Lon = runif(35, -75, -70) , Lat = runif(35, -3.5, 6), stringsAsFactors = FALSE)
 lflt_bubbles_GlnGlt(data,
                     map_name = "col_departments",
                     tooltip = "Coord 1: {Lon} <br/> Coord 2: {Lat}",
                     palette_colors = "#000000",
                     na_color = "#FEAFEA",
                     topo_fill_opacity = 0.2)
+
+lflt_choropleth_GnmCat(data=sample_data("Gnm-Cat"))
+lflt_choropleth_GcdCat(data=sample_data("Gcd-Cat"))
+lflt_choropleth_GcdCatNum(data=sample_data("Gcd-Cat-Num"))
+
+data <- fakeData("madrid_barrios")
+lflt_choropleth_GnmNum(data, map_name = "madrid_barrios")

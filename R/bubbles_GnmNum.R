@@ -1,38 +1,72 @@
 
-#' Leaflet bubbless by numerical variable
+#' Bubbles chart Gnm Num
 #'
-#' Leaflet bubbless by numerical variable
+#' @description
+#' `lflt_bubbles_GnmNum()` Create a Leaflet bubbles map based on a particular data type.
+#' In this case, you can load data with only two columns, where the firts it's a **geoname column**,
+#' and the second is a **numeric class column**, or make sure that the first two columns of
+#' your data meet this condition
 #'
-#' @name lflt_bubbles_GnmNum
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gnm-Num
 #' @export
+#' @family Gnm-Num plots
+#' @section Ftype:
+#' Gnm-Num
 #' @examples
-#' lflt_bubbles_GnmNum(sampleData("Gnm-Num", nrow = 10))
+#' data <- sample_data("Gnm-Num", n = 30)
+#' lflt_bubbles_GnmNum(data)
+#'
+#'
+#' # if you want to calculate the average instead of the sum, you can use agg inside a function
+#' lflt_bubbles_GnmNum(data,
+#'                        agg = "mean")
+#'
+#'
 lflt_bubbles_GnmNum <- function(data = NULL, ...) {
 
+  if(!is.null(data)) data[[1]] <- homodatum::as_Gnm(data[[1]])
   opts <- dsvizopts::merge_dsviz_options(...)
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
   lf <- lflt_basic_bubbles(l) %>%
           lflt_background(l$theme) %>%
-            lflt_bounds(l$b_box) %>%
               lflt_graticule(l$graticule) %>%
                 lflt_titles(l$titles)
   lf
 }
 
 
-#' Leaflet bubbless by numerical variable
+#' Bubbles chart Gnm
 #'
-#' Leaflet bubbless by numerical variable
+#' @description
+#' `lflt_bubbles_Gnm()` Create a Leaflet bubbles map based on a particular data type.
+#' In this case, you can load data with only one column, where it's a **geoname column**,
+#' or make sure that the first column of your data meet this condition
 #'
-#' @name lflt_bubbles_Gnm
-#' @param x A data.frame
-#' @return leaflet viz
-#' @section ctypes: Gnm
 #' @export
+#' @inheritParams lflt_bubbles_GnmNum
+#' @section Ftype:
+#' Gnm
 #' @examples
-#' lflt_bubbles_Gnm(sampleData("Gnm", nrow = 10))
-lflt_bubbles_Gnm <- lflt_bubbles_GnmNum
+#' data <- sample_data("Gnm", n = 30)
+#' lflt_bubbles_Gnm(data)
+#'
+#' # Activate data labels
+#' lflt_bubbles_Gnm(data)
+#'
+#' # if you want to calculate the average instead of the sum, you can use agg inside a function
+#' lflt_bubbles_Gnm(data,
+#'                        agg = "mean")
+#'
+lflt_bubbles_Gnm <- function(data = NULL, ...) {
+
+  if(!is.null(data)) data[[1]] <- as_Gnm(data[[1]])
+  opts <- dsvizopts::merge_dsviz_options(...)
+
+  l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm")
+  lf <- lflt_basic_bubbles(l) %>%
+    lflt_background(l$theme) %>%
+    lflt_graticule(l$graticule) %>%
+    lflt_titles(l$titles)
+  lf
+}
+

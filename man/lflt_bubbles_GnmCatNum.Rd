@@ -2,23 +2,50 @@
 % Please edit documentation in R/bubbles_GnmCatNum.R
 \name{lflt_bubbles_GnmCatNum}
 \alias{lflt_bubbles_GnmCatNum}
-\title{Leaflet bubbles by categorical variable}
+\title{Bubbles chart Gnm Cat Num}
 \usage{
 lflt_bubbles_GnmCatNum(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbles by categorical variable
+\code{lflt_bubbles_GnmCatNum()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with only three columns, where the firts it's a \strong{geoname column},
+the second is a \strong{categorical column} and the third must be  a \strong{numeric class column}, you should be sure that
+three firts columns they meet this condition
 }
-\section{ctypes}{
- Gnm-Cat-Num
+\section{Ftype}{
+
+Gnm-Cat-Num
 }
 
 \examples{
-lflt_bubbles_GnmCatNum(sample_data("Gnm-Cat-Num", nrow = 10))
+data <- sample_data("Gnm-Cat-Num", n = 30)
+lflt_bubbles_GnmCatNum(data)
+
+# Activate data labels
+lflt_bubbles_GnmCatNum(data)
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_bubbles_GnmCatNum(data,
+                       agg = "mean",
+                       dataLabels_show = TRUE)
+
+# data with more of one column
+data <- sample_data("Gnm-Cat-Num-Dat-Yea-Cat", n = 30)
+lflt_bubbles_GnmCatNum(data)
+
+# Change variable to color and pallete type
+lflt_bubbles_GnmCatNum(data,
+                       color_by = names(data)[2],
+                       palette_type = "sequential")
+
+# Change tooltip info and add additional information contained in your data
+names_data <- names(data)
+info_tool <- paste0("<b>",names_data[1],":</b> {", names_data[1],"}<br/><b>", names_data[4],":</b> {", names_data[4],"}<br/>")
+data \%>\%
+ lflt_bubbles_GnmCatNum(tooltip = info_tool)
 }
+\seealso{
+Other Gnm-Cat-Num plots: 
+\code{\link{lflt_choropleth_GnmCatNum}()}
+}
+\concept{Gnm-Cat-Num plots}

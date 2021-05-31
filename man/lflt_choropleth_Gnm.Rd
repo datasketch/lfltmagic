@@ -2,23 +2,29 @@
 % Please edit documentation in R/choropleth_GnmNum.R
 \name{lflt_choropleth_Gnm}
 \alias{lflt_choropleth_Gnm}
-\title{Leaflet choropleths by numerical variable}
+\title{choropleth chart Gnm}
 \usage{
 lflt_choropleth_Gnm(data = NULL, ...)
 }
-\arguments{
-\item{data}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet choropleths by numerical variable
+\code{lflt_choropleth_Gnm()} Create a Leaflet choropleth map based on a particular data type.
+In this case, you can load data with only one column, where it's a \strong{geoname column},
+or make sure that the first column of your data meet this condition
 }
-\section{ctypes}{
- Gnm
+\section{Ftype}{
+
+Gnm
 }
 
 \examples{
-lflt_choropleth_Gnm(sampleData("Gnm", nrow = 10))
+data <- sample_data("Gnm", n = 30)
+lflt_choropleth_Gnm(data)
+
+# Activate data labels
+lflt_choropleth_Gnm(data)
+
+# if you want to calculate the average instead of the sum, you can use agg inside a function
+lflt_choropleth_Gnm(data,
+                       agg = "mean")
+
 }

@@ -2,23 +2,23 @@
 % Please edit documentation in R/bubbles_GlnGlt.R
 \name{lflt_bubbles_GlnGltNum}
 \alias{lflt_bubbles_GlnGltNum}
-\title{Leaflet bubbles by numerical variable}
+\title{#' Bubbles chart Gln Glt Num}
 \usage{
 lflt_bubbles_GlnGltNum(data = NULL, ...)
 }
-\arguments{
-\item{x}{A data.frame}
-}
-\value{
-leaflet viz
-}
 \description{
-Leaflet bubbles by numerical variable
+\code{lflt_bubbles_GlnGlt()} Create a Leaflet bubbles map based on a particular data type.
+In this case, you can load data with only three columns, where the firts column contains \strong{longitudes points},
+the second \strong{latitudes points} and the third must be a \strong{numeric class column},
+or be sure that three firts columns they meet this condition.
 }
-\section{ctypes}{
- Gnm-Num
+\section{Ftype}{
+
+Gln-Glt-Num
 }
 
 \examples{
-lflt_bubbles_GlnGltNum(sampleData("Gln-Glt-Num", nrow = 10))
+data <- sample_data("Gln-Glt-Num", n = 30)
+lflt_bubbles_GlnGltNum(data)
 }
+\concept{Gln-Glt-Num plots}

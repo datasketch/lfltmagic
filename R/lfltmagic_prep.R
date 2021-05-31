@@ -1,206 +1,46 @@
 
 #' @export
 lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm-Num", ...) {
+  # call geographical info
+  shape <- dsvizopts::shape_info(map_name = opts$extra$map_name,
+                                 ftype = ftype,
+                                 by_col = by_col,
+                                 addRds = FALSE)
+  #topoData <- shape$rdsInfo
+  topoInfo <- shape$topoInfo
+  topoInfo$labels <- topoInfo[[by_col]]
+  # data preparation by type
+  if (!is.null(data)) {
+    list_d <- dsvizopts::data_map_prep(data = data,
+                                       ftype = ftype,
+                                       agg =  opts$summarize$agg,
+                                       color_by = opts$style$color_by,
+                                       more_levels = shape$more_levels,
+                                       ptage_col = opts$postprocess$percentage_col)
+    # format setting of data being displayed
+    data_format <- dsvizopts::format_prep(data = list_d$data,
+                                          dic = list_d$dic,
+                                          formats = list(sample_num = opts$style$format_sample_num,
+                                                         sample_cat = opts$style$format_sample_cat,
+                                                         prefix = opts$style$prefix,
+                                                         suffix = opts$style$suffix))
 
-  map_name <- opts$extra$map_name
-  label_by <- opts$extra$map_label_by
 
-  topoInfo <- topo_info(map_name)
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
-  bbox <- topoInfo@bbox
-  if (is.null(bbox)) bbox <- topo_bbox(centroides$lon, centroides$lat)
-  color_scale <- opts$extra$map_color_scale
-  palette_colors <-  opts$theme$palette_colors
-  palette_type <-  opts$theme$palette_type
-
-  if (is.null(data)) {
-    topoInfo@data <- topoInfo@data %>%
-      mutate(labels = glue::glue(paste0('<strong>{', label_by, '}</strong>')) %>% lapply(htmltools::HTML))
-  } else {
-
-    f <- homodatum::fringe(data)
-    nms <- homodatum::fringe_labels(f)
-    d <- homodatum::fringe_d(f)
-    dic <- fringe_dic(f, id_letters = T)
-    pre_ftype <- strsplit(ftype, "-") %>% unlist()
-
-    if(length(pre_ftype) < length(dic$hdType)){
-      if(!all(pre_ftype == dic$hdType[1:length(pre_ftype)])){
-        warning("Input data types differ from expected data types.")
-        dic$hdType[1:length(pre_ftype)] <- pre_ftype
-      }
-    } else if(length(pre_ftype) > length(dic$hdType)){
-      if(!all(pre_ftype[1:length(dic$hdType)] == dic$hdType)){
-        warning("Input data types differ from expected data types.")
-        dic$hdType <- pre_ftype[1:length(dic$hdType)]
-      }
+    if (grepl("Gnm|Gcd", ftype)) {
+      data_format$name_alt <- iconv(tolower(data_format$a), to = "ASCII//TRANSLIT")
+      topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
+      # add info tooltip in data
+      topoInfo <- agg_tooltip(data = topoInfo, label_by = opts$extra$map_label_by,nms = list_d$nms, label_ftype = list_d$nms_tooltip, tooltip = opts$chart$tooltip)
     } else {
-      if(!all(pre_ftype == dic$hdType)){
-        warning("Input data types differ from expected data types.")
-        dic$hdType <- pre_ftype
-      }
+      topoInfo <- list(topoInfo = topoInfo, data = data_format)
+      # add info tooltip in data
+      topoInfo$data <- agg_tooltip(data = topoInfo$data, label_by = opts$extra$map_label_by,nms = list_d$nms, label_ftype = list_d$nms_tooltip, tooltip = opts$chart$tooltip)
     }
 
 
-    frtype_d <- paste0(dic$hdType, collapse = "-")
-    if (sum(grepl("Cat", dic$hdType))>0) color_scale <- "Category"
-
-    if (grepl("Pct", frtype_d)) {
-      dic$hdType[dic$hdType == "Pct"] <- "Num"
-      frtype_d <- gsub("Pct", "Num", frtype_d)
-    }
-
-    if (sum(c("Glt", "Gln", "Gcd", "Gnm") %in% dic$hdType)==0) stop("Make sure you have a geographic variable in your data, it can be name or country codes, or latitude and longitude coordinates. Also make sure the map_name entered is correct.")
-
-
-
-    if(frtype_d %in% c("Gcd", "Gnm")){
-      d <- d %>%
-        mutate(a = na_if(a, "-99")) %>%
-        drop_na(a) %>%
-        dplyr::group_by_all() %>%
-        dplyr::summarise(b = n())
-      frtype_d <- paste0(frtype_d, "-Num")
-      nms[2] <- opts$summarize$agg_text %||% "Count"
-      names(nms) <- c("a", "b")
-      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "b")
-      dic <- dic %>% bind_rows(dic_num)
-    }
-
-    if(frtype_d == "Gln-Glt"){
-      d <- d %>%
-        drop_na(a,b) %>%
-        dplyr::group_by_all() %>%
-        dplyr::summarise(c = n())
-      frtype_d <- paste0(frtype_d, "-Num")
-      nms[3] <- opts$summarize$agg_text %||% "Count"
-      names(nms) <- c("a", "b", "c")
-      dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
-      dic <- dic %>% bind_rows(dic_num)
-    }
-
-
-    if(frtype_d %in% c("Gcd-Cat", "Gnm-Cat")){
-      d <- d %>%
-        mutate(a = na_if(a, "-99")) %>%
-        drop_na(a) %>%
-        dplyr::group_by_all() %>%
-        dplyr::summarise(c = n())
-
-      if(sum(d$c) > nrow(d)){
-        frtype_d <- paste0(frtype_d, "-Num")
-        nms[3] <- opts$summarize$agg_text %||% "Count"
-        names(nms) <- c("a", "b", "c")
-        dic_num <- data.frame(id = "count", label = "Count", hdType= as_hdType(x = "Num"), id_letters = "c")
-        dic <- dic %>% bind_rows(dic_num)
-      } else {
-        d <- d %>% select(-c)
-      }
-
-    }
-
-    var_cats <- grep("Cat|Gcd|Gnm", dic$hdType)
-    var_nums <- grep("Num|Glt|Gln", dic$hdType)
-
-    # category, geocode, geoname formtat
-
-    if (!identical(var_cats, integer())) {
-      var_cats <- dic$id_letters[var_cats]
-      l_cats <- map(var_cats, function(f_cats){
-        d[[paste0(f_cats, "_label")]] <<- makeup_chr(d[[f_cats]], opts$style$format_sample_cat)
-      })}
-
-
-    # numeric format
-
-    if (!identical(var_nums, integer())) {
-      var_nums <- dic$id_letters[var_nums]
-
-      l_nums <- map(var_nums, function(f_nums){
-        d[[paste0(f_nums, "_label")]] <<- makeup_num(d[[f_nums]], sample = opts$style$format_sample_num)
-      })}
-
-
-    if (grepl("Gln|Glt", frtype_d)) {
-      d <- d %>%
-        mutate(labels = glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
-    }
-
-
-    if (grepl("Gcd|Gnm", frtype_d)) {
-      centroides$name_alt <- iconv(tolower(centroides[[by_col]]), to = "ASCII//TRANSLIT")
-
-      centroides <- centroides[,c("name_alt","lat", "lon")]
-
-
-      topoInfo@data$name_label <- makeup::makeup_chr(topoInfo@data$name, opts$style$format_sample_cat)
-      topoInfo@data$id_label <- topoInfo@data$id
-
-      if(grepl("\\{name\\}", opts$chart$tooltip)) {
-        nm <- names(nms)
-        nms <- c(nms, "name")
-        names(nms) <- c(nm, "name")
-      }
-
-      topoInfo@data$name_alt <- iconv(tolower(topoInfo@data[[by_col]]), to = "ASCII//TRANSLIT")
-      topoInfo@data <- left_join(topoInfo@data, centroides, by = "name_alt")
-
-      d <- d %>%
-        mutate(name_alt = iconv(tolower(a), to = "ASCII//TRANSLIT"))
-
-      topoInfo@data  <- left_join(topoInfo@data, d, by = "name_alt")
-
-      topoInfo@data$name <- makeup::makeup_chr(topoInfo@data[[by_col]], opts$style$format_cat_sample)
-
-
-
-
-      topoInfo@data <- topoInfo@data %>%
-        mutate(labels = ifelse(is.na(a),
-                               glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
-                               glue::glue(lflt_tooltip(nms, tooltip = opts$chart$tooltip)) %>% lapply(htmltools::HTML))
-        )
-
-    } else if (grepl("Gln|Glt", frtype_d)) {
-      topoInfo@data <- d
-      topoInfo@data$name <- opts$preprocess$na_label
-    }
-
-
-    data <- d
-
-
-  # define color palette based on data type
-  var_cat <- "Cat" %in% dic$hdType
-  if(!is.null(palette_type)){
-    if(!palette_type %in% c("categorical", "sequential", "divergent")){
-      warning("Palette type must be one of 'categorical', 'sequential', or 'divergent'; reverting to default.")
-      palette_type <- NULL
-    }
-    if(!var_cat & palette_type == "categorical" | (var_cat & palette_type %in% c("sequential", "divergent"))){
-      warning("Palette type might not be suitable for data type.")
-    }
-  } else {
-    if(var_cat){
-      palette_type <- "categorical"
-    } else {
-      palette_type <- "sequential"
-    }
   }
 
-  if(is.null(palette_colors)){
-    if(palette_type == "categorical"){
-      palette_colors <- opts$theme$palette_colors_categorical
-    } else if (palette_type == "sequential"){
-      palette_colors <- opts$theme$palette_colors_sequential
-    } else if (palette_type == "divergent"){
-      palette_colors <- opts$theme$palette_colors_divergent
-    }
-  }
-  }
 
-  # style titles
   title <- tags$div(HTML(paste0("<div style='margin-bottom:0px;font-family:", opts$theme$text_family,
                                 ';color:', opts$theme$title_color,
                                 ';font-size:', opts$theme$title_size,"px;'>", opts$title$title %||% "","</div>")))
@@ -214,11 +54,14 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                               ';color:', opts$theme$legend_color,
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
+  color_scale <- opts$extra$map_color_scale
+  palette_type <-  opts$theme$palette_type %||% "sequential"
+  palette_colors <-  opts$theme$palette_colors %||% opts$theme[[paste0("palette_colors_", palette_type)]]
+
 
   list(
-    d = topoInfo,
-    data = data,
-    b_box = bbox,
+    topoInfo = topoInfo,
+    #geoInfo = topoData,
     color_scale = color_scale,
     palette_colors = palette_colors,
     titles = list(title = title,
@@ -246,6 +89,4 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     min_zoom = opts$extra$map_min_zoom
   )
 
-
 }
-

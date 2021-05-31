@@ -1,25 +1,23 @@
-context("helpers")
+context("lflt magic prep")
 
-test_that("Tooltips", {
+test_that("Tooltip", {
 
-  data <- sample_data("Gcd")
-  names(data) <- "Countries"
+  data <- sample_data("Gcd-Cat-Num-Num-Cat-Gnm")
   f <- homodatum::fringe(data)
   nms <- homodatum::fringe_labels(f)
-  t_t <- lflt_tooltip(nms = nms, tooltip = "test {Countries}")
-  expect_equal(t_t,  "test {a_label}")
+  lf <- names(data)[c(1,3,5)]
+  l_tooltip <- lflt_tooltip(nms,
+                            label_ftype = lf,
+                            tooltip = "")
 
-
-  data <- sample_data("Glt-Gln-Cat-Num-Num-Num")
-  names(data) <- c("Lat", "Long", "Categories", "Values_uno", "Values_two", "Values_trhee")
-  f <- homodatum::fringe(data)
-  nms <- homodatum::fringe_labels(f)
-  t_t <- lflt_tooltip(nms = nms, tooltip = "La Categoria {Categories} tiene {Values_uno} y {Values_trhee} mariposas")
-  expect_equal(t_t,  "La Categoria {c_label} tiene {d_label} y {f_label} mariposas")
-
-  t_t <- lflt_tooltip(nms = nms, tooltip = "Hola")
-  expect_equal(t_t,  "Hola")
-
-
+  nms_filter <-  nms[nms %in% lf]
+  nms_names <- names(nms_filter)
+  l <- map(seq_along(nms_filter), function(i){
+    paste0(nms_filter[[i]], ": {", nms_names[i], "_label}")
+    #paste0("<span style='font-size:15px;'><strong>", nms_filter[[i]], ":</strong> {", nms_names[i], "_label}</span>")
+  }) %>% unlist()
+  tooltip <- paste0(l, collapse = "<br/>")
+  expect_identical(l_tooltip, tooltip)
 
 })
+
