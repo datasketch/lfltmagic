@@ -17,6 +17,7 @@ Depends:
     leaflet,
     d3.format,
     dsvizopts,
+    dsvizprep,
     makeup,
     leaflet.extras,
     leaflet.esri,
@@ -30,6 +31,7 @@ Remotes:
     datasketch/makeup,
     datasketch/paletero,
     datasketch/dsvizopts,
+    datasketch/dsvizprep,
     dreamRs/d3.format
 License: MIT + file LICENSE
 LazyData: no
