@@ -1,4 +1,3 @@
-
 #' Legend by palette type
 lflt_palette <- function(opts) {
 
@@ -21,11 +20,11 @@ lflt_palette <- function(opts) {
     color_mapping <- "colorNumeric"
   }
 
+  # Add leaflet namespace
+  color_mapping <- paste0("leaflet::",color_mapping)
 
-  do.call(color_mapping, l)
+  do.call(getfun(color_mapping), l)
 }
-
-
 
 
 agg_tooltip <- function(data, label_by, nms, label_ftype, tooltip) {
@@ -50,9 +49,9 @@ lflt_legend_bubbles <- function(map, colors, labels, sizes,
                            max(sizes), "px; margin-bottom: 3px; line-height: ", max(sizes), "px; font-size: 13px; '>",
                            makeup::makeup_num(labels), "</div>")
 
-  return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
-                   opacity = opacity, title = title, na.label = na.label,
-                   position = position))
+  return(leaflet::addLegend(map, colors = colorAdditions, labels = labelAdditions,
+                            opacity = opacity, title = title, na.label = na.label,
+                            position = position))
 }
 
 
@@ -89,20 +88,20 @@ lflt_legend_format <- function (prefix = "",
 
 lflt_base_map <- function(topoinfo, opts, ...) {
 
-  lf <- leaflet(topoinfo,
-                option = leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
+  lf <- leaflet::leaflet(topoinfo,
+                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
     # addTopoJSON(geoinfo,
     #             weight = opts$border_weight,
     #             fillOpacity = opts$topo_fill_opacity,
     #             opacity = 1,
     #             color = opts$border_color,
     #             fillColor = opts$color_map) %>%
-    addPolygons(weight = opts$border_weight,
-                label = ~labels,
-                color =  opts$border_color,
-                fillColor = opts$color_map,
-                fillOpacity = opts$topo_fill_opacity,
-                opacity = 1)
+    leaflet::addPolygons(weight = opts$border_weight,
+                         label = ~labels,
+                         color =  opts$border_color,
+                         fillColor = opts$color_map,
+                         fillOpacity = opts$topo_fill_opacity,
+                         opacity = 1)
   lf
 }
 
@@ -150,31 +149,32 @@ lflt_basic_choropleth <- function(l) {
 
 
     lf <- lf %>%
-      addPolygons( weight = l$theme$border_weight,
-                   fillOpacity = fill_opacity,
-                   opacity = 1,
-                   color = l$border_color,
-                   fillColor = color_map,
-                   layerId = ~a,
-                   label = ~labels,
-                   labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto")#,
-                   # highlight = highlightOptions(
-                   #   color= 'white',
-                   #   opacity = 0.8,
-                   #   weight= 3,
-                   #   bringToFront = TRUE)
+      leaflet::addPolygons( weight = l$theme$border_weight,
+                            fillOpacity = fill_opacity,
+                            opacity = 1,
+                            color = l$border_color,
+                            fillColor = color_map,
+                            layerId = ~a,
+                            label = ~labels,
+                            labelOptions = leaflet::labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"),
+                                                                  textsize = "13px", direction = "auto")#,
+                            # highlight = highlightOptions(
+                            #   color= 'white',
+                            #   opacity = 0.8,
+                            #   weight= 3,
+                            #   bringToFront = TRUE)
       )
     if ( l$theme$legend_show) {
 
-      lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
-                             position = l$theme$legend_position,
-                             na.label = l$na_label,
-                             title = l$legend_title,
-                             labFormat = lflt_legend_format(
-                               sample =l$format_num, locale = l$locale,
-                               prefix = l$prefix, suffix = l$suffix,
-                               between = paste0(l$suffix, " - ", l$prefix),
-                             ))
+      lf <- lf %>% leaflet::addLegend(pal = pal, values = domain, opacity = 1,
+                                      position = l$theme$legend_position,
+                                      na.label = l$na_label,
+                                      title = l$legend_title,
+                                      labFormat = lflt_legend_format(
+                                        sample =l$format_num, locale = l$locale,
+                                        prefix = l$prefix, suffix = l$suffix,
+                                        between = paste0(l$suffix, " - ", l$prefix),
+                                      ))
     }
   }
   lf
@@ -193,15 +193,15 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
                                       na.label = opts$na_label,
                                       title = opts$legend_title)
   } else {
-    lf <- map %>% addLegend(pal = opts$pal, values = ~value, opacity = 1,
-                            position = opts$legend_position,
-                            na.label = opts$na_label,
-                            title = opts$legend_title,
-                            labFormat = lflt_legend_format(
-                              sample = opts$format_num, locale = opts$locale,
-                              prefix = opts$prefix, suffix = opts$suffix,
-                              between = paste0(opts$suffix, " - ",opts$prefix),
-                            ))
+    lf <- map %>% leaflet::addLegend(pal = opts$pal, values = ~value, opacity = 1,
+                                     position = opts$legend_position,
+                                     na.label = opts$na_label,
+                                     title = opts$legend_title,
+                                     labFormat = lflt_legend_format(
+                                       sample = opts$format_num, locale = opts$locale,
+                                       prefix = opts$prefix, suffix = opts$suffix,
+                                       between = paste0(opts$suffix, " - ",opts$prefix),
+                                     ))
   }
   lf
 }
@@ -260,7 +260,7 @@ lflt_basic_bubbles <- function(l) {
     lat[is.na(radius)] <- NA
 
     lf <- lf %>%
-      addCircleMarkers(
+      leaflet::addCircleMarkers(
         lng = lon,
         lat = lat,
         radius = radius,
@@ -268,10 +268,10 @@ lflt_basic_bubbles <- function(l) {
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
-        labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
+        labelOptions = leaflet::labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
         layerId = ~a
       )
-print(unique(color))
+
     if (l$theme$legend_show){
       lf <- legend_format(map = lf, opts = list(min_size = l$min_size,
                                                 max_size = l$max_size,
@@ -342,7 +342,7 @@ lflt_basic_points <- function(l) {
     }
 
     lf <- lf %>%
-      addCircleMarkers(
+      leaflet::addCircleMarkers(
         lng = l$topoInfo$data$a,
         lat = l$topoInfo$data$b,
         radius = radius,
@@ -384,7 +384,7 @@ lflt_basic_points <- function(l) {
 
 url_logo <- function(logo, background_color) {
   if (grepl("http", logo)) logo_url <- logo
-  logo_path <- local_logo_path(logo, background_color)
+  logo_path <- dsvizopts::local_logo_path(logo, background_color)
   logo_url <- knitr::image_uri(f = logo_path)
   logo_url
 }
@@ -393,15 +393,15 @@ url_logo <- function(logo, background_color) {
 lflt_background <- function(map, theme) {
   #print(theme$map_provider_tile)
   if (is.null(theme$map_tiles) & theme$map_provider_tile == "leaflet") {
-    lf <- map %>% setMapWidgetStyle(list(background = theme$background_color))
+    lf <- map %>% leaflet.extras::setMapWidgetStyle(list(background = theme$background_color))
   } else {
     if (theme$map_provider_tile == "leaflet") {
-      lf <- map %>% addProviderTiles(theme$map_tiles)
+      lf <- map %>% leaflet::addProviderTiles(theme$map_tiles)
     } else {
-      lf <- map %>% leaflet.esri::addEsriBasemapLayer(esriBasemapLayers[[theme$map_tiles_esri]])
+      lf <- map %>% leaflet.esri::addEsriBasemapLayer(leaflet.esri::esriBasemapLayers[[theme$map_tiles_esri]])
       if (!is.null(theme$map_extra_layout)) {
         lf <- lf %>%
-          addEsriFeatureLayer(
+          leaflet.esri::addEsriFeatureLayer(
             url = theme$map_extra_layout,
             labelProperty = theme$map_name_layout)
       }
@@ -419,7 +419,7 @@ lflt_background <- function(map, theme) {
 lflt_bounds <- function(map, b_box) {
 
   map %>%
-    fitBounds(b_box[1], b_box[2], b_box[3], b_box[4])
+    leaflet::fitBounds(b_box[1], b_box[2], b_box[3], b_box[4])
 }
 
 #' Graticule map
@@ -427,8 +427,8 @@ lflt_graticule <- function(map, graticule) {
 
   if (graticule$map_graticule) {
     map <- map %>%
-      addGraticule(interval = graticule$map_graticule_interval,
-                   style = list(color = graticule$map_graticule_color, weight = graticule$map_graticule_weight))
+      leaflet::addGraticule(interval = graticule$map_graticule_interval,
+                            style = list(color = graticule$map_graticule_color, weight = graticule$map_graticule_weight))
   }
   map
 }
@@ -437,15 +437,15 @@ lflt_graticule <- function(map, graticule) {
 lflt_titles <- function(map, titles) {
 
   map %>%
-    addControl(titles$caption,
-               position = "bottomleft",
-               className="map-caption") %>%
-    addControl(titles$title,
-               position = "topleft",
-               className="map-title") %>%
-    addControl(titles$subtitle,
-               position = "topleft",
-               className="map-subtitle")
+    leaflet::addControl(titles$caption,
+                        position = "bottomleft",
+                        className="map-caption") %>%
+    leaflet::addControl(titles$title,
+                        position = "topleft",
+                        className="map-title") %>%
+    leaflet::addControl(titles$subtitle,
+                        position = "topleft",
+                        className="map-subtitle")
 
 }
 
@@ -458,13 +458,13 @@ geoType <- function(data, map_name) {
   nms <- homodatum::fringe_labels(f)
   d <- homodatum::fringe_d(f)
 
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  lfmap <- geodata::geodataMeta(map_name)
+  centroides <- dsvizopts::data_centroid(lfmap$geoname, lfmap$basename)
   vs <- NULL
-  values <- intersect(d[["a"]], centroides[["id"]])
+  values <- dplyr::intersect(d[["a"]], centroides[["id"]])
 
   if (identical(values, character(0))||identical(values, numeric(0))) {
-    values <- intersect(d[["a"]], centroides[["name"]])
+    values <- dplyr::intersect(d[["a"]], centroides[["name"]])
     if(!identical(values, character())) vs <- "Gnm"
   } else {
     vs <- "Gcd"
@@ -477,7 +477,7 @@ geoType <- function(data, map_name) {
 #' @export
 fakeData <- function(map_name = NULL, by = "name", ...) {
   if (is.null(map_name)) return()
-  centroides <- suppressWarnings(geodataMeta(map_name)$codes)
+  centroides <- suppressWarnings(geodata::geodataMeta(map_name)$codes)
   names_centroides <- names(centroides)
   diff_names <- setdiff(names_centroides, c("id", "name", "lat", "lon"))
   nsample <- nrow(centroides)
@@ -485,10 +485,10 @@ fakeData <- function(map_name = NULL, by = "name", ...) {
   centroides <- centroides[sample(1:nrow(centroides), nsample),]
   if (by == "name" & !(identical(diff_names, character()))) {
     d <- data.frame(name = centroides[[by]],
-                    name_addition = centroides[[diff_names]], sample_value = runif(nsample, 33, 333),
+                    name_addition = centroides[[diff_names]], sample_value = stats::runif(nsample, 33, 333),
                     stringsAsFactors = FALSE)
   } else {
-    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = runif(nsample, 33, 333),
+    d <- data.frame(name = sample(centroides[[by]], nsample), sample_value = stats::runif(nsample, 33, 333),
                     stringsAsFactors = FALSE)
   }
   d
@@ -499,8 +499,8 @@ fakeData <- function(map_name = NULL, by = "name", ...) {
 #' @export
 fakepoints <- function(map_name = NULL, ...) {
   if (is.null(map_name)) return()
-  lfmap <- geodataMeta(map_name)
-  centroides <- data_centroid(lfmap$geoname, lfmap$basename)
+  lfmap <- geodata::geodataMeta(map_name)
+  centroides <- dsvizopts::data_centroid(lfmap$geoname, lfmap$basename)
 
   nsample <- nrow(centroides)
   if (nsample > 30) nsample <- 30
@@ -515,9 +515,9 @@ fakepoints <- function(map_name = NULL, ...) {
 #' standar dataset
 #' @export
 standar_values <- function(data) {
-  l <- map(colnames(data), function(i) iconv(tolower(data[[i]]), to = "ASCII//TRANSLIT"))
+  l <- purrr::map(colnames(data), function(i) iconv(tolower(data[[i]]), to = "ASCII//TRANSLIT"))
   names(l) <- names(data)
-  l <- l %>% bind_rows()
+  l <- l %>% dplyr::bind_rows()
   l
 }
 
@@ -526,20 +526,24 @@ standar_values <- function(data) {
 find_geoinfo <- function(data, centroides) {
 
 
-  centroides <- centroides %>% select(-lat, -lon)
+  centroides <- centroides %>% dplyr::select(-lat, -lon)
   centroides <- standar_values(centroides)
   dic_info <- data.frame(names_centroides = c("id", "name", "name_addition", "code_addition"),
                          ftype = c("Gcd", "Gnm", "Gnm", "Gcd"), stringsAsFactors = FALSE)
 
-  info_data <- paste0("^", map(colnames(centroides),
-                               function (i) {unique(centroides[[i]])
-                               }) %>% unlist(), "$", collapse = "|")
+  # info_data <- paste0("^", purrr::map(colnames(centroides),
+  #                              function (i) {unique(centroides[[i]])
+  #                              }) %>% unlist(), "$", collapse = "|")
+
+  info_data <- paste0(purrr::map(colnames(centroides),
+                                 function (i) {unique(centroides[[i]])
+                                 }) %>% unlist(), collapse = "|")
 
   data <- standar_values(data)
 
 
   l <- sapply(colnames(data), function(x) {
-    search_info <- !identical(grep(info_data, as.matrix(data[,x])), integer(0)) == TRUE
+    search_info <- !identical(grep(info_data, as.matrix(as.character(data[,x]))), integer(0)) == TRUE
   })
   r <- names(l)[l == TRUE]
   if (identical(r, character(0))) {
@@ -559,12 +563,12 @@ guess_ftypes <- function(data, map_name) {
     stop("Please type a map name")
   if (is.null(data)) return()
 
-  f <- fringe(data)
+  f <- homodatum::fringe(data)
   d <- homodatum::fringe_d(f)
   dic <- homodatum::fringe_dic(f)
   dic$id <- names(d)
 
-  centroides <- suppressWarnings(geodataMeta(map_name)$codes)
+  centroides <- suppressWarnings(geodata::geodataMeta(map_name)$codes)
   centroides$id <- iconv(tolower(centroides$id), to = "ASCII//TRANSLIT")
   dif_names <- setdiff(names(centroides), c("id", "name", "lat", "lon"))
 
@@ -591,16 +595,16 @@ guess_ftypes <- function(data, map_name) {
     if(!all(is.na(suppressWarnings(as.numeric(centroides$id))))) {
       max_gcd <- max(centroides$id)
       d_gcd <- r %>%
-        map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
+        purrr::map(function(i){max(d[[i]], na.rm = TRUE) <= max(centroides$id)}) %>% unlist()
       r <- r[d_gcd]
     }
-    ld<- map(r, function(i) {
+    ld<- purrr::map(r, function(i) {
       dic$hdType[dic$label == i] <<- "Gcd"
     })
   }
 
 
-  info_gnm <- paste0("^", map(col_names,
+  info_gnm <- paste0("^", purrr::map(col_names,
                               function (i) {unique(centroides[[i]])
                               }) %>% unlist(), "$", collapse = "|")
   l <- sapply(colnames(d), function(x) {
@@ -609,7 +613,7 @@ guess_ftypes <- function(data, map_name) {
   r <- names(l)[l == TRUE]
 
   if (!identical(r, character(0))) {
-    ld<- map(r, function(i) {
+    ld<- purrr::map(r, function(i) {
       dic$hdType[dic$label == i] <<- "Gnm"
     })
   }

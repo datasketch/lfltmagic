@@ -36,8 +36,8 @@
 lflt_bubbles_GlnGltCatNum <- function(data = NULL, ...) {
 
   if(!is.null(data)) {
-    data[[1]] <- as_Gln(data[[1]])
-    data[[2]] <- as_Glt(data[[2]])
+    data[[1]] <- homodatum::as_Gln(data[[1]])
+    data[[2]] <- homodatum::as_Glt(data[[2]])
   }
 
   opts <- dsvizopts::merge_dsviz_options(...)

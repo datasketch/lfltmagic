@@ -24,3 +24,23 @@ calculate_custom_intervals <- function(cutoff_points, domain) {
   intervals <- cut(domain, breaks=cutoff_points, include.lowest=TRUE, dig.lab = 5)
   intervals
 }
+
+
+#' Get function from string of namespace::function() to pass to do.call
+#'
+#' @param x String of package namespace and function name, separated by ::
+#'
+#' @return Function without namespace of package
+#'
+#' @noRd
+#'
+#' @examples
+#' getfun("shiny::actionButton")
+getfun <- function(x) {
+  if(length(grep("::", x))>0) {
+    parts<-strsplit(x, "::")[[1]]
+    getExportedValue(parts[1], parts[2])
+  } else {
+    x
+  }
+}
