@@ -271,7 +271,7 @@ lflt_basic_bubbles <- function(l) {
         labelOptions = leaflet::labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
         layerId = ~a
       )
-print(unique(color))
+
     if (l$theme$legend_show){
       lf <- legend_format(map = lf, opts = list(min_size = l$min_size,
                                                 max_size = l$max_size,
