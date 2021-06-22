@@ -1,4 +1,3 @@
-
 #' Legend by palette type
 lflt_palette <- function(opts) {
 
@@ -21,11 +20,11 @@ lflt_palette <- function(opts) {
     color_mapping <- "colorNumeric"
   }
 
+  # Add leaflet namespace
+  color_mapping <- paste0("leaflet::",color_mapping)
 
-  do.call(color_mapping, l)
+  do.call(getfun(color_mapping), l)
 }
-
-
 
 
 agg_tooltip <- function(data, label_by, nms, label_ftype, tooltip) {
@@ -50,9 +49,9 @@ lflt_legend_bubbles <- function(map, colors, labels, sizes,
                            max(sizes), "px; margin-bottom: 3px; line-height: ", max(sizes), "px; font-size: 13px; '>",
                            makeup::makeup_num(labels), "</div>")
 
-  return(addLegend(map, colors = colorAdditions, labels = labelAdditions,
-                   opacity = opacity, title = title, na.label = na.label,
-                   position = position))
+  return(leaflet::addLegend(map, colors = colorAdditions, labels = labelAdditions,
+                            opacity = opacity, title = title, na.label = na.label,
+                            position = position))
 }
 
 
@@ -89,20 +88,20 @@ lflt_legend_format <- function (prefix = "",
 
 lflt_base_map <- function(topoinfo, opts, ...) {
 
-  lf <- leaflet(topoinfo,
-                option = leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
+  lf <- leaflet::leaflet(topoinfo,
+                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
     # addTopoJSON(geoinfo,
     #             weight = opts$border_weight,
     #             fillOpacity = opts$topo_fill_opacity,
     #             opacity = 1,
     #             color = opts$border_color,
     #             fillColor = opts$color_map) %>%
-    addPolygons(weight = opts$border_weight,
-                label = ~labels,
-                color =  opts$border_color,
-                fillColor = opts$color_map,
-                fillOpacity = opts$topo_fill_opacity,
-                opacity = 1)
+    leaflet::addPolygons(weight = opts$border_weight,
+                         label = ~labels,
+                         color =  opts$border_color,
+                         fillColor = opts$color_map,
+                         fillOpacity = opts$topo_fill_opacity,
+                         opacity = 1)
   lf
 }
 
@@ -150,31 +149,32 @@ lflt_basic_choropleth <- function(l) {
 
 
     lf <- lf %>%
-      addPolygons( weight = l$theme$border_weight,
-                   fillOpacity = fill_opacity,
-                   opacity = 1,
-                   color = l$border_color,
-                   fillColor = color_map,
-                   layerId = ~a,
-                   label = ~labels,
-                   labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto")#,
-                   # highlight = highlightOptions(
-                   #   color= 'white',
-                   #   opacity = 0.8,
-                   #   weight= 3,
-                   #   bringToFront = TRUE)
+      leaflet::addPolygons( weight = l$theme$border_weight,
+                            fillOpacity = fill_opacity,
+                            opacity = 1,
+                            color = l$border_color,
+                            fillColor = color_map,
+                            layerId = ~a,
+                            label = ~labels,
+                            labelOptions = leaflet::labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"),
+                                                                  textsize = "13px", direction = "auto")#,
+                            # highlight = highlightOptions(
+                            #   color= 'white',
+                            #   opacity = 0.8,
+                            #   weight= 3,
+                            #   bringToFront = TRUE)
       )
     if ( l$theme$legend_show) {
 
-      lf <- lf %>% addLegend(pal = pal, values = domain, opacity = 1,
-                             position = l$theme$legend_position,
-                             na.label = l$na_label,
-                             title = l$legend_title,
-                             labFormat = lflt_legend_format(
-                               sample =l$format_num, locale = l$locale,
-                               prefix = l$prefix, suffix = l$suffix,
-                               between = paste0(l$suffix, " - ", l$prefix),
-                             ))
+      lf <- lf %>% leaflet::addLegend(pal = pal, values = domain, opacity = 1,
+                                      position = l$theme$legend_position,
+                                      na.label = l$na_label,
+                                      title = l$legend_title,
+                                      labFormat = lflt_legend_format(
+                                        sample =l$format_num, locale = l$locale,
+                                        prefix = l$prefix, suffix = l$suffix,
+                                        between = paste0(l$suffix, " - ", l$prefix),
+                                      ))
     }
   }
   lf
@@ -193,15 +193,15 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
                                       na.label = opts$na_label,
                                       title = opts$legend_title)
   } else {
-    lf <- map %>% addLegend(pal = opts$pal, values = ~value, opacity = 1,
-                            position = opts$legend_position,
-                            na.label = opts$na_label,
-                            title = opts$legend_title,
-                            labFormat = lflt_legend_format(
-                              sample = opts$format_num, locale = opts$locale,
-                              prefix = opts$prefix, suffix = opts$suffix,
-                              between = paste0(opts$suffix, " - ",opts$prefix),
-                            ))
+    lf <- map %>% leaflet::addLegend(pal = opts$pal, values = ~value, opacity = 1,
+                                     position = opts$legend_position,
+                                     na.label = opts$na_label,
+                                     title = opts$legend_title,
+                                     labFormat = lflt_legend_format(
+                                       sample = opts$format_num, locale = opts$locale,
+                                       prefix = opts$prefix, suffix = opts$suffix,
+                                       between = paste0(opts$suffix, " - ",opts$prefix),
+                                     ))
   }
   lf
 }
@@ -260,7 +260,7 @@ lflt_basic_bubbles <- function(l) {
     lat[is.na(radius)] <- NA
 
     lf <- lf %>%
-      addCircleMarkers(
+      leaflet::addCircleMarkers(
         lng = lon,
         lat = lat,
         radius = radius,
@@ -268,10 +268,10 @@ lflt_basic_bubbles <- function(l) {
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
-        labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
+        labelOptions = leaflet::labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
         layerId = ~a
       )
-print(unique(color))
+
     if (l$theme$legend_show){
       lf <- legend_format(map = lf, opts = list(min_size = l$min_size,
                                                 max_size = l$max_size,
@@ -342,7 +342,7 @@ lflt_basic_points <- function(l) {
     }
 
     lf <- lf %>%
-      addCircleMarkers(
+      leaflet::addCircleMarkers(
         lng = l$topoInfo$data$a,
         lat = l$topoInfo$data$b,
         radius = radius,
@@ -384,7 +384,7 @@ lflt_basic_points <- function(l) {
 
 url_logo <- function(logo, background_color) {
   if (grepl("http", logo)) logo_url <- logo
-  logo_path <- local_logo_path(logo, background_color)
+  logo_path <- dsvizopts::local_logo_path(logo, background_color)
   logo_url <- knitr::image_uri(f = logo_path)
   logo_url
 }
@@ -393,15 +393,15 @@ url_logo <- function(logo, background_color) {
 lflt_background <- function(map, theme) {
   #print(theme$map_provider_tile)
   if (is.null(theme$map_tiles) & theme$map_provider_tile == "leaflet") {
-    lf <- map %>% setMapWidgetStyle(list(background = theme$background_color))
+    lf <- map %>% leaflet.extras::setMapWidgetStyle(list(background = theme$background_color))
   } else {
     if (theme$map_provider_tile == "leaflet") {
-      lf <- map %>% addProviderTiles(theme$map_tiles)
+      lf <- map %>% leaflet::addProviderTiles(theme$map_tiles)
     } else {
-      lf <- map %>% leaflet.esri::addEsriBasemapLayer(esriBasemapLayers[[theme$map_tiles_esri]])
+      lf <- map %>% leaflet.esri::addEsriBasemapLayer(leaflet.esri::esriBasemapLayers[[theme$map_tiles_esri]])
       if (!is.null(theme$map_extra_layout)) {
         lf <- lf %>%
-          addEsriFeatureLayer(
+          leaflet.esri::addEsriFeatureLayer(
             url = theme$map_extra_layout,
             labelProperty = theme$map_name_layout)
       }
@@ -419,7 +419,7 @@ lflt_background <- function(map, theme) {
 lflt_bounds <- function(map, b_box) {
 
   map %>%
-    fitBounds(b_box[1], b_box[2], b_box[3], b_box[4])
+    leaflet::fitBounds(b_box[1], b_box[2], b_box[3], b_box[4])
 }
 
 #' Graticule map
@@ -427,8 +427,8 @@ lflt_graticule <- function(map, graticule) {
 
   if (graticule$map_graticule) {
     map <- map %>%
-      addGraticule(interval = graticule$map_graticule_interval,
-                   style = list(color = graticule$map_graticule_color, weight = graticule$map_graticule_weight))
+      leaflet::addGraticule(interval = graticule$map_graticule_interval,
+                            style = list(color = graticule$map_graticule_color, weight = graticule$map_graticule_weight))
   }
   map
 }
@@ -437,15 +437,15 @@ lflt_graticule <- function(map, graticule) {
 lflt_titles <- function(map, titles) {
 
   map %>%
-    addControl(titles$caption,
-               position = "bottomleft",
-               className="map-caption") %>%
-    addControl(titles$title,
-               position = "topleft",
-               className="map-title") %>%
-    addControl(titles$subtitle,
-               position = "topleft",
-               className="map-subtitle")
+    leaflet::addControl(titles$caption,
+                        position = "bottomleft",
+                        className="map-caption") %>%
+    leaflet::addControl(titles$title,
+                        position = "topleft",
+                        className="map-title") %>%
+    leaflet::addControl(titles$subtitle,
+                        position = "topleft",
+                        className="map-subtitle")
 
 }
 
