@@ -165,9 +165,12 @@ lflt_basic_choropleth <- function(l) {
                             #   bringToFront = TRUE)
       )
     if ( l$theme$legend_show) {
+    legend_position <- l$theme$legend_position %||% "topright"
+    if (legend_position == "bottom") legend_position <- "bottomright"
+    if (legend_position == "top") legend_position <- "topright"
 
       lf <- lf %>% leaflet::addLegend(pal = pal, values = domain, opacity = 1,
-                                      position = l$theme$legend_position,
+                                      position = legend_position,
                                       na.label = l$na_label,
                                       title = l$legend_title,
                                       labFormat = lflt_legend_format(
@@ -184,17 +187,22 @@ lflt_basic_choropleth <- function(l) {
 legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
 
   if (is.null(map)) stop("There is no map")
+
+  legend_position <- opts$legend_position %||% "topright"
+  if (legend_position == "bottom") legend_position <- "bottomright"
+  if (legend_position == "top") legend_position <- "topright"
+
   if (map_legend_bubble){
     lf <- map %>% lflt_legend_bubbles(sizes = 2*scales::rescale(opts$cuts, to = c(opts$min_size, opts$max_size)),
                                       labels = opts$cuts,
-                                      color = opts$legend_color,
+                                      color = legend_color,
                                       opacity = 1,
                                       position = opts$legend_position,
                                       na.label = opts$na_label,
                                       title = opts$legend_title)
   } else {
     lf <- map %>% leaflet::addLegend(pal = opts$pal, values = ~value, opacity = 1,
-                                     position = opts$legend_position,
+                                     position = legend_position,
                                      na.label = opts$na_label,
                                      title = opts$legend_title,
                                      labFormat = lflt_legend_format(
