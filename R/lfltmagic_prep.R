@@ -1,4 +1,4 @@
-
+#' @importFrom dplyr %>%
 #' @export
 lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm-Num", ...) {
   # call geographical info
