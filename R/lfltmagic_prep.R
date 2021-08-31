@@ -27,7 +27,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
     if (grepl("Gnm|Gcd", ftype)) {
-      data_format$name_alt <- iconv(tolower(data_format$a), to = "ASCII//TRANSLIT")
+      data_format$name_alt <- gsub("'", "",iconv(tolower(data_format$a), to = "ASCII//TRANSLIT"))
       topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
       # add info tooltip in data
       topoInfo <- agg_tooltip(data = topoInfo, label_by = opts$extra$map_label_by,nms = list_d$nms, label_ftype = list_d$nms_tooltip, tooltip = opts$chart$tooltip)
