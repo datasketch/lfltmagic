@@ -24,7 +24,10 @@
 lflt_choropleth_GnmNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
-  if (!is.null(data)) data[[1]] <- homodatum::as_Gnm(data[[1]])
+  if (!is.null(data)) {
+    data[[1]] <- homodatum::as_Gnm(data[[1]])
+    data[[2]] <- homodatum::as_Num(data[[2]])
+  }
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
 
   lf <- lflt_basic_choropleth(l) %>%
