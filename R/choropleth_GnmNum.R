@@ -24,11 +24,21 @@
 lflt_choropleth_GnmNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
+
   if (!is.null(data)) {
+    l <- lfltmagic_prep(data = NULL, opts = opts, ftype="Gnm-Num")
     data[[1]] <- homodatum::as_Gnm(data[[1]])
-    data[[2]] <- homodatum::as_Num(data[[2]])
+    if (l$more_levels) {
+      data[[3]] <- homodatum::as_Num(data[[3]])
+    } else {
+      data[[2]] <- homodatum::as_Num(data[[2]])
+    }
   }
+
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
+
+
+
 
   lf <- lflt_basic_choropleth(l) %>%
           lflt_background(l$theme) %>%

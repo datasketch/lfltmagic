@@ -9,6 +9,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   #topoData <- shape$rdsInfo
   topoInfo <- shape$topoInfo
   topoInfo$labels <- topoInfo[[by_col]]
+
   # data preparation by type
   if (!is.null(data)) {
     list_d <- dsvizprep::data_map_prep(data = data,
@@ -17,6 +18,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                        color_by = opts$style$color_by,
                                        more_levels = shape$more_levels,
                                        ptage_col = opts$postprocess$percentage_col)
+
     # format setting of data being displayed
     data_format <- dsvizprep::format_prep(data = list_d$data,
                                           dic = list_d$dic,
@@ -62,6 +64,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   list(
     topoInfo = topoInfo,
     #geoInfo = topoData,
+    more_levels = shape$more_levels,
     color_scale = color_scale,
     palette_colors = palette_colors,
     titles = list(title = title,
