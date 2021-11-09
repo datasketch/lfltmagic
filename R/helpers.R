@@ -195,9 +195,9 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
   if (map_legend_bubble){
     lf <- map %>% lflt_legend_bubbles(sizes = 2*scales::rescale(opts$cuts, to = c(opts$min_size, opts$max_size)),
                                       labels = opts$cuts,
-                                      color = legend_color,
+                                      color = opts$legend_color,
                                       opacity = 1,
-                                      position = opts$legend_position,
+                                      position = legend_position,
                                       na.label = opts$na_label,
                                       title = opts$legend_title)
   } else {

@@ -53,7 +53,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
                                   ';color:', opts$theme$caption_color,
                                   ';font-size:', opts$theme$caption_size,"px;'>", opts$title$caption %||% "","</p>")))
   legend_title <- HTML(paste0("<p style='font-family:", opts$theme$text_family,
-                              ';color:', opts$theme$legend_color,
+                              ';color:', opts$theme$legend_color %||% "#ffffff",
                               ';font-size:', opts$theme$legend_size,"px;'>", opts$title$legend_title %||% "","</p>"))
 
   color_scale <- opts$extra$map_color_scale
