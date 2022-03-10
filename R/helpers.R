@@ -303,6 +303,34 @@ lflt_basic_bubbles <- function(l) {
 }
 
 
+#' heatmap
+lflt_basic_heatmap <- function(l) {
+
+  color_map <- l$theme$na_color
+  # base map
+  lf <- lflt_base_map(l$topoInfo$topoInfo %||% l$topoInfo,
+                      opts = list(
+                        map_zoom = l$theme$map_zoom,
+                        min_zoom = l$min_zoom,
+                        border_weight = l$theme$border_weight,
+                        topo_fill_opacity = l$theme$topo_fill_opacity,
+                        border_color = l$border_color,
+                        color_map = color_map
+                      ))
+
+  lf <- lf %>%
+    leaflet.extras::addHeatmap(
+      lng = l$topoInfo$data$a,
+      lat = l$topoInfo$data$b,
+      intensity = l$topoInfo$c,
+     blur = 20,
+     max = 0.05, radius = 10
+    )
+
+  lf
+
+}
+
 #' Basic layer points
 lflt_basic_points <- function(l) {
 

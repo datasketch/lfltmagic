@@ -21,4 +21,8 @@ Gln-Glt-Num
 data <- sample_data("Gln-Glt-Num", n = 30)
 lflt_bubbles_GlnGltNum(data)
 }
+\seealso{
+Other Gln-Glt-Num plots: 
+\code{\link{lflt_heatmap_GlnGltNum}()}
+}
 \concept{Gln-Glt-Num plots}
