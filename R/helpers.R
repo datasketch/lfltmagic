@@ -276,6 +276,7 @@ lflt_basic_bubbles <- function(l) {
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = ~labels,
+        clusterOptions = l$theme$map_cluster,
         labelOptions = leaflet::labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto"),
         layerId = ~a
       )
