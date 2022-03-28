@@ -387,7 +387,8 @@ lflt_basic_points <- function(l) {
         stroke = l$map_stroke,
         fillOpacity = l$bubble_opacity,
         label = l$topoInfo$data$labels,
-        layerId = l$topoInfo$data$a
+        layerId = l$topoInfo$data$a,
+        clusterOptions = l$theme$map_cluster
       )
 
 
