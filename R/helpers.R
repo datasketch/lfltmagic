@@ -443,8 +443,8 @@ lflt_background <- function(map, theme) {
     if (theme$map_provider_tile == "leaflet") {
       lf <- map %>% leaflet::addProviderTiles(theme$map_tiles,
                                               options = providerTileOptions(
-                                                        updateWhenZooming = FALSE,      # map won't update tiles until zoom is done
-                                                        updateWhenIdle = TRUE           # map won't load new tiles when panning
+                                                        updateWhenZooming = theme$map_tiles_zoom_update,      # map won't update tiles until zoom is done
+                                                        updateWhenIdle = theme$map_tiles_id_update          # map won't load new tiles when panning
       )
                                               )
     } else {
