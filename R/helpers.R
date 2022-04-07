@@ -441,7 +441,12 @@ lflt_background <- function(map, theme) {
     lf <- map %>% leaflet.extras::setMapWidgetStyle(list(background = theme$background_color))
   } else {
     if (theme$map_provider_tile == "leaflet") {
-      lf <- map %>% leaflet::addProviderTiles(theme$map_tiles)
+      lf <- map %>% leaflet::addProviderTiles(theme$map_tiles,
+                                              options = providerTileOptions(
+                                                        updateWhenZooming = FALSE,      # map won't update tiles until zoom is done
+                                                        updateWhenIdle = TRUE           # map won't load new tiles when panning
+      )
+                                              )
     } else {
       lf <- map %>% leaflet.esri::addEsriBasemapLayer(leaflet.esri::esriBasemapLayers[[theme$map_tiles_esri]])
       if (!is.null(theme$map_extra_layout)) {
