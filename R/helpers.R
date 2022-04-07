@@ -89,7 +89,10 @@ lflt_legend_format <- function (prefix = "",
 lflt_base_map <- function(topoinfo, opts, ...) {
 
   lf <- leaflet::leaflet(topoinfo,
-                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
+                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom,
+                                                          minZoom = opts$min_zoom,
+                                                          maxZoom = 18,
+                                                          preferCanvas = opts$map_canvas)) %>%
     # addTopoJSON(geoinfo,
     #             weight = opts$border_weight,
     #             fillOpacity = opts$topo_fill_opacity,
@@ -113,6 +116,7 @@ lflt_basic_choropleth <- function(l) {
   lf <- lflt_base_map(l$topoInfo,
                       opts = list(
                         map_zoom = l$theme$map_zoom,
+                        map_canvas = l$theme$map_canvas,
                         min_zoom = l$min_zoom,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
@@ -225,6 +229,7 @@ lflt_basic_bubbles <- function(l) {
                       opts = list(
                         map_zoom = l$theme$map_zoom,
                         min_zoom = l$min_zoom,
+                        map_canvas = l$theme$map_canvas,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
@@ -313,6 +318,7 @@ lflt_basic_heatmap <- function(l) {
                       opts = list(
                         map_zoom = l$theme$map_zoom,
                         min_zoom = l$min_zoom,
+                        map_canvas = l$theme$map_canvas,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
@@ -341,6 +347,7 @@ lflt_basic_points <- function(l) {
                       opts = list(
                         map_zoom = l$theme$map_zoom,
                         min_zoom = l$min_zoom,
+                        map_canvas = l$theme$map_canvas,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
