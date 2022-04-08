@@ -89,10 +89,7 @@ lflt_legend_format <- function (prefix = "",
 lflt_base_map <- function(topoinfo, opts, ...) {
 
   lf <- leaflet::leaflet(topoinfo,
-                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom,
-                                                          minZoom = opts$min_zoom,
-                                                          maxZoom = 18,
-                                                          preferCanvas = opts$map_canvas)) %>%
+                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
     # addTopoJSON(geoinfo,
     #             weight = opts$border_weight,
     #             fillOpacity = opts$topo_fill_opacity,
@@ -116,7 +113,6 @@ lflt_basic_choropleth <- function(l) {
   lf <- lflt_base_map(l$topoInfo,
                       opts = list(
                         map_zoom = l$theme$map_zoom,
-                        map_canvas = l$theme$map_canvas,
                         min_zoom = l$min_zoom,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
@@ -229,7 +225,6 @@ lflt_basic_bubbles <- function(l) {
                       opts = list(
                         map_zoom = l$theme$map_zoom,
                         min_zoom = l$min_zoom,
-                        map_canvas = l$theme$map_canvas,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
@@ -318,7 +313,6 @@ lflt_basic_heatmap <- function(l) {
                       opts = list(
                         map_zoom = l$theme$map_zoom,
                         min_zoom = l$min_zoom,
-                        map_canvas = l$theme$map_canvas,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
@@ -347,7 +341,6 @@ lflt_basic_points <- function(l) {
                       opts = list(
                         map_zoom = l$theme$map_zoom,
                         min_zoom = l$min_zoom,
-                        map_canvas = l$theme$map_canvas,
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
@@ -441,12 +434,7 @@ lflt_background <- function(map, theme) {
     lf <- map %>% leaflet.extras::setMapWidgetStyle(list(background = theme$background_color))
   } else {
     if (theme$map_provider_tile == "leaflet") {
-      lf <- map %>% leaflet::addProviderTiles(theme$map_tiles,
-                                              options = providerTileOptions(
-                                                        updateWhenZooming = theme$map_tiles_zoom_update,      # map won't update tiles until zoom is done
-                                                        updateWhenIdle = theme$map_tiles_id_update          # map won't load new tiles when panning
-      )
-                                              )
+      lf <- map %>% leaflet::addProviderTiles(theme$map_tiles)
     } else {
       lf <- map %>% leaflet.esri::addEsriBasemapLayer(leaflet.esri::esriBasemapLayers[[theme$map_tiles_esri]])
       if (!is.null(theme$map_extra_layout)) {
