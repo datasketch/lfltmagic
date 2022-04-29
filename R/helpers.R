@@ -89,7 +89,12 @@ lflt_legend_format <- function (prefix = "",
 lflt_base_map <- function(topoinfo, opts, ...) {
 
   lf <- leaflet::leaflet(topoinfo,
-                         option = leaflet::leafletOptions(zoomControl = opts$map_zoom, minZoom = opts$min_zoom, maxZoom = 18)) %>%
+                         option = leaflet::leafletOptions(
+                           zoomSnap = opts$map_zoom_snap,
+                           zoomDelta = opts$map_zoom_delta,
+                           zoomControl = opts$map_zoom,
+                           minZoom = opts$min_zoom,
+                           maxZoom = opts$max_zoom)) %>%
     # addTopoJSON(geoinfo,
     #             weight = opts$border_weight,
     #             fillOpacity = opts$topo_fill_opacity,

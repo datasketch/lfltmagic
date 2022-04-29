@@ -91,7 +91,10 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     prefix = opts$style$prefix,
     format_num = opts$style$format_sample_num,
     locale = opts$style$locale,
-    min_zoom = opts$extra$map_min_zoom
+    min_zoom = opts$extra$map_min_zoom,
+    max_zoom = opts$extra$map_max_zoom,
+    map_zoom_snap = opts$map_zoom_snap,
+    map_zoom_delta = opts$map_zoom_delta
   )
 
 }
