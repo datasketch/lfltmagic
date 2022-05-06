@@ -34,8 +34,8 @@ agg_tooltip <- function(data, label_by, nms, label_ftype, tooltip) {
                                   glue::glue(paste0("<span style='font-size:13px;'><strong>{", label_by,"_label}</strong></span>")) %>% lapply(htmltools::HTML),
                                   glue::glue(
                                     dsvizprep::tooltip_map(nms = nms,
-                                                 label_ftype = label_ftype,
-                                                 tooltip = tooltip)) %>%
+                                                           label_ftype = label_ftype,
+                                                           tooltip = tooltip)) %>%
                                     lapply(htmltools::HTML))
     )
   data_format
@@ -107,6 +107,17 @@ lflt_base_map <- function(topoinfo, opts, ...) {
                          fillColor = opts$color_map,
                          fillOpacity = opts$topo_fill_opacity,
                          opacity = 1)
+  if (opts$extraLayer) {
+    map_name_extra <- opts$map_name_extra
+    topoFile <- geodata::geodataTopojsonPath(map_name_extra)
+    topoData <- readLines(topoFile)
+    lf <- lf %>%  leaflet::addTopoJSON(topojson = topoData,
+                                       weight = opts$map_extra_weight,
+                                       opacity = opts$map_extra_opacity,
+                                       fillColor = opts$map_extra_fillColor,
+                                       color = opts$map_extra_color)
+  }
+
   lf
 }
 
@@ -115,20 +126,33 @@ lflt_basic_choropleth <- function(l) {
 
   color_map <- l$theme$na_color
 
+  extraLayer <- l$map_extra_layer
+  opts <-  list(
+    map_zoom = l$theme$map_zoom,
+    min_zoom = l$min_zoom,
+    border_weight = l$theme$border_weight,
+    topo_fill_opacity = l$theme$topo_fill_opacity,
+    border_color = l$border_color,
+    color_map = color_map,
+    map_zoom_snap = l$map_zoom_snap,
+    map_zoom_delta = l$map_zoom_delta,
+    map_zoom = l$map_zoom,
+    min_zoom = l$min_zoom,
+    max_zoom = l$max_zoom,
+    extraLayer = extraLayer
+  )
+
+  if (extraLayer) {
+    opts <- modifyList(opts, list(map_name_extra = l$map_name_extra,
+                                  map_extra_weight = l$map_extra_weight,
+                                  map_extra_opacity = l$map_extra_opacity,
+                                  map_extra_fillColor = l$map_extra_fillColor,
+                                  map_extra_color = l$map_extra_color))
+  }
+
   lf <- lflt_base_map(l$topoInfo,
-                      opts = list(
-                        map_zoom = l$theme$map_zoom,
-                        min_zoom = l$min_zoom,
-                        border_weight = l$theme$border_weight,
-                        topo_fill_opacity = l$theme$topo_fill_opacity,
-                        border_color = l$border_color,
-                        color_map = color_map,
-                        map_zoom_snap = l$map_zoom_snap,
-                        map_zoom_delta = l$map_zoom_delta,
-                        map_zoom = l$map_zoom,
-                        min_zoom = l$min_zoom,
-                        max_zoom = l$max_zoom
-                      ))
+                      opts = opts
+  )
   #print("value" %in% names(l$topoInfo))
   if ("value" %in% names(l$topoInfo)) {
     domain <- l$topoInfo[["value"]]#l$d %>% drop_na(value) %>% .$value
@@ -175,9 +199,9 @@ lflt_basic_choropleth <- function(l) {
                             #   bringToFront = TRUE)
       )
     if ( l$theme$legend_show) {
-    legend_position <- l$theme$legend_position %||% "topright"
-    if (legend_position == "bottom") legend_position <- "bottomright"
-    if (legend_position == "top") legend_position <- "topright"
+      legend_position <- l$theme$legend_position %||% "topright"
+      if (legend_position == "bottom") legend_position <- "bottomright"
+      if (legend_position == "top") legend_position <- "topright"
 
       lf <- lf %>% leaflet::addLegend(pal = pal, values = domain, opacity = 1,
                                       position = legend_position,
@@ -229,22 +253,32 @@ legend_format <- function(map, map_legend_bubble = FALSE, opts, ...) {
 lflt_basic_bubbles <- function(l) {
 
   color_map <- l$theme$na_color
+  extraLayer <- l$map_extra_layer
+  opts <- list(
+    map_zoom = l$theme$map_zoom,
+    min_zoom = l$min_zoom,
+    border_weight = l$theme$border_weight,
+    topo_fill_opacity = l$theme$topo_fill_opacity,
+    border_color = l$border_color,
+    color_map = color_map,
+    map_zoom_snap = l$map_zoom_snap,
+    map_zoom_delta = l$map_zoom_delta,
+    map_zoom = l$map_zoom,
+    min_zoom = l$min_zoom,
+    max_zoom = l$max_zoom,
+    extraLayer = extraLayer
+  )
 
-  # base map
+  if (extraLayer) {
+    opts <- modifyList(opts, list(map_name_extra = l$map_name_extra,
+                                  map_extra_weight = l$map_extra_weight,
+                                  map_extra_opacity = l$map_extra_opacity,
+                                  map_extra_fillColor = l$map_extra_fillColor,
+                                  map_extra_color = l$map_extra_color))
+  }
+
   lf <- lflt_base_map(l$topoInfo,
-                      opts = list(
-                        map_zoom = l$theme$map_zoom,
-                        min_zoom = l$min_zoom,
-                        border_weight = l$theme$border_weight,
-                        topo_fill_opacity = l$theme$topo_fill_opacity,
-                        border_color = l$border_color,
-                        color_map = color_map,
-                        map_zoom_snap = l$map_zoom_snap,
-                        map_zoom_delta = l$map_zoom_delta,
-                        map_zoom = l$map_zoom,
-                        min_zoom = l$min_zoom,
-                        max_zoom = l$max_zoom
-                      ))
+                      opts = opts )
 
   if ("value" %in% names(l$topoInfo)) {
 
@@ -344,8 +378,8 @@ lflt_basic_heatmap <- function(l) {
       lng = l$topoInfo$data$a,
       lat = l$topoInfo$data$b,
       intensity = l$topoInfo$c,
-     blur = 20,
-     max = 0.05, radius = 10
+      blur = 20,
+      max = 0.05, radius = 10
     )
 
   lf

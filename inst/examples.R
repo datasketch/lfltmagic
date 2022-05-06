@@ -53,8 +53,8 @@ lflt_choropleth_Gnm(sample_data("Gnm", addNA = F))
 lflt_choropleth_GnmCat(sample_data("Gnm-Cat", addNA = F))
 lflt_choropleth_GnmCatNum(sample_data("Gnm-Cat-Num", addNA = F))
 lflt_choropleth_GnmNum(sample_data("Gnm-Num", addNA = F))
-
-
+lflt_choropleth_Gnm(map_name = "cdmx_colonies")
+lflt_choropleth_Gnm(map_name = "cdmx_colonies", map_extra_layer = TRUE, map_name_extra = "mex_mayors")
 
 # Gnm-Num examples --------------------------------------------------------
 
