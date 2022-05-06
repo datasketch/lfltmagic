@@ -122,7 +122,12 @@ lflt_basic_choropleth <- function(l) {
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
-                        color_map = color_map
+                        color_map = color_map,
+                        map_zoom_snap = l$map_zoom_snap,
+                        map_zoom_delta = l$map_zoom_delta,
+                        map_zoom = l$map_zoom,
+                        min_zoom = l$min_zoom,
+                        max_zoom = l$max_zoom
                       ))
   #print("value" %in% names(l$topoInfo))
   if ("value" %in% names(l$topoInfo)) {
@@ -233,7 +238,12 @@ lflt_basic_bubbles <- function(l) {
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
-                        color_map = color_map
+                        color_map = color_map,
+                        map_zoom_snap = l$map_zoom_snap,
+                        map_zoom_delta = l$map_zoom_delta,
+                        map_zoom = l$map_zoom,
+                        min_zoom = l$min_zoom,
+                        max_zoom = l$max_zoom
                       ))
 
   if ("value" %in% names(l$topoInfo)) {
@@ -321,7 +331,12 @@ lflt_basic_heatmap <- function(l) {
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
-                        color_map = color_map
+                        color_map = color_map,
+                        map_zoom_snap = l$map_zoom_snap,
+                        map_zoom_delta = l$map_zoom_delta,
+                        map_zoom = l$map_zoom,
+                        min_zoom = l$min_zoom,
+                        max_zoom = l$max_zoom
                       ))
 
   lf <- lf %>%
@@ -349,7 +364,12 @@ lflt_basic_points <- function(l) {
                         border_weight = l$theme$border_weight,
                         topo_fill_opacity = l$theme$topo_fill_opacity,
                         border_color = l$border_color,
-                        color_map = color_map
+                        color_map = color_map,
+                        map_zoom_snap = l$map_zoom_snap,
+                        map_zoom_delta = l$map_zoom_delta,
+                        map_zoom = l$map_zoom,
+                        min_zoom = l$min_zoom,
+                        max_zoom = l$max_zoom
                       ))
 
   if (is.null(l$topoInfo$topoInfo)) return(lf)

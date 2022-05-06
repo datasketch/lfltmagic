@@ -62,7 +62,6 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
   palette_type <-  opts$theme$palette_type %||% "sequential"
   palette_colors <-  opts$theme$palette_colors %||% opts$theme[[paste0("palette_colors_", palette_type)]]
 
-
   list(
     topoInfo = topoInfo,
     #geoInfo = topoData,

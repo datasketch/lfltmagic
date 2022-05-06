@@ -32,7 +32,7 @@ lflt_choropleth_GnmNum()
 
 
 
-lflt_bubbles_Gcd(sample_data("Gcd", addNA = F))
+lflt_bubbles_Gcd(sample_data("Gcd", addNA = F, map_zoom_snap=0.25))
 lflt_bubbles_GcdNum(sample_data("Gcd-Num", addNA = F))
 lflt_bubbles_GcdCat(sample_data("Gcd-Cat", addNA = F))
 lflt_bubbles_GcdCatNum(sample_data("Gcd-Cat-Num", addNA = F))
