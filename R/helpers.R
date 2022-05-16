@@ -177,8 +177,9 @@ lflt_basic_choropleth <- function(l) {
     color_map <- pal(domain)
 
     fill_opacity <- l$theme$topo_fill_opacity
+    max_fill_opacity <-  l$theme$max_topo_fill_opacity
     if (is(l$topoInfo[["value"]], "numeric")){
-      fill_opacity <- scales::rescale(l$topoInfo[["value"]], to = c( fill_opacity, 1))
+      fill_opacity <- scales::rescale(l$topoInfo[["value"]], to = c( fill_opacity, max_fill_opacity))
     }
 
     lf <- lf %>%
