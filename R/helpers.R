@@ -106,7 +106,7 @@ lflt_base_map <- function(topoinfo, opts, ...) {
                          color =  opts$border_color,
                          fillColor = opts$color_map,
                          fillOpacity = opts$topo_fill_opacity,
-                         opacity = 1)
+                         opacity = 0.4)
   if (opts$extraLayer) {
     map_name_extra <- opts$map_name_extra
     topoFile <- geodata::geodataTopojsonPath(map_name_extra)
@@ -178,14 +178,13 @@ lflt_basic_choropleth <- function(l) {
 
     fill_opacity <- l$theme$topo_fill_opacity
     if (is(l$topoInfo[["value"]], "numeric")){
-      fill_opacity <- scales::rescale(l$topoInfo[["value"]], to = c(0.5, 1))
+      fill_opacity <- scales::rescale(l$topoInfo[["value"]], to = c( fill_opacity, 1))
     }
-
 
     lf <- lf %>%
       leaflet::addPolygons( weight = l$theme$border_weight,
                             fillOpacity = fill_opacity,
-                            opacity = 1,
+                            opacity = l$map_opacity,
                             color = l$border_color,
                             fillColor = color_map,
                             layerId = ~a,

@@ -21,7 +21,7 @@ lflt_bubbles_GlnGltCat()
 lflt_bubbles_GlnGltCatNum()
 lflt_bubbles_GlnGltNum()
 lflt_choropleth_Gcd()
-lflt_choropleth_Gcd(sample_data("Gcd"))
+lflt_choropleth_Gcd(sample_data("Gcd", 5000))
 lflt_choropleth_GcdCat()
 lflt_choropleth_GcdCatNum()
 lflt_choropleth_GcdNum()
@@ -55,6 +55,9 @@ lflt_choropleth_GnmCatNum(sample_data("Gnm-Cat-Num", addNA = F))
 lflt_choropleth_GnmNum(sample_data("Gnm-Num", addNA = F))
 lflt_choropleth_Gnm(map_name = "cdmx_colonies")
 lflt_choropleth_Gnm(map_name = "cdmx_colonies", map_extra_layer = TRUE, map_name_extra = "mex_mayors")
+
+
+
 
 # Gnm-Num examples --------------------------------------------------------
 
