@@ -82,8 +82,10 @@ lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_tiles = "OpenStreetMap", data = df
 )
 lflt_choropleth_GnmNum(map_name = "col_departments",
-                       map_provider_tile = "esri",
-                       map_tiles_esri = "Streets"
+                       map_extra_layout = "https://maps.geoapify.com/v1/tile/positron-blue/{z}/{x}/{y}.png?&apiKey=f39345000acd4188aae1f2f4eed3ff14",
+                       map_name_layout = "positron",
+                       map_provider_tile = "url"#,
+                       #map_tiles_esri = "Streets"
 )
 
 lflt_choropleth_GnmNum(map_name = "col_departments",

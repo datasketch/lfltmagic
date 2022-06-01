@@ -492,9 +492,10 @@ lflt_background <- function(map, theme) {
   if (is.null(theme$map_tiles) & theme$map_provider_tile == "leaflet") {
     lf <- map %>% leaflet.extras::setMapWidgetStyle(list(background = theme$background_color))
   } else {
+
     if (theme$map_provider_tile == "leaflet") {
       lf <- map %>% leaflet::addProviderTiles(theme$map_tiles)
-    } else {
+    } else if (theme$map_provider_tile == "esri") {
       lf <- map %>% leaflet.esri::addEsriBasemapLayer(leaflet.esri::esriBasemapLayers[[theme$map_tiles_esri]])
       if (!is.null(theme$map_extra_layout)) {
         lf <- lf %>%
@@ -502,6 +503,9 @@ lflt_background <- function(map, theme) {
             url = theme$map_extra_layout,
             labelProperty = theme$map_name_layout)
       }
+    } else {
+      lf <- map %>% leaflet::addTiles(urlTemplate = theme$map_extra_layout,
+                                      attribution = theme$map_name_layout)
     }
   }
   if (theme$branding_include) {
