@@ -24,7 +24,6 @@
 lflt_choropleth_GnmNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
-
   if (!is.null(data)) {
     l <- lfltmagic_prep(data = NULL, opts = opts, ftype="Gnm-Num")
     data[[1]] <- homodatum::as_Gnm(data[[1]])
@@ -36,9 +35,6 @@ lflt_choropleth_GnmNum <- function(data = NULL, ...) {
   }
 
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gnm-Num")
-
-
-
 
   lf <- lflt_basic_choropleth(l) %>%
           lflt_background(l$theme) %>%

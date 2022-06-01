@@ -77,6 +77,10 @@ lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_tiles = "OpenStreetMap"
 )
 
+df <- data.frame(depto=c("Antioquia", "Tolima", "Quindio"), num = c(5, 10, 20))
+lflt_choropleth_GnmNum(map_name = "col_departments",
+                       map_tiles = "OpenStreetMap", data = df
+)
 lflt_choropleth_GnmNum(map_name = "col_departments",
                        map_provider_tile = "esri",
                        map_tiles_esri = "Streets"
