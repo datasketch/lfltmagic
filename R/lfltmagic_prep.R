@@ -34,6 +34,9 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
       data_format$name_alt <- tolower(stringi::stri_trans_general(str = data_format$a, id = "Latin-ASCII"))
       topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
       # add info tooltip in data
+      if (length(list_d$nms_tooltip) > 1) {
+        if (opts$postprocess$percentage)  list_d$nms_tooltip[length(list_d$nms_tooltip)] <- "%"
+      }
       topoInfo <- agg_tooltip(data = topoInfo, label_by = opts$extra$map_label_by,nms = list_d$nms, label_ftype = list_d$nms_tooltip, tooltip = opts$chart$tooltip)
     } else {
       topoInfo <- list(topoInfo = topoInfo, data = data_format)
