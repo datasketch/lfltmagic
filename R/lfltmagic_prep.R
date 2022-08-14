@@ -31,7 +31,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
 
     if (grepl("Gnm|Gcd", ftype)) {
-      data_format$name_alt <- tolower(stringi::stri_trans_general(str = data_format$a, id = "Latin-ASCII"))
+      data_format$name_alt <- gsub("[[:punct:]]", "",tolower(stringi::stri_trans_general(str = data_format$a, id = "Latin-ASCII")))
       topoInfo <- topoInfo %>% dplyr::left_join(data_format, by = "name_alt")
       # add info tooltip in data
       if (length(list_d$nms_tooltip) > 1) {
