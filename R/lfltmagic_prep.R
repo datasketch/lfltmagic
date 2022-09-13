@@ -103,7 +103,8 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     map_extra_weight = opts$extra$map_extra_weight,
     map_extra_opacity = opts$extra$map_extra_opacity,
     map_extra_fillColor = opts$extra$map_extra_fillColor,
-    map_extra_color = opts$extra$map_extra_color
+    map_extra_color = opts$extra$map_extra_color,
+    decreasing= opts$extra$legend_decreasing #legend - leaflet -order
 
   )
 
