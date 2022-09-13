@@ -211,6 +211,8 @@ lflt_basic_choropleth <- function(l) {
                                         sample =l$format_num, locale = l$locale,
                                         prefix = l$prefix, suffix = l$suffix,
                                         between = paste0(l$suffix, " - ", l$prefix),
+                                        transform = function(x) sort(x, decreasing = l$decreasing)
+
                                       ))
     }
   }
