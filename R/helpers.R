@@ -216,9 +216,10 @@ lflt_basic_choropleth <- function(l) {
       }else{
 
         # print( colorNumeric(palette = l$palette_color, domain,reverse = TRUE))
-        # print(rev(pal))
+        print(l$palette_color)
+        print(domain)
         pal_rev <- colorNumeric(palette = l$palette_color, domain, reverse = TRUE)
-
+        print(pal_rev)
         lf <- lf %>% leaflet::addLegend(pal =  pal_rev, values = domain, opacity = 1,
                                         position = legend_position,
                                         na.label = l$na_label,
