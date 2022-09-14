@@ -202,19 +202,38 @@ lflt_basic_choropleth <- function(l) {
       legend_position <- l$theme$legend_position %||% "topright"
       if (legend_position == "bottom") legend_position <- "bottomright"
       if (legend_position == "top") legend_position <- "topright"
+      if(l$decreasing==FALSE){
+        lf <- lf %>% leaflet::addLegend(pal = pal, values = domain, opacity = 1,
+                                        position = legend_position,
+                                        na.label = l$na_label,
+                                        title = l$legend_title,
+                                        labFormat = lflt_legend_format(
+                                          sample =l$format_num, locale = l$locale,
+                                          prefix = l$prefix, suffix = l$suffix,
+                                          between = paste0(l$suffix, " - ", l$prefix)
 
-      lf <- lf %>% leaflet::addLegend(pal = pal, values = domain, opacity = 1,
-                                      position = legend_position,
-                                      na.label = l$na_label,
-                                      title = l$legend_title,
-                                      labFormat = lflt_legend_format(
-                                        sample =l$format_num, locale = l$locale,
-                                        prefix = l$prefix, suffix = l$suffix,
-                                        between = paste0(l$suffix, " - ", l$prefix),
-                                        transform = function(x) sort(x, decreasing = l$decreasing)
+                                        ))
+      }else{
 
-                                      ))
-    }
+        # print( colorNumeric(palette = l$palette_color, domain,reverse = TRUE))
+        # print(rev(pal))
+        pal_rev <- colorNumeric(palette = l$palette_color, domain, reverse = TRUE)
+
+        lf <- lf %>% leaflet::addLegend(pal =  pal_rev, values = domain, opacity = 1,
+                                        position = legend_position,
+                                        na.label = l$na_label,
+                                        title = l$legend_title,
+                                        labFormat = lflt_legend_format(
+                                          sample =l$format_num, locale = l$locale,
+                                          prefix = l$prefix, suffix = l$suffix,
+                                          between = paste0(l$suffix, " - ", l$prefix),
+                                          transform = function(x) sort(x, decreasing = l$decreasing)
+
+                                        ))
+
+
+      }
+        }
   }
   lf
 }
