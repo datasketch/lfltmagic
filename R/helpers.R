@@ -428,7 +428,8 @@ lflt_basic_points <- function(l) {
                         map_zoom_delta = l$map_zoom_delta,
                         map_zoom = l$map_zoom,
                         min_zoom = l$min_zoom,
-                        max_zoom = l$max_zoom
+                        max_zoom = l$max_zoom,
+                        extraLayer =l$map_extra_layer
                       ))
 
   if (is.null(l$topoInfo$topoInfo)) return(lf)
