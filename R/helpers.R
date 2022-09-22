@@ -404,7 +404,8 @@ lflt_basic_heatmap <- function(l) {
       lat = l$topoInfo$data$b,
       intensity = l$topoInfo$c,
       blur = 20,
-      max = 0.05, radius = 10
+      max = 0.05,
+      radius = l$map_radius
     )
 
   lf

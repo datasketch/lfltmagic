@@ -98,6 +98,7 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
     max_zoom = opts$extra$map_max_zoom,
     map_zoom_snap = opts$extra$map_zoom_snap,
     map_zoom_delta = opts$extra$map_zoom_delta,
+    map_radius = opts$extra$map_radius,
     map_name_extra = opts$extra$map_name_extra,
     map_extra_layer = opts$extra$map_extra_layer,
     map_extra_weight = opts$extra$map_extra_weight,
