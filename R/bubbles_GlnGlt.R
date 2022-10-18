@@ -60,7 +60,6 @@ lflt_bubbles_GlnGlt <- function(data = NULL, ...) {
   }
   opts <- dsvizopts::merge_dsviz_options(...)
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gln-Glt")
-
   lf <- lflt_basic_points(l) %>%
     lflt_background(l$theme) %>%
     lflt_graticule(l$graticule) %>%

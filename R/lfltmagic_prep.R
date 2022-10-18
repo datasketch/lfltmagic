@@ -12,13 +12,13 @@ lfltmagic_prep <- function(data = NULL, opts = NULL, by_col = "name", ftype="Gnm
 
   # data preparation by type
   if (!is.null(data)) {
-
     list_d <- dsvizprep::data_map_prep(data = data,
                                        ftype = ftype,
                                        agg =  opts$summarize$agg,
                                        color_by = opts$style$color_by,
                                        ptage = opts$postprocess$percentage,
                                        more_levels = shape$more_levels,
+                                       cluster = opts$theme$map_cluster %||% FALSE,
                                        ptage_col = opts$postprocess$percentage_col)
 
     # format setting of data being displayed

@@ -232,4 +232,9 @@ lflt_choropleth_GcdCatNum(data=sample_data("Gcd-Cat-Num"))
 data <- fakeData("madrid_barrios")
 lflt_choropleth_GnmNum(data, map_name = "madrid_barrios")
 
-lflt_heatmap_GlnGltNum(data = sample_data("Gln-Glt-Num"))
+lflt_heatmap_GlnGltNum(data = sample_data("Gln-Glt-Num"), map_radius = 15)
+
+
+
+
+
