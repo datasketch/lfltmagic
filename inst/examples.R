@@ -233,7 +233,8 @@ data <- fakeData("madrid_barrios")
 lflt_choropleth_GnmNum(data, map_name = "madrid_barrios")
 
 lflt_heatmap_GlnGltNum(data = sample_data("Gln-Glt-Num"), map_radius = 15)
-
+lflt_heatmap_GlnGlt(data = sample_data("Gln-Glt"), map_radius = 15)
+lflt_hexmap_GlnGlt(data = sample_data("Gln-Glt"), map_radius = 15)
 
 
 

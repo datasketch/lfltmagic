@@ -11,7 +11,7 @@
 #' Gln-Glt-Num
 #' @examples
 #' data <- sample_data("Gln-Glt-Num", n = 30)
-#' lflt_Heatmap_GlnGltNum(data)
+#' lflt_heatmap_GlnGltNum(data)
 lflt_heatmap_GlnGltNum <- function(data = NULL, ...) {
   if(!is.null(data)) {
     data[[1]] <- homodatum::as_Gln(data[[1]])
@@ -20,7 +20,7 @@ lflt_heatmap_GlnGltNum <- function(data = NULL, ...) {
 
   opts <- dsvizopts::merge_dsviz_options(...)
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gln-Glt-Num")
-
+  print(l)
   lf <- lflt_basic_heatmap(l) %>%
     lflt_background(l$theme) %>%
     #lflt_bounds(l$b_box) %>%
@@ -43,8 +43,8 @@ lflt_heatmap_GlnGltNum <- function(data = NULL, ...) {
 #' Gln-Glt
 #' @examples
 #' data <- sample_data("Gln-Glt", n = 30)
-#' lflt_Heatmap_GlnGlt(data)
-lflt_heatmap_GlnGltNum <- function(data = NULL, ...) {
+#' lflt_heatmap_GlnGlt(data)
+lflt_heatmap_GlnGlt <- function(data = NULL, ...) {
   if(!is.null(data)) {
     data[[1]] <- homodatum::as_Gln(data[[1]])
     data[[2]] <- homodatum::as_Glt(data[[2]])

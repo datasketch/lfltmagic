@@ -412,6 +412,46 @@ lflt_basic_heatmap <- function(l) {
 
 }
 
+#' hexmap
+lflt_basic_hexmap <- function(l) {
+
+  color_map <- l$theme$na_color
+  df <- l$topoInfo$data[1:2]
+  names(df) <- c("lng", "lat")
+  lf <- lflt_base_map(l$topoInfo$topoInfo %||% l$topoInfo,
+                      opts = list(
+                        map_zoom = l$theme$map_zoom,
+                        min_zoom = l$min_zoom,
+                        border_weight = l$theme$border_weight,
+                        topo_fill_opacity = l$theme$topo_fill_opacity,
+                        border_color = l$border_color,
+                        color_map = color_map,
+                        map_zoom_snap = l$map_zoom_snap,
+                        map_zoom_delta = l$map_zoom_delta,
+                        map_zoom = l$map_zoom,
+                        min_zoom = l$min_zoom,
+                        max_zoom = l$max_zoom,
+                        extraLayer =l$map_extra_layer
+                      ))
+
+  colors <- l$theme$palette_colors
+  if (is.null(colors)) {
+    colors <- c(l$theme$palette_colors_sequentiall[1], l$theme$palette_colors_sequential[length(l$theme$palette_colors_sequential)])
+  }
+
+  lf <- lf %>%
+    leaflethex::addHexbin(
+      data = df,
+      radius = l$map_radius,
+      lowEndColor = colors[1],
+      highEndColor= colors[2])
+
+
+
+  lf
+
+}
+
 #' Basic layer points
 lflt_basic_points <- function(l) {
 
