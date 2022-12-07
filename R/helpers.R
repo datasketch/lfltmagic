@@ -440,6 +440,7 @@ lflt_basic_hexmap <- function(l) {
   }
 
   lf <- lf %>%
+    lflt_background(l$theme) %>%
     leaflethex::addHexbin(
       data = df,
       radius = l$map_radius,
