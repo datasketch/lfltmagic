@@ -444,9 +444,11 @@ lflt_basic_hexmap <- function(l) {
   leaflet.extras2::addHexbin(
     lng = df$lng,
     lat = df$lat,
-    radius = l$map_radius,
+    opacity = l$theme$topo_fill_opacity,
     options = leaflet.extras2::hexbinOptions(
-      colorRange = c(colors[1], colors[2])
+      colorRange = c(colors[1], colors[2]),
+      radiusRange = l$map_radius,
+      tooltip = FALSE
     )
   )
 
