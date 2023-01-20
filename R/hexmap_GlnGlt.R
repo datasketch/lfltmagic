@@ -22,6 +22,7 @@ lflt_hexmap_GlnGlt <- function(data = NULL, ...) {
   opts <- dsvizopts::merge_dsviz_options(...)
   l <- lfltmagic_prep(data = data, opts = opts, ftype="Gln-Glt")
 
-  lf <- lflt_basic_hexmap(l)
+  lf <- lflt_basic_hexmap(l) |>
+    lflt_titles(l$titles)
   lf
 }
