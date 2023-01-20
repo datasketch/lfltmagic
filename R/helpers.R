@@ -445,7 +445,7 @@ lflt_basic_hexmap <- function(l) {
     lng = df$lng,
     lat = df$lat,
     radius = l$map_radius,
-    options = hexbinOptions(
+    options = leaflet.extras2::hexbinOptions(
       colorRange = c(colors[1], colors[2])
     )
   )
