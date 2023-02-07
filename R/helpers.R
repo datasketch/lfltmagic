@@ -412,6 +412,12 @@ lflt_basic_heatmap <- function(l) {
 
 }
 
+addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.8, position ="bottomleft", title = NULL){
+  colorAdditions <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px;")
+  labelAdditions <- paste0("<div style='display: inline-flex;height: ", sizes, "px;line-height: ", sizes, "px;'>", labels, "</div>")
+  return(addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, position = position, title = title))
+}
+
 #' hexmap
 lflt_basic_hexmap <- function(l) {
 
@@ -465,6 +471,7 @@ lflt_basic_hexmap <- function(l) {
     lf <- lf |>  addLegendCustom(colors = colors,
                                  labels = cuts,
                                  sizes = sizes,
+                                 position = l$theme$legend_position,
                                  title = l$legend_title)
   }
 
@@ -550,7 +557,6 @@ lflt_basic_points <- function(l) {
                                       na_label = l$na_label,
                                       legend_title = l$legend_title,
                                       pal = pal,
-                                      legend_position = l$theme$legend_position,
                                       na_label = l$na_label,
                                       legend_title = l$legend_title,
                                       format_num = l$format_num,
@@ -638,8 +644,4 @@ lflt_titles <- function(map, titles) {
 
 }
 
-addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.8, position ="bottomleft", title = NULL){
-  colorAdditions <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px;")
-  labelAdditions <- paste0("<div style='display: inline-flex;height: ", sizes, "px;line-height: ", sizes, "px;'>", labels, "</div>")
-  return(addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, position = position, title = title))
-}
+
