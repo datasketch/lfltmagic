@@ -234,7 +234,11 @@ lflt_choropleth_GnmNum(data, map_name = "madrid_barrios")
 
 lflt_heatmap_GlnGltNum(data = sample_data("Gln-Glt-Num"), map_radius = 15)
 lflt_heatmap_GlnGlt(data = sample_data("Gln-Glt"), map_radius = 15)
-lflt_hexmap_GlnGlt(data = sample_data("Gln-Glt"), map_radius = 15)
+df <- data.frame(lnt = runif(100, -80, 80), lng = runif(100, 0, 90))
+lflt_hexmap_GlnGlt(data = df, map_radius = 15, legend_show = F)
+lflt_hexmap_GlnGlt(data = df, map_radius = 10,
+                   legend_color_cuts = c("#dadada", "#cccafd"),
+                   legend_cuts = c("mas", "menos"))
 
 
 

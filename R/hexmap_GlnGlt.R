@@ -24,5 +24,6 @@ lflt_hexmap_GlnGlt <- function(data = NULL, ...) {
 
   lf <- lflt_basic_hexmap(l) |>
     lflt_titles(l$titles)
+
   lf
 }

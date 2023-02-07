@@ -452,6 +452,22 @@ lflt_basic_hexmap <- function(l) {
     )
   )
 
+  if (l$theme$legend_show) {
+    cuts <- l$theme$legend_cuts
+    if (is.null(cuts)) {
+    cuts <- suppressWarnings(create_legend_cuts(l$topoInfo$data$value))
+    }
+    colors <- l$theme$legend_color_cuts
+    if (is.null(colors)) {
+    colors <- l$palette_colors[1:length(cuts)]
+    }
+    sizes <- rep(15, length(cuts))
+    lf <- lf |>  addLegendCustom(colors = colors,
+                                 labels = cuts,
+                                 sizes = sizes,
+                                 title = l$legend_title)
+  }
+
 
   lf
 
@@ -622,3 +638,8 @@ lflt_titles <- function(map, titles) {
 
 }
 
+addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.8, position ="bottomleft", title = NULL){
+  colorAdditions <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px;")
+  labelAdditions <- paste0("<div style='display: inline-flex;height: ", sizes, "px;line-height: ", sizes, "px;'>", labels, "</div>")
+  return(addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, position = position, title = title))
+}
