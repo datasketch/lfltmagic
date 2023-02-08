@@ -415,7 +415,7 @@ lflt_basic_heatmap <- function(l) {
 addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.8, position ="bottomleft", title = NULL){
   colorAdditions <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px;")
   labelAdditions <- paste0("<div style='display: inline-flex;height: ", sizes, "px;line-height: ", sizes, "px;'>", labels, "</div>")
-  return(addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, position = position, title = title))
+  return(leaflet::addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, position = position, title = title))
 }
 
 #' hexmap
@@ -447,28 +447,28 @@ lflt_basic_hexmap <- function(l) {
 
   lf <- lf %>%
     lflt_background(l$theme) %>%
-  leaflet.extras2::addHexbin(
-    lng = df$lng,
-    lat = df$lat,
-    opacity = l$theme$topo_fill_opacity,
-    options = leaflet.extras2::hexbinOptions(
-      colorRange = c(colors[1], colors[2]),
-      radiusRange = l$map_radius,
-      tooltip = FALSE
+    leaflet.extras2::addHexbin(
+      lng = df$lng,
+      lat = df$lat,
+      opacity = l$theme$topo_fill_opacity,
+      options = leaflet.extras2::hexbinOptions(
+        colorRange = c(colors[1], colors[2]),
+        radiusRange = l$map_radius,
+        tooltip = FALSE
+      )
     )
-  )
 
   if (l$theme$legend_show) {
     cuts <- l$theme$legend_cuts
     if (is.null(cuts)) {
-    cuts <- suppressWarnings(create_legend_cuts(l$topoInfo$data$value))
+      cuts <- suppressWarnings(create_legend_cuts(l$topoInfo$data$value))
     }
     colors <- l$theme$legend_color_cuts
     if (is.null(colors)) {
-    colors <- l$palette_colors[1:length(cuts)]
+      colors <- l$palette_colors[1:length(cuts)]
     }
     sizes <- rep(15, length(cuts))
-    lf <- lf |>  lfltmagic:::addLegendCustom(colors = colors,
+    lf <- lf |>  addLegendCustom(colors = colors,
                                  labels = cuts,
                                  sizes = sizes,
                                  position = l$theme$legend_position,
