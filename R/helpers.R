@@ -468,7 +468,7 @@ lflt_basic_hexmap <- function(l) {
     colors <- l$palette_colors[1:length(cuts)]
     }
     sizes <- rep(15, length(cuts))
-    lf <- lf |>  addLegendCustom(colors = colors,
+    lf <- lf |>  lfltmagic:::addLegendCustom(colors = colors,
                                  labels = cuts,
                                  sizes = sizes,
                                  position = l$theme$legend_position,

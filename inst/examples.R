@@ -238,8 +238,10 @@ df <- data.frame(lnt = runif(100, -80, 80), lng = runif(100, 0, 90))
 df$ad <- "a"
 lflt_hexmap_GlnGlt(data = df, map_radius = 15, legend_show = F)
 lflt_hexmap_GlnGlt(data = df, map_radius = 10,
+                   palette_colors = c("red", "blue"),
                    legend_color_cuts = c("#dadada", "#cccafd"),
-                   legend_cuts = c("mas", "menos"))
+                   legend_cuts = c("mas", "menos"),
+                   legend_position = "topright")
 
 
 
